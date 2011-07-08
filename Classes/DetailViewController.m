@@ -253,14 +253,15 @@ static int retryCount;
 
 
 #ifdef CAMERAROLL
+#define S (NSString *)
 
 -(void) pickClip
 {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.allowsEditing = NO;
     picker.delegate = self;
-    picker.mediaTypes = [NSArray arrayWithObjects:  kUTTypeAudiovisualContent, kUTTypeMovie, kUTTypeQuickTimeMovie, kUTTypeMPEG,  kUTTypeMPEG4, kUTTypeVideo, nil]; 
-    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    picker.mediaTypes = [NSArray arrayWithObjects:  S kUTTypeAudiovisualContent, S kUTTypeMovie, S kUTTypeQuickTimeMovie, S kUTTypeMPEG,  S kUTTypeMPEG4, S kUTTypeVideo, nil]; 
+    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary; /* UIImagePickerControllerSourceTypeSavedPhotosAlbum; */
     picker.modalPresentationStyle = UIModalPresentationFormSheet;
     picker.videoQuality =   UIImagePickerControllerQualityTypeHigh;
     
