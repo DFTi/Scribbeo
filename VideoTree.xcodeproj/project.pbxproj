@@ -1,0 +1,310 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		02A305CB13C6868B00E7340D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02A305CA13C6868B00E7340D /* UIKit.framework */; };
+		02A305CD13C6868B00E7340D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02A305CC13C6868B00E7340D /* Foundation.framework */; };
+		02A305CF13C6868B00E7340D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02A305CE13C6868B00E7340D /* CoreGraphics.framework */; };
+		02A305D513C6868B00E7340D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 02A305D313C6868B00E7340D /* InfoPlist.strings */; };
+		02A305D813C6868B00E7340D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305D713C6868B00E7340D /* main.m */; };
+		02A305DB13C6868B00E7340D /* VideoTreeAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305DA13C6868B00E7340D /* VideoTreeAppDelegate.m */; };
+		02A305DF13C6868B00E7340D /* VideoTreeAppDelegate_iPhone.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305DE13C6868B00E7340D /* VideoTreeAppDelegate_iPhone.m */; };
+		02A305E213C6868B00E7340D /* MainWindow_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 02A305E013C6868B00E7340D /* MainWindow_iPhone.xib */; };
+		02A305E613C6868B00E7340D /* VideoTreeAppDelegate_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305E513C6868B00E7340D /* VideoTreeAppDelegate_iPad.m */; };
+		02A305E913C6868B00E7340D /* MainWindow_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 02A305E713C6868B00E7340D /* MainWindow_iPad.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		02A305C613C6868B00E7340D /* VideoTree.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VideoTree.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		02A305CA13C6868B00E7340D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		02A305CC13C6868B00E7340D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		02A305CE13C6868B00E7340D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		02A305D213C6868B00E7340D /* VideoTree-Info.plist */ = {isa = PBXFileReference; path = "VideoTree-Info.plist"; sourceTree = "<group>"; };
+		02A305D413C6868B00E7340D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		02A305D613C6868B00E7340D /* VideoTree-Prefix.pch */ = {isa = PBXFileReference; path = "VideoTree-Prefix.pch"; sourceTree = "<group>"; };
+		02A305D713C6868B00E7340D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		02A305D913C6868B00E7340D /* VideoTreeAppDelegate.h */ = {isa = PBXFileReference; path = VideoTreeAppDelegate.h; sourceTree = "<group>"; };
+		02A305DA13C6868B00E7340D /* VideoTreeAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoTreeAppDelegate.m; sourceTree = "<group>"; };
+		02A305DD13C6868B00E7340D /* VideoTreeAppDelegate_iPhone.h */ = {isa = PBXFileReference; name = VideoTreeAppDelegate_iPhone.h; path = iPhone/VideoTreeAppDelegate_iPhone.h; sourceTree = "<group>"; };
+		02A305DE13C6868B00E7340D /* VideoTreeAppDelegate_iPhone.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VideoTreeAppDelegate_iPhone.m; path = iPhone/VideoTreeAppDelegate_iPhone.m; sourceTree = "<group>"; };
+		02A305E113C6868B00E7340D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = iPhone/en.lproj/MainWindow_iPhone.xib; sourceTree = "<group>"; };
+		02A305E413C6868B00E7340D /* VideoTreeAppDelegate_iPad.h */ = {isa = PBXFileReference; name = VideoTreeAppDelegate_iPad.h; path = iPad/VideoTreeAppDelegate_iPad.h; sourceTree = "<group>"; };
+		02A305E513C6868B00E7340D /* VideoTreeAppDelegate_iPad.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VideoTreeAppDelegate_iPad.m; path = iPad/VideoTreeAppDelegate_iPad.m; sourceTree = "<group>"; };
+		02A305E813C6868B00E7340D /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = iPad/en.lproj/MainWindow_iPad.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		02A305C313C6868B00E7340D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02A305CB13C6868B00E7340D /* UIKit.framework in Frameworks */,
+				02A305CD13C6868B00E7340D /* Foundation.framework in Frameworks */,
+				02A305CF13C6868B00E7340D /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		02A305BB13C6868B00E7340D = {
+			isa = PBXGroup;
+			children = (
+				02A305D013C6868B00E7340D /* VideoTree */,
+				02A305C913C6868B00E7340D /* Frameworks */,
+				02A305C713C6868B00E7340D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		02A305C713C6868B00E7340D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				02A305C613C6868B00E7340D /* VideoTree.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		02A305C913C6868B00E7340D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				02A305CA13C6868B00E7340D /* UIKit.framework */,
+				02A305CC13C6868B00E7340D /* Foundation.framework */,
+				02A305CE13C6868B00E7340D /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		02A305D013C6868B00E7340D /* VideoTree */ = {
+			isa = PBXGroup;
+			children = (
+				02A305D913C6868B00E7340D /* VideoTreeAppDelegate.h */,
+				02A305DA13C6868B00E7340D /* VideoTreeAppDelegate.m */,
+				02A305DC13C6868B00E7340D /* iPhone */,
+				02A305E313C6868B00E7340D /* iPad */,
+				02A305D113C6868B00E7340D /* Supporting Files */,
+			);
+			path = VideoTree;
+			sourceTree = "<group>";
+		};
+		02A305D113C6868B00E7340D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				02A305D213C6868B00E7340D /* VideoTree-Info.plist */,
+				02A305D313C6868B00E7340D /* InfoPlist.strings */,
+				02A305D613C6868B00E7340D /* VideoTree-Prefix.pch */,
+				02A305D713C6868B00E7340D /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		02A305DC13C6868B00E7340D /* iPhone */ = {
+			isa = PBXGroup;
+			children = (
+				02A305DD13C6868B00E7340D /* VideoTreeAppDelegate_iPhone.h */,
+				02A305DE13C6868B00E7340D /* VideoTreeAppDelegate_iPhone.m */,
+				02A305E013C6868B00E7340D /* MainWindow_iPhone.xib */,
+			);
+			name = iPhone;
+			sourceTree = "<group>";
+		};
+		02A305E313C6868B00E7340D /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				02A305E413C6868B00E7340D /* VideoTreeAppDelegate_iPad.h */,
+				02A305E513C6868B00E7340D /* VideoTreeAppDelegate_iPad.m */,
+				02A305E713C6868B00E7340D /* MainWindow_iPad.xib */,
+			);
+			name = iPad;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		02A305C513C6868B00E7340D /* VideoTree */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 02A305EC13C6868B00E7340D /* Build configuration list for PBXNativeTarget "VideoTree" */;
+			buildPhases = (
+				02A305C213C6868B00E7340D /* Sources */,
+				02A305C313C6868B00E7340D /* Frameworks */,
+				02A305C413C6868B00E7340D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VideoTree;
+			productName = VideoTree;
+			productReference = 02A305C613C6868B00E7340D /* VideoTree.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		02A305BD13C6868B00E7340D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "DFT Software";
+			};
+			buildConfigurationList = 02A305C013C6868B00E7340D /* Build configuration list for PBXProject "VideoTree" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 02A305BB13C6868B00E7340D;
+			productRefGroup = 02A305C713C6868B00E7340D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				02A305C513C6868B00E7340D /* VideoTree */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		02A305C413C6868B00E7340D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02A305D513C6868B00E7340D /* InfoPlist.strings in Resources */,
+				02A305E213C6868B00E7340D /* MainWindow_iPhone.xib in Resources */,
+				02A305E913C6868B00E7340D /* MainWindow_iPad.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		02A305C213C6868B00E7340D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02A305D813C6868B00E7340D /* main.m in Sources */,
+				02A305DB13C6868B00E7340D /* VideoTreeAppDelegate.m in Sources */,
+				02A305DF13C6868B00E7340D /* VideoTreeAppDelegate_iPhone.m in Sources */,
+				02A305E613C6868B00E7340D /* VideoTreeAppDelegate_iPad.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		02A305D313C6868B00E7340D /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				02A305D413C6868B00E7340D /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		02A305E013C6868B00E7340D /* MainWindow_iPhone.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				02A305E113C6868B00E7340D /* en */,
+			);
+			name = MainWindow_iPhone.xib;
+			sourceTree = "<group>";
+		};
+		02A305E713C6868B00E7340D /* MainWindow_iPad.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				02A305E813C6868B00E7340D /* en */,
+			);
+			name = MainWindow_iPad.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		02A305EA13C6868B00E7340D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		02A305EB13C6868B00E7340D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		02A305ED13C6868B00E7340D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "VideoTree/VideoTree-Prefix.pch";
+				INFOPLIST_FILE = "VideoTree/VideoTree-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		02A305EE13C6868B00E7340D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "VideoTree/VideoTree-Prefix.pch";
+				INFOPLIST_FILE = "VideoTree/VideoTree-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		02A305C013C6868B00E7340D /* Build configuration list for PBXProject "VideoTree" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				02A305EA13C6868B00E7340D /* Debug */,
+				02A305EB13C6868B00E7340D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		02A305EC13C6868B00E7340D /* Build configuration list for PBXNativeTarget "VideoTree" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				02A305ED13C6868B00E7340D /* Debug */,
+				02A305EE13C6868B00E7340D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 02A305BD13C6868B00E7340D /* Project object */;
+}
