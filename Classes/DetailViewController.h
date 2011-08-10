@@ -25,6 +25,7 @@
     UIBarButtonItem    *cameraRollButton;
     UIPopoverController *popoverController;
     NSString            *moviePath;
+    NSTimer             *networkTimer;
 }
 
 @property (nonatomic, retain) NSString *currentPath, *moviePath;
@@ -37,6 +38,7 @@
 @property (nonatomic, retain)  NSMutableArray      *clipList;
 @property (nonatomic, retain)  NSString            *episode, *date, *tape, *clip;
 @property int   clipCount, currentClip, currentTape;
+@property (nonatomic, retain)  NSTimer *networkTimer;
 @property int levelCount;
 
 -(BOOL) nextClip;

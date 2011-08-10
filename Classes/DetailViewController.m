@@ -203,7 +203,8 @@ static int retryCount;
     }
     else {
         [UIAlertView doAlert: @"Network error" withMsg: 
-          @"Couldn't connect to the server.  Check your network and server settings and restart the app"];
+          @"Couldn't connect to the server.  Check your network and server settings"];
+        [self stopActivity];
 
         retryCount = 0;
     }
@@ -272,22 +273,22 @@ static int retryCount;
         [vc presentModalViewController: picker animated:YES];
     }
     else {
-        //create a popover controller
+        //create a popover controller for the iPad
         
         popoverController = [[UIPopoverController alloc]
                             initWithContentViewController: picker];
-        CGRect aFrame = [[[[[kAppDel rootTvc] navigationItem] leftBarButtonItem] customView] frame];
+        
+        CGRect aFrame;
         aFrame.origin.x = 20;
-        aFrame.origin.y = 20;
+        aFrame.origin.y = 10;
+        aFrame.size.width = 40;  aFrame.size.height = 35;
 
-        //present the popover view non-modal with a
-        //reference to the button pressed within the current view
         [popoverController presentPopoverFromRect: aFrame
-                        inView: vc.view permittedArrowDirections:UIPopoverArrowDirectionAny
+                        inView: vc.view permittedArrowDirections: UIPopoverArrowDirectionAny
                         animated:YES];
     }
+    
     [picker release];
-   
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {

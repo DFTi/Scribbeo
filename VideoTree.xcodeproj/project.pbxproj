@@ -128,7 +128,7 @@
 		02A305FD13C686D300E7340D /* FullScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FullScreen.m; sourceTree = "<group>"; };
 		02A305FE13C686D300E7340D /* HelpScreenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelpScreenController.h; sourceTree = "<group>"; };
 		02A305FF13C686D300E7340D /* HelpScreenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelpScreenController.m; sourceTree = "<group>"; };
-		02A3060013C686D300E7340D /* HelpScreenController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HelpScreenController.xib; sourceTree = "<group>"; };
+		02A3060013C686D300E7340D /* HelpScreenController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = HelpScreenController.xib; path = Classes/HelpScreenController.xib; sourceTree = "<group>"; };
 		02A3060113C686D300E7340D /* HelpScreenControlleriPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = HelpScreenControlleriPhone.xib; path = Classes/HelpScreenControlleriPhone.xib; sourceTree = "<group>"; };
 		02A3060213C686D300E7340D /* myDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myDefs.h; sourceTree = "<group>"; };
 		02A3060313C686D300E7340D /* myDefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = myDefs.m; sourceTree = "<group>"; };
@@ -160,7 +160,7 @@
 		02A3061D13C686D300E7340D /* Refresh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Refresh.png; sourceTree = "<group>"; };
 		02A3061E13C686D300E7340D /* helpScreenO.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = helpScreenO.png; sourceTree = "<group>"; };
 		02A3061F13C686D300E7340D /* help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = help.png; sourceTree = "<group>"; };
-		02A3062013C686D300E7340D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		02A3062013C686D300E7340D /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ../main.m; sourceTree = "<group>"; };
 		02A3062113C686D300E7340D /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		02A3062213C686D300E7340D /* MainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
 		02A3062313C686D300E7340D /* spot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spot.png; sourceTree = "<group>"; };
@@ -283,15 +283,13 @@
 				02A305F013C686D300E7340D /* base64.c */,
 				02A305F413C686D300E7340D /* Clip.h */,
 				02A305F513C686D300E7340D /* Clip.m */,
-				02A305F613C686D300E7340D /* DetailViewController.h */,
-				02A305F713C686D300E7340D /* DetailViewController.m */,
 				02A305F813C686D300E7340D /* DrawView.h */,
 				02A305F913C686D300E7340D /* DrawView.m */,
 				02A305FC13C686D300E7340D /* FullScreen.h */,
 				02A305FD13C686D300E7340D /* FullScreen.m */,
 				02A305FE13C686D300E7340D /* HelpScreenController.h */,
 				02A305FF13C686D300E7340D /* HelpScreenController.m */,
-				02A3060013C686D300E7340D /* HelpScreenController.xib */,
+				02A3062013C686D300E7340D /* main.m */,
 				02A3060213C686D300E7340D /* myDefs.h */,
 				02A3060313C686D300E7340D /* myDefs.m */,
 				02A3060413C686D300E7340D /* MyPlayerLayerView.h */,
@@ -305,6 +303,8 @@
 				02A3060F13C686D300E7340D /* VideoTreeAlert.m */,
 				02A3061013C686D300E7340D /* VideoTreeAppDelegate.h */,
 				02A3061113C686D300E7340D /* VideoTreeAppDelegate.m */,
+				02A305F613C686D300E7340D /* DetailViewController.h */,
+				02A305F713C686D300E7340D /* DetailViewController.m */,
 				02A3061213C686D300E7340D /* VideoTreeViewController.h */,
 				02A3061313C686D300E7340D /* VideoTreeViewController.m */,
 				02A3061513C686D300E7340D /* VoiceMemo.h */,
@@ -318,6 +318,7 @@
 		02A306C913C687C200E7340D /* XIB */ = {
 			isa = PBXGroup;
 			children = (
+				02A3060013C686D300E7340D /* HelpScreenController.xib */,
 				02A3062213C686D300E7340D /* MainWindow.xib */,
 				02A3060113C686D300E7340D /* HelpScreenControlleriPhone.xib */,
 				02A3061413C686D300E7340D /* VideoTreeViewController.xib */,
@@ -357,7 +358,6 @@
 				02A3061D13C686D300E7340D /* Refresh.png */,
 				02A3061E13C686D300E7340D /* helpScreenO.png */,
 				02A3061F13C686D300E7340D /* help.png */,
-				02A3062013C686D300E7340D /* main.m */,
 				02A3062313C686D300E7340D /* spot.png */,
 				02A3062413C686D300E7340D /* airplay.png */,
 				02A3062513C686D300E7340D /* blank.png */,

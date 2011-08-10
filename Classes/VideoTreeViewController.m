@@ -79,7 +79,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         drawView.frame = theFrame;
     }
             
-    // mQueue = dispatch_queue_create("AVPlayerCaptureFrame queue", 0);
+//    mQueue = dispatch_queue_create("AVPlayerCaptureFrame queue", 0);
  
     // Add a volume control for Airplay; Add a Route Button if >= iOS5
  
@@ -1005,7 +1005,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     [imageGen generateCGImagesAsynchronouslyForTimes: requestedTimes completionHandler:
         ^(CMTime requestedTime, CGImageRef image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error) {
-            NSLog (@"handler!");
             if (error) 
                 NSLog (@"Error trying to capture image: %@ at time: %@", [error localizedDescription], [self timeFormat: requestedTime]);
             
@@ -1565,8 +1564,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         NSLog (@"retry #%i listing", reTryCount);
         [self getAllFTPNotes];
     }
-    else
+    else {
         reTryCount = 0;
+        [self noteStopActivity];
+    }
 }
 
 -(NSMutableArray *) getMyNotes

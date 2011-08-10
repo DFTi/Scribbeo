@@ -52,17 +52,6 @@ static int tryOne = 0;
         [window addSubview: viewController.view];
     }
     
-//    [self makeSettings];                    // July 5, 2011
-//    [viewController makeSettings];
-    
-//    self.demoView = [[DemoView alloc] initWithFrame: 
-//                    [[UIScreen mainScreen] applicationFrame]];
-//    demoView.userInteractionEnabled = YES;
-//    demoView.backgroundColor = [UIColor clearColor];
-//   [window addSubview: demoView];
-
-//   [demoView becomeFirstResponder];
-    
     [self makeDetailTableViewController];
     [viewController.view addSubview: nc.view];
     
