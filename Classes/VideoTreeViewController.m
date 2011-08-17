@@ -50,18 +50,13 @@ static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewC
 
 static int reTryCount = 0;   // number of retries for an ftp list: request???
 
-/*
-// Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView {
-}
-*/
 
 - (BOOL)canBecomeFirstResponder {
     NSLog (@"Yes, I can become first responder");
     return YES;
 }
 
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+// Do additional setup after loading the view
 
 - (void) viewDidLoad {
     NSLog (@"view controller view did load");
@@ -78,9 +73,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         theFrame.origin = theOrigin;
         drawView.frame = theFrame;
     }
-            
-//    mQueue = dispatch_queue_create("AVPlayerCaptureFrame queue", 0);
- 
+             
     // Add a volume control for Airplay; Add a Route Button if >= iOS5
  
     if (! iPHONE) {
@@ -101,18 +94,20 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         playerToolbar.items = items;
     }
     
+    // Make sure the upload indicator is off
+    
     [self uploadActivityIndicator: NO];
+    
+    // Makes the note border look a little nicer
     
     newNote.layer.borderWidth = 2;
 	newNote.layer.borderColor = [[UIColor grayColor] CGColor];
     
     if (iPHONE)
         newNote.layer.cornerRadius = 8;
-    else {
-//      newNote.layer.cornerRadius = 12;
-    }
 
-    // Add the TableView for the Notes
+    // Add the TableView for the Notes (don't know why I didn't
+    // lay this out in the interface (!)
     
     if (iPHONE) {
         theOrigin =  (CGPoint) {6, 160};
@@ -135,10 +130,14 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     notes.dataSource = self;
     notes.scrollEnabled = YES;
     
+    // Hide the remote control view (currently not used)
+    
     remote.alpha = 0;
 
     [self.view addSubview: notes]; 
     [notes release];
+    
+    // Red is the default markup color
     
     [self red];  
     
@@ -908,18 +907,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     }
 }
 
-#pragma mark -
-#pragma mark Clip and Tape advance
 
 
 #pragma mark -
 #pragma mark Saving a note
 
-// The first set of methods will only work if we can get an accurate screen grab
-// The second set uses UIGetScreenImage (), which is a private API and may present problems
+// The first set of methods will only work if we can get an accurate screen grab (available as of iOS 5.0)
+// The second set uses UIGetScreenImage (), which is a private API and will present problems
 // getting through the app store
 
-#define APPSTORE
+// #define APPSTORE
 
 #ifdef APPSTORE
 -(void)drawMarkups: (CGContextRef) ctx width: (float) wid height: (float) ht { 
@@ -3514,7 +3511,6 @@ static int saveRate;
             [self leaveFullScreen: nil];
     }
 }
-
 
 
 - (void)startObservingTimeChanges

@@ -14,6 +14,9 @@
 
 @synthesize spotView;
 
+// This method handles the yellow spot that tracks the finger if demo mode
+// is turned on.  This is useful for demoing the app with the output displayed
+// on a large screen (e.g., through an HDMI port
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     NSLog2 (@"My hit test");
@@ -30,6 +33,8 @@
         
         spotView.center = point;
         CABasicAnimation *theAnimation;
+        
+        // We want to animate the appearance/disappearance of the spot
         
         theAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
         theAnimation.duration = 0.8;	

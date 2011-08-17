@@ -6,6 +6,8 @@
 //  Copyright 2011 DFT Software. All rights reserved.
 //
 
+// This method creates an alert, shows it, and releases it
+
 #import "VideoTreeAlert.h"
 
 @implementation UIAlertView (VideoTreeAlert)

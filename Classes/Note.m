@@ -10,6 +10,8 @@
 @implementation Note
 @synthesize thumb, text, timeStamp, drawing, colors, date, initials, voiceMemo, frameWidth, frameHeight;
 
+// The method used for archiving a note
+
 -(void) encodeWithCoder: (NSCoder *) encoder {
     [encoder encodeObject:thumb forKey:@"NoteThumb"];
     [encoder encodeObject: voiceMemo forKey:@"NotevoiceMemo"];
@@ -22,6 +24,8 @@
     [encoder  encodeFloat: frameWidth forKey: @"NoteFrameWidth"];
     [encoder  encodeFloat: frameHeight forKey: @"NoteFrameHeight"];
 }
+
+// The method used to unarchive a note
 
 -(id) initWithCoder: (NSCoder *) decoder
 {

@@ -17,7 +17,6 @@
 
 
 @property (nonatomic, retain) AVPlayerLayer *playerLayer;
-// @property (nonatomic, retain) AVPlayer *player;
 
 
 @end

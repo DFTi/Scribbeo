@@ -6,6 +6,8 @@
 //  Copyright 2011 DFT Software. All rights reserved.
 //
 
+// A category extension to the UIAlertView class for a customized alert
+
 #import <UIKit/UIKit.h>
 
 @interface UIAlertView (VideoTreeAlert)

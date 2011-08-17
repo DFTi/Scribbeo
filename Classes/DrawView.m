@@ -48,8 +48,6 @@
 
 -(void) showDebugAlert
 {
-    // Alert for saving the image or copying it to the pasteboard 
-    
     NSString *alertMsg = [NSString stringWithFormat: @"Free Mem = %.2f MB", 
         [(VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] freemem] / (1024. * 1024.)];
     
@@ -194,6 +192,7 @@
     CGFloat  theX;
     
     int taps = [[touches anyObject] tapCount];
+    
     if (taps == 3) {
         [[app viewController] erase];
         [self showDebugAlert];
