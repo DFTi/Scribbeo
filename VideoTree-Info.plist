@@ -33,6 +33,11 @@
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
 	<string>videotree_icon3.png</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>videotree_icon3.png</string>
+		<string>videotree_icon3-2.png</string>
+	</array>
 	<key>CFBundleIdentifier</key>
 	<string>com.classroomm.videotree</string>
 	<key>CFBundleInfoDictionaryVersion</key>

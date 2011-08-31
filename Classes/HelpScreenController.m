@@ -10,7 +10,6 @@
 #import "VideoTreeAppDelegate.h"
 #import "myDefs.h"
 
-
 @implementation HelpScreenController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -21,6 +20,8 @@
     }
     return self;
 }
+
+// A touch anywhere on the help screen dismisses it
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
      
@@ -38,7 +39,6 @@
 - (void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
     
 }
-
 
 
 - (void)didReceiveMemoryWarning
@@ -64,6 +64,8 @@
     // e.g. self.myOutlet = nil;
 }
 
+// We only support landscape orientation
+
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
@@ -71,10 +73,12 @@
          interfaceOrientation == UIDeviceOrientationLandscapeLeft);
 }
 
-- (IBAction)moreHelp {
+// We have a "More" button on the Help screen that sends the user to the website
+
+- (IBAction) moreHelp {
     [[kAppDel viewController] dismissModalViewControllerAnimated: YES];  
 
-    NSString *helpURL = @"http://www.digitalfilmtree.com"; 
+    NSString *helpURL = kVideoTreeWebsite; 
     
     [[UIApplication sharedApplication] openURL: [NSURL URLWithString: helpURL]];
 }

@@ -40,7 +40,7 @@ static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewC
 @synthesize player, seekToZeroBeforePlay, movieURL, playerLayerView, theTime, maxLabel, minLabel, noteData, currentlyPlaying, isSaving, markers;
 @synthesize pausePlayButton, pauseImage, playImage, recImage, isRecordingImage, clip, clipPath, show, tape, filmDate, playerLayer, editButton, initials, episode, playerItem, theTimer;
 @synthesize progressView, activityIndicator, notePaths, xmlPaths, txtPaths, noteProgressView, noteActivityIndicator, volLabel, curInitials, movieController;
-@synthesize fullScreenProgressView, fullScreenActivityIndicator, stampLabel, stampLabelFull, theAsset, startTimecode, download, clipLabel, runAllMode;
+@synthesize  stampLabel, stampLabelFull, theAsset, startTimecode, download, clipLabel, runAllMode;
 @synthesize rewindToStartButton, frameBackButton, frameForwardButton, forwardToEndButton, fullScreenButton, rewindButton, fastForwardButton, airPlayMode, remote;
 @synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo;
 @synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView;;
@@ -76,15 +76,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
              
     // Add a volume control for Airplay; Add a Route Button if >= iOS5
  
-    if (! iPHONE) {
+    if (! iPHONE)  {
         CGRect volFrame = { 580, 165, 300, 50 };
+    
         myVolumeView = [[MPVolumeView alloc] initWithFrame: volFrame];
         
         if (! kRunningOS5OrGreater)
             myVolumeView.showsRouteButton = NO;
         
         [self.view addSubview: myVolumeView];
-    } 
+    }
     
     // remove the playout button from the toolbar if iOS 5 or greater
     
@@ -180,10 +181,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     self.pauseImage = [UIImage imageNamed: @"pause2.png"];
     self.playImage = [UIImage imageNamed: @"play.png"];
 
-    seekToZeroBeforePlay = YES;    
-    movieTimeControl.value = 0;
-    drawView.hidden = NO;
-    notePaper.hidden = NO;
+    seekToZeroBeforePlay = YES;         // Only when we start playing or reached the end
+    movieTimeControl.value = 0; 
+    drawView.hidden = NO;              
+    notePaper.hidden = NO;          
     keyboardShows = NO;
     pendingSave = NO;
     download  = kNotes;
@@ -192,30 +193,47 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     recordButton.enabled = NO;
     self.recImage = [UIImage imageNamed: @"mic.png"];
     self.isRecordingImage = [UIImage imageNamed: @"micrec.png"];
+                    
+    // We show a red microphone during recording
+                    
     [recordButton setImage: recImage forState: UIControlStateNormal];
-    [recordButton setImage: isRecordingImage forState: UIControlStateHighlighted];    
+    [recordButton setImage: isRecordingImage forState: UIControlStateHighlighted];  
+                    
     playerLayerView.backgroundColor = [UIColor blackColor];
     
+    // Tables of paths to notes, FCP XML files, Avid locator files
+                    
     self.notePaths = [NSMutableArray array];
     self.xmlPaths = [NSMutableArray array];
     self.txtPaths = [NSMutableArray array];
+                    
+    // The table of notes used to populate the note table
+                    
     self.noteData = [NSMutableArray array];
+                    
     voiceMemo = [[VoiceMemo alloc] init];
     recording.hidden = YES;
+                    
+    // Images used in the Notes table for FCP markers and Avid locator records
     
     self.FCPImage = [UIImage imageNamed: @"fcp.png"];
     self.FCPChapterImage = [UIImage imageNamed: @"fcpChapter.png"];
     self.AvidImage = [UIImage imageNamed: @"avid.png"];
+                    
+    // Respond to the scrubber events by connecting three methods to the slider
 
     [movieTimeControl addTarget:self action:@selector(sliderDragBeganAction) forControlEvents:UIControlEventTouchDown];
     [movieTimeControl addTarget:self action:@selector(sliderDragEndedAction) forControlEvents:UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchCancel];
     [movieTimeControl addTarget:self action:@selector(sliderValueChange) forControlEvents:UIControlEventValueChanged];	
     
+    // We put a custom red color behined the scrubber cause it looks purdy!
+                    
     movieTimeControl.backgroundColor = [UIColor clearColor];	
     UIImage *stetchLeftTrack = [[UIImage imageNamed:@"redhi.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0.0];
     [movieTimeControl setMinimumTrackImage:stetchLeftTrack forState: UIControlStateNormal];
     
     // This is for the dialog for an "Open in.." or the camera roll
+    // We laid it out in IB, but we don't want to show it until we're ready
 
     filenameView.hidden = YES;
     filenameView.layer.borderWidth = 2;
@@ -236,6 +254,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     filenameView.center = center;
     [self.view addSubview: filenameView];
  
+    // We shouldn't be uploading any data right now
+                    
     if (uploadCount)
         [uploadActivityIndicator stopAnimating];
     
@@ -245,6 +265,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 - (void) viewDidAppear: (BOOL) animated {
     
     [super viewDidAppear: animated];
+    
+    // So you can use the headphones to pause/start playback...
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     [self becomeFirstResponder];
 }
@@ -254,7 +276,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 {    
 	[super viewWillAppear:animated];
     
-    //---registers the notifications for keyboard---
+    // registers the notifications for the keyboard 
+    
     [[NSNotificationCenter defaultCenter] addObserver:self 
                                              selector:@selector(keyboardDidShow:) 
                                                  name:UIKeyboardDidShowNotification 
@@ -281,13 +304,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 // Override to allow orientations other than the default portrait orientation.
 
 - (BOOL) shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    
+    // This app only runs in landscape mode
+    
     return interfaceOrientation == UIInterfaceOrientationLandscapeLeft || 
                     interfaceOrientation == UIInterfaceOrientationLandscapeRight;
 }
 
 - (void) didReceiveMemoryWarning {
-	// Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
+    
 	NSLog (@"*** VideoTreeViewController did receive memory warning");
     
     if (! activityIndicator.isAnimating) {
@@ -298,11 +324,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     if (! noteActivityIndicator.isAnimating) {
         self.noteActivityIndicator = nil;
         self.noteProgressView = nil;
-    }
-    
-    if (! fullScreenActivityIndicator.isAnimating) {
-        self.fullScreenActivityIndicator = nil;
-        self.fullScreenProgressView = nil;
     }
 }
 
@@ -323,8 +344,15 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 #pragma mark -
 #pragma mark remote control (e.g. headphones)
 
+//                    
+// This method is called when a button is pressed on the headphones
+// We allow the play/pause and ff/rew
+//
+
 -(void)remoteControlReceivedWithEvent:(UIEvent *)event {
     NSLog (@"Remote control event received");
+    
+    // This is if we're using a movieController (won't need this after iOS 5.0)
     
     if (movieController) {
         switch (event.subtype) {
@@ -368,6 +396,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     if (!player)
         return;
     
+    // This is if we're using AVPlayer to play the movie
+    
     switch (event.subtype) {
         case UIEventSubtypeRemoteControlTogglePlayPause:
             [self playPauseButtonPressed: nil];
@@ -407,6 +437,12 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 #pragma mark -
 #pragma mark activity indicators
 
+//
+// This creates the overlay view with an activity indicator
+// The activity indicator is animated while a movie is being loaded 
+// for playback
+//
+                    
 -(void) showActivity
 {
 	if (!progressView) {
@@ -430,6 +466,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 	[activityIndicator startAnimating];
 	[playerLayerView addSubview: progressView];
 }
+
+//
+// This creates the overlay view with an activity indicator
+// The activity indicator is animated while the Notes 
+// table is being loaded
 
 -(void) noteShowActivity
 {
@@ -455,29 +496,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 	[notes addSubview: noteProgressView];
 }
 
--(void) fullScreenShowActivity
-{
-	if (!fullScreenProgressView) {
-        CGRect theFrame = CGRectMake (0.0, 0.0, 1024., 768.);
-        theFrame.origin = CGPointMake (0.0, 0.0);
-        
-        fullScreenProgressView = [[UIView alloc] initWithFrame: theFrame];
-        fullScreenProgressView.alpha = 0.8;
-        fullScreenProgressView.backgroundColor = [UIColor lightGrayColor];
-        fullScreenActivityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleWhiteLarge];
-        
-        CGSize theSize = self.view.frame.size;
-        CGPoint theCenter;
-        
-        theCenter.x = theSize.height / 2;
-        theCenter.y = theSize.width / 2;
-        fullScreenActivityIndicator.center = theCenter;
-        [fullScreenProgressView addSubview: fullScreenActivityIndicator];
-    }
-	
-	[fullScreenActivityIndicator startAnimating];
-	[self.view addSubview: fullScreenProgressView];
-}
 
 -(void) stopActivity
 {
@@ -492,7 +510,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     self.activityIndicator = nil;
 
     if (autoPlay) {
-        mySleep (1000);
+        mySleep (1000);   // allows time for things to settle
         
         pausePlayButton.image = pauseImage;
 
@@ -511,16 +529,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [noteProgressView removeFromSuperview];
 }
 
--(void) fullScreenStopActivity
-{
-    NSLog (@"fullscreen: stopping activity indicator");
-    
-    if (fullScreenActivityIndicator.isAnimating)
-        [fullScreenActivityIndicator stopAnimating];
-        
-    [fullScreenProgressView removeFromSuperview];
-}
-
+//
+// This creates a view on the toolbar that displays an activity indicator
+// This indicator is animated whenever content (e.g., Notes, HTML) is being
+// uploaded to the server
+//
 
 -(void) uploadActivityIndicator: (BOOL) start
 {
@@ -556,6 +569,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [self.view bringSubviewToFront: uploadActivityIndicatorView];
     ++uploadCount;
 }
+                    
+// These are delefate routines that will allow us to dismiss the keyboard
 
 - (IBAction)textFieldFinished: (UITextField *) textField
 {
@@ -570,7 +585,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [self keyboardDidHide: nil];
     return NO;
 }
-
 
 - (void) keyboardDidShow: (id) notUsed
 {
@@ -593,6 +607,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [kAppDel saveFileNameEntered];
 }
 
+//
+// This method is used for setting up default settings (that come from the Settings app)
+//
+                    
 -(void) makeSettings
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -637,11 +655,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     NSLog (@"Setting emailPDF to %i", emailPDF);
     
     // timecodeFormat on or off
+    // I had to invert this since DefaultValue doesn't seem to work
     
-    timecodeFormat = (BOOL) [defaults boolForKey: @"Timecode"];
-    
-    NSLog (@"Setting timecodeFormat to %i", timecodeFormat);
-    
+    timecodeFormat =  !(BOOL) [[defaults objectForKey: @"Timecode"] integerValue];
+        
     // Skip value
     
     skipValue = [[defaults objectForKey: @"skipValue"] integerValue];
@@ -669,6 +686,12 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 #pragma mark -
 #pragma mark Buttons
 
+//
+//  The color selection button, which is a segmented control
+//  Make sure when one color is selected, that a highlighted image is
+//  shown for that color and the others are set to normal
+//
+
 -(IBAction) color: (UISegmentedControl *) colorControl
 {
     //  Programmatically change the image for the selected color
@@ -682,7 +705,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
             break;
         case 1: 
-             [self blue]; 
+            [self blue]; 
             [colorControl setImage: [UIImage imageNamed: @"red.png"] forSegmentAtIndex: 0]; 
             [colorControl setImage: [UIImage imageNamed: @"bluehi.png"] forSegmentAtIndex: 1]; 
             [colorControl setImage: [UIImage imageNamed: @"green.png"] forSegmentAtIndex: 2]; 
@@ -712,12 +735,24 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     drawView.color = BLUE;
 }
 
+//
+// The erase button
+//
+// Erase all current markups
+
 -(IBAction) erase
 {
     NSLog2 (@"Erase");
     [drawView cancelDrawing];
     [audioPlayer stop];
 }
+
+//
+// The microphone button
+//
+// Record an audio note
+// Stop recording if we're currently recording a note (and save the note)
+//
 
 -(IBAction) recordNote
 {
@@ -740,6 +775,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     }
 }
 
+//
+// The Undo Button
+//
+// Undo the last drawn line segment
+
 -(IBAction) unDo
 {
     NSLog (@"Undo");
@@ -749,13 +789,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 #pragma mark -
 #pragma mark Playback Control
 
+// The single frame playback button
+
 -(IBAction) backFrame
 {
     [self erase];
     goingForward = NO;
     [self singleFrame];
 }  
-    
+ 
+// The rewind button
 
 -(IBAction) rewind
 {
@@ -766,14 +809,18 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     else
         pausePlayButton.image = pauseImage;
     
+    // progressive rewind: 1.75x => 5.25xx => 15.75x => 1x
+    
     if (player.rate >= 0.0)
         player.rate = -1.75;
     else if (player.rate < -13.0)
         player.rate = 1.0;
     else
-        player.rate *= 2.0;
+        player.rate *= 3.0;
 
 }
+
+// The seek to start button
 
 -(IBAction) rewindToStart
 {
@@ -781,27 +828,35 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [player seekToTime: kCMTimeZero];
 }
 
+// The pause/play button
+                    
 - (IBAction)playPauseButtonPressed:(id)sender
 {    
+    // If a timer's running we're in single frame playback
+    // In that case, we'll pause playback below
+    
     if (theTimer) 
         player.rate = 1.0;
     
 	if (player.rate == 0.0) {
 		// if we are at the end of the movie we must seek to the beginning first before starting playback
+        
 		if (YES == seekToZeroBeforePlay) {
 			seekToZeroBeforePlay = NO;
 			[player seekToTime: kCMTimeZero];
 		}
         
-        newNote.text = @"";
+        newNote.text = @"";       // Clear any note or markups
         [self erase];
-		player.rate = 1.0;
+		player.rate = 1.0;        // Start playback and set the play/pause button to pause icon
         pausePlayButton.image = pauseImage;
 	} else {
 		[self pauseIt];
 	}
 }
 
+// The fast forward button
+                    
 -(IBAction) fastForward
 {
     [self erase];
@@ -811,13 +866,20 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     else
         pausePlayButton.image = pauseImage;
     
+    // progressive fast forward:  1.75x => 5.25x => 15.75x => 1x
+    
     if (player.rate <= 1.0)
         player.rate = 1.75;
     else if (player.rate > 13)
         player.rate = 1.0;
     else
-        player.rate *= 2;
+        player.rate *= 3;
 }
+
+//
+// Advance the playback head forward or back (if arg is negative)
+// by a specified number of seconds
+//
 
 -(void) advance: (int) secs;
 {
@@ -830,22 +892,31 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [self playPauseButtonPressed: nil];
 }
 
+// 
+// The programmable skip back button
+// Skip back by the programmed number of seconds (specified in the Settings)
+//
     
 -(IBAction) skipBack
 {
-    NSLog (@"skip back");
-    
     [self advance: -skipValue];
 }
 
+// 
+// The programmable skip forward button
+// Skip back by the programmed number of seconds (specified in the Settings)
+//
 
 -(IBAction) skipForward
 {
-    NSLog (@"skip forward");
-
     [self advance: skipValue];
 }
 
+//
+//  This method gets called every time the time fires to 
+//  move playback forward or back by a single frame
+//  The method supports the single frame forward and back playback buttons
+//
 
 -(void) nextFrame: (NSTimer *) timer 
 {
@@ -855,24 +926,40 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [player.currentItem stepByCount: -1];
 }
 
+//
+// Method to support single frame play back
+// We set a timer to fire every .25 seconds.
+// When the timers fires, we call the nextFrame: method
+// to move forward or back by a single frame
+//
+
 -(void) singleFrame
 {
     if (!player)
         return;
+    
+    // If there's already a timer firing, and the single frame forward/back
+    // button was pressed a second time, let's pause the playback here
     
     if (theTimer) {
         [self pauseIt];
         return;
     }   
     
+    // Erase any pending markups or notes
+    
     newNote.text = @"";
     [self erase];
     
     pausePlayButton.image = pauseImage;
     
+    // Schedule the timer now
+    
     self.theTimer = [NSTimer scheduledTimerWithTimeInterval: .25 target:self 
                         selector:@selector(nextFrame:) userInfo:nil repeats:YES]; 
 }
+
+// The single frame forward playback button
 
 -(IBAction) forwardFrame
 {
@@ -880,6 +967,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     goingForward = YES;
     [self singleFrame];
 }
+
+// The seek to end button
 
 -(IBAction) forwardToEnd
 {
@@ -894,7 +983,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     NSLog (@"Forwarding to %lg", CMTimeGetSeconds (endOfVid));
     [player seekToTime:  endOfVid  toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
 }
-     
+   
+// Pause playback.  If there's a timer running, get rid of it
 
 -(IBAction) pauseIt
 {
@@ -907,20 +997,25 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     }
 }
 
-
-
 #pragma mark -
 #pragma mark Saving a note
 
-// The first set of methods will only work if we can get an accurate screen grab (available as of iOS 5.0)
-// The second set uses UIGetScreenImage (), which is a private API and will present problems
-// getting through the app store
+// The first set of methods will only work if we can get an accurate screen grab 
+// (available as of iOS 5.0)
+//
+// The second set uses UIGetScreenImage (), which is a private API and will not 
+// get through the app store
 
 // #define APPSTORE
 
 #ifdef APPSTORE
+//
+// Once we grab the frame, we have to draw the markups (line segments) onto the frame
+// This is the purpose of this method.  On input it gets a reference to a bitmap
+// context to render into, along with the width and height of the captured frame
+//
+
 -(void)drawMarkups: (CGContextRef) ctx width: (float) wid height: (float) ht { 
-    //  CGContextTranslateCTM (ctx, playerLayerView.bounds.size.width / 8 - wid, ht);
     CGContextTranslateCTM (ctx, 0, ht);
     CGContextScaleCTM (ctx, ((wid * 8) / drawView.bounds.size.width) / 8, - ((ht * 8) / drawView.bounds.size.height) / 8 ); 
     
@@ -965,37 +1060,51 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     }
 }
 
+//
+// This method will capture the paused video frame so we can save the 
+// frame into the notes table.   The method will ask the AVAssetImageGenerator class
+// to capture the frame for us at the currentTime.  Then, we'll draw the markups
+// onto the current captured frame and save it to our notes table
+//
+
 -(void) frameDraw
-{
-// [player seekToTime:[player currentTime] toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
-    
-    AVAssetImageGenerator *imageGen = [[AVAssetImageGenerator alloc] initWithAsset: [[player currentItem] asset]];
+{    
+    AVAssetImageGenerator *imageGen = [[AVAssetImageGenerator alloc] initWithAsset: 
+                    [[player currentItem] asset]];
  
     if (!imageGen) {
-        NSLog (@"AVAssetImageGenerator failed!");
+        NSLog (@"AVAssetImageGenerator failed!");  // Hopefully this never happens
         return;
     }
     
-//  [imageGen setMaximumSize: CGSizeMake (320, 196)];
+    //  [imageGen setMaximumSize: CGSizeMake (320, 196)];
     [imageGen setVideoComposition:[[player currentItem] videoComposition]];
     [imageGen setAppliesPreferredTrackTransform:YES];
+    
+    // Yay!  iOS 5.0 lets us set the tolerance for the frame we want to capture
+    // Prior to iOS 5.0 we're only going to get the nearest key frame
+    // Still waiting for support for any of this from streaming media....
     
     if (kRunningOS5OrGreater){
         [imageGen setRequestedTimeToleranceAfter: kCMTimeZero];
         [imageGen setRequestedTimeToleranceBefore: kCMTimeZero];
     }
 
+    // Create the request to get the frame using the copyCGImageAtTime:actualTime:error: method
+    
     NSError *error = nil;
     CMTime actual;
     CMTime request = [player currentTime];   // kCMTimeMakeWithSeconds (kCVTime([player currentTime]));
 
     CGImageRef image = [imageGen copyCGImageAtTime: request actualTime: &actual error: &error];
     NSLog (@"Request for frame at %@, actual = %@ (fps = %f)", [self timeFormat: request], [self timeFormat: actual], fps);
-
-    if (error)  {
+    
+    if (error)  {   // Oops!  We couldn't grab the frame
         NSLog (@"Error trying to capture image: %@ at time: %@", [error localizedDescription], [self timeFormat: request]);
         return;
     }
+    
+    // Asynchronous frame capture -- we really don't need this; the video is paused anyway
    
 #ifdef ASYNC  
     NSArray *requestedTimes = [NSArray arrayWithObject: [NSValue valueWithCMTime: request]];
@@ -1009,17 +1118,17 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         }];
 #endif
 
-   CGImageAlphaInfo	alphaInfo = CGImageGetAlphaInfo(image);
+    // We grabbed the frame, let's make it smaller
     
-    NSLog (@"alphaInfo = %x", alphaInfo);
-    
+    CGImageAlphaInfo	alphaInfo = CGImageGetAlphaInfo(image);
+        
     if (alphaInfo == kCGImageAlphaNone)
         alphaInfo = kCGImageAlphaNoneSkipLast;
     
     int  wid = CGImageGetWidth (image) + CGImageGetWidth (image) % 8;
     int  ht =  CGImageGetHeight (image)  + CGImageGetHeight(image) % 8;  
     
-    wid = 320;
+    wid = 320;   // We've hardcoded the thumbnail size for now!
     ht = 192;
     
     NSLog (@"image width,height = (%i, %i)", wid, ht);
@@ -1032,6 +1141,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     NSLog (@"bits per component = %i, color space = %i",  CGImageGetBitsPerComponent(image), CGImageGetColorSpace(image));
     
     // Build a bitmap context that's the size of the thumbRect
+    
     CGContextRef bitmap = CGBitmapContextCreate(
                 NULL,
                 thumbRect.size.width,		// width
@@ -1043,22 +1153,32 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
                 );
     
     // Draw into the context, this scales the image
+    
     CGContextDrawImage(bitmap, thumbRect, image);
     
     [self drawMarkups: bitmap width: wid height: ht];
     
-    // Get an image from the context and a UIImage
+    // Get an image from the context and create a UIImage
+    
     CGImageRef	ref = CGBitmapContextCreateImage(bitmap);
     self.newThumb = [UIImage imageWithCGImage:ref];
     NSLog (@"saved image size = %f x %f", newThumb.size.width, newThumb.size.height);
     
-    CGContextRelease (bitmap);	// ok if NULL
+    // Clean up
+    
+    CGContextRelease (bitmap);	
     CGImageRelease (ref);
     CGImageRelease (image);
     [imageGen release];
 }
 
 #else
+
+//
+// Code to rotate an image
+// We need this because we run in landscape mode and GetScreenImage will
+// give us an image that we'll need to rotate
+//
 
 - (CGImageRef)CGImageRotatedByAngle:(CGImageRef)imgRef angle:(CGFloat)angle
 {
@@ -1094,6 +1214,12 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 	return rotatedImage;
 }
 
+//
+// This method is a no-no for Apple
+// It uses the on-again off-again private UIGetScreenImage function to grab what's on the screen
+// Nice thing about it is we don't have to redraw the markups and it's of course precise
+// (although iOS 5.0 has thankfully resolved the latter problem for us)
+//
 
 -(void) frameDraw
 {
@@ -1102,6 +1228,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     CGRect thumbRect = playerLayerView.frame; 
    
+    //
+    // These are kludged numbers in here to adjust the stupid bitmap to the right orientation
+    // I absolutely hate the math here and couldn't explain if I tried!
+    //
+    
     if ( !iPHONE) 
         if (self.interfaceOrientation == UIDeviceOrientationLandscapeLeft) {
             NSLog (@"UIDeviceOrientationLandscapeLeft");
@@ -1150,53 +1281,88 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 }
 #endif
 
+//
+// The Save button
+// This method is also called internally to save a note (e.g., when the keyboard is dismissed)
+//
+
 -(IBAction) save
 {
+    // Dismiss the keyboard if it's showing
+    
     if (keyboardShows)  {
         [newNote resignFirstResponder];
         pendingSave = YES;
         return;
     }
     
+    // Stop recording if that's what we're doing
+    
     if ([voiceMemo audioRecorder].isRecording)  { 
         [self recordNote];
         return;
     }
     
+    // If there's no video player, or we're playing--ignore this save
+    
     if (!player || player.rate != 0.0)
         return;
 
+    // We're here, so we really want to save a note
+    // Create a new note object
+    
     Note *aNewNote = [[Note alloc] init];
+    
+    // Capture the frame and draw the markups on it
 
     [self frameDraw];
     
     CMTime curTime =  kCMTimeMakeWithSeconds (kCVTime ([player currentTime]) + startTimecode);
+    
+    // Capture any text typed into the note pad area
 
     aNewNote.text = newNote.text;
+    
+    // Always store the time in timecode format
     
     BOOL saveFormat = timecodeFormat;
     timecodeFormat = YES;
     aNewNote.timeStamp = [self timeFormat: curTime];
     timecodeFormat = saveFormat;
     
+    // Save the markups
+    
     aNewNote.drawing = [drawView myDrawing];
     aNewNote.colors = [drawView colors];
+    
+    // Save the date this note was made, and who made it
+    
     aNewNote.date = [self formatDate: NO];
     aNewNote.initials = initials;
+    
+    // We use this to scale the markups as needed so it
+    // works on both the iPhone and iPad
+    
     aNewNote.frameWidth = playerLayerView.frame.size.width;
     aNewNote.frameHeight = playerLayerView.frame.size.height;
 
+    // If we made an audio note, save it as NSData
+    
     if (madeRecording)
         aNewNote.voiceMemo = [NSData dataWithContentsOfURL:[voiceMemo memoURL]];
     else
         aNewNote.voiceMemo = nil;
 
+    // Let's compress the frame we grabbed and store it as NSData
+    
     isSaving = YES;
     aNewNote.thumb = UIImageJPEGRepresentation(newThumb, 0.25f);
+    
+    // Love this part.  Animate the frame and note going into the notes table
 
     [self animateSave];
     
-    // Find where to put the note in the table
+    // Find where to put the note in the table (sorted in timecode order)
     
     Float64 now = CMTimeGetSeconds(curTime);
                                          
@@ -1218,6 +1384,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [notes insertRowsAtIndexPaths:(NSArray *)indexPaths 
                      withRowAnimation:(UITableViewRowAnimation)UITableViewRowAnimationLeft];
 
+    // Sometimes this crashes, so we'll do this in an @try block
+    
     @try 
     {
         [notes scrollToRowAtIndexPath: indexP 
@@ -1226,10 +1394,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     @catch (NSException * e)
     {
         //do nothing
-        NSLog (@"Tace condition with notes table exception: %@", [e reason]);
+        NSLog (@"Race condition with notes table exception: %@", [e reason]);
     }
 
-    
     // Clear the note
     
     newNote.text = @"";
@@ -1241,12 +1408,20 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     pendingSave = NO;
 }
 
+// 
+
 -(void) animateSave {
     // animate frame save
     
+    // This part will animate the movement of the playback frame into the table
+    
     CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, playerLayerView.layer.frame.origin.x + playerLayerView.layer.bounds.size.width / 2,
+    CGPathMoveToPoint(path, NULL, playerLayerView.layer.frame.origin.x + 
+                      playerLayerView.layer.bounds.size.width / 2,
                       playerLayerView.frame.origin.y + playerLayerView.layer.bounds.size.height / 2);
+    
+    // We want to animate along a curve
+    
     if ( !iPHONE)
         CGPathAddQuadCurveToPoint(path, NULL, 350, playerLayerView.layer.frame.origin.y, 0, 600);
     else
@@ -1255,6 +1430,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     CAKeyframeAnimation *pathAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     pathAnimation.path = path;
     pathAnimation.duration = 1.0;
+    
+    // Make the image shrink and fade as it moves
     
     CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform"];
     CATransform3D t = CATransform3DMakeScale(0.1, 0.1, 1.0);
@@ -1272,7 +1449,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     CFRelease(path);
     
-    // animate note saving
+    // This part will does the same thing as the previous block of code
+    // except now we're animating the note into the notes table, also along a curve
+    
     path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, newNote.frame.origin.x + newNote.bounds.size.width / 2,
                       newNote.frame.origin.y + newNote.bounds.size.height / 2);
@@ -1293,8 +1472,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     alphaAnimation2.toValue = [NSNumber numberWithFloat:0.5f];    
     
     CAAnimationGroup *animationGroup2 = [CAAnimationGroup animation];
-    animationGroup2.animations = [NSArray arrayWithObjects:pathAnimation2, scaleAnimation2, alphaAnimation2, nil];
-    animationGroup2.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    animationGroup2.animations = [NSArray arrayWithObjects:pathAnimation2, 
+                                  scaleAnimation2, alphaAnimation2, nil];
+    animationGroup2.timingFunction = [CAMediaTimingFunction functionWithName:
+                                            kCAMediaTimingFunctionEaseInEaseOut];
     animationGroup2.duration = 1;
     
     [newNote.layer addAnimation:animationGroup2 forKey:nil];
@@ -1304,6 +1485,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
 #pragma mark -
 #pragma mark make file paths
+
+// Text files used for Avid locator import and export
 
 -(NSString *) txtFilePath
 {
@@ -1315,6 +1498,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 	return [docDir stringByAppendingPathComponent: fileName];
 }
 
+// Path to a local file.  Notes are locally stored here
 
 -(NSString *) archiveFilePath
 {
@@ -1342,7 +1526,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             home = @"/Sites";
         
         NSString *urlString = [NSString stringWithFormat: @"ftp://%@%@", kFTPserver, home ];
- //    urlString = [urlString stringByReplacingOccurrencesOfString: @" " withString: @"%20"];
+ //     urlString = [urlString stringByReplacingOccurrencesOfString: @" " withString: @"%20"];
         
         NSLog (@"Trying to download file from %@",  urlString);
         [FTPHelper sharedInstance].urlString = urlString;
@@ -1372,6 +1556,14 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             });
 }
 
+//
+// Here we're gonna look to download:
+//  1. An FCP XML file with markers
+//  2. An AVid Locator (txt) file
+//  3. A .tc file that contains a start timecode
+//
+
+
 -(void) setStartTimecode   
 {
     if (kFTPMode) {
@@ -1400,12 +1592,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         
         NSString *fileName = [NSString stringWithFormat: @"%@.tc", [clip stringByDeletingPathExtension]];
         fileName = [docDir stringByAppendingPathComponent: fileName];
-        NSLog (@"Trying to download ftp timecode file %@ to %@", [clipPath  stringByDeletingPathExtension], fileName);
+        NSLog (@"Trying to download ftp timecode file %@ to %@", [clipPath stringByDeletingPathExtension], fileName);
       
         [FTPHelper download: [NSString stringWithFormat: @"%@.tc", [clipPath stringByDeletingPathExtension]] to: fileName];
-
     }
 }
+
+//
+// Get all a listing of all the FTP note files for the current clip (from all users)
+// Since the ftp download is asynchronous, this just kicks off the list request
+//
 
 -(void) getAllFTPNotes
 {
@@ -1419,16 +1615,20 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         home = @"/Sites";
     
 	// Listing
-	[FTPHelper list: [NSString stringWithFormat: @"ftp://%@:%@@%@%@/Notes/", [FTPHelper sharedInstance].uname, 
+    [FTPHelper list: [NSString stringWithFormat: @"ftp://%@:%@@%@%@/Notes/", [FTPHelper sharedInstance].uname, 
     [FTPHelper sharedInstance].pword, kFTPserver, home]];
 }
 
-// the FTP listing has finished; gather all the notes
 
 #define CONTAINS(x,y) ([x rangeOfString: y].location != NSNotFound)
 
 #pragma mark -
 #pragma mark XML import
+
+// 
+//  The XML parsing of the FCP markers file is done
+//  Lets load the markers as notes into the notes table
+//
 
 -(void) XMLDone: (NSArray *) data
 {
@@ -1458,6 +1658,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
         int32_t fpsUse = fps + .5; 
         
+        // Make sure we get the timecode right
+        
         Float64  now =  [[aDict objectForKey: @"in"] floatValue] / fpsUse + startTimecode;
         XMLNote.timeStamp = [self timeFormat: kCMTimeMakeWithSeconds (now)];
         
@@ -1482,6 +1684,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [notes reloadData];
 }
 
+// Parse FCP XML marker file
+
 -(void) getXML: (NSString *) file
 {
     NSLog (@"processing XML file %@", file);
@@ -1492,9 +1696,17 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 		XMLURLreader = [[XMLURL alloc] init];
 
     NSString *url = [NSString stringWithFormat: @"%@%@/Notes/%@", kHTTPserver, userDir, file];
+    
+    // This is the guy that will parset the XML.  The XMLDone: method will get called when
+    // the parsing has been completed
 	
 	[XMLURLreader parseXMLURL: url atEndDoSelector: @selector (XMLDone:) withObject: self];
 }
+
+//
+// The ftp list request has finished.  Now we are given a list of file paths as
+// the argument to this method.
+//
 
 -(void) receivedListing: (NSArray *) listing
 {
@@ -1506,6 +1718,12 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [notePaths removeAllObjects];
     [xmlPaths removeAllObjects];
     [txtPaths removeAllObjects];
+    
+    // We will look at each file to see if it contains the clip name.  Then look at the extension:
+    // 1. XML: FCP XML file for import
+    // 2. txt: Avid Locator file for import
+    // 3. movie file: Skip it
+    // 4. Anything else: assume it's a note file (the extension is the initials)
 
 	for (NSDictionary *dict in listing) {
         NSString *fileName = [FTPHelper textForDirectoryListing:(CFDictionaryRef) dict];
@@ -1538,7 +1756,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             [notePaths addObject: extension];
     }
     
-    // kick off the loading of the note files; the rest are loaded from the downloadFinished callback
+    // kick off the loading of the individual note files; the rest are loaded from the downloadFinished callback
+    
     noteFileProcessed = 0;
 
     if ([notePaths count] != 0)
@@ -1548,6 +1767,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [self setStartTimecode];
     }
 }
+
+//
+// The ftp listing failed.  We'll retry three times.  Often works on a retry
+// 
 
 - (void) listingFailed
 {    
@@ -1567,6 +1790,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     }
 }
 
+// Look at all the notes in the noteData array and just get mine to archive and upload
+// to the server or store locally
+
 -(NSMutableArray *) getMyNotes
 {
     NSMutableArray *myNotes = [[NSMutableArray alloc] init];
@@ -1577,6 +1803,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     return myNotes;
 }
+
+// Store my notes on the server or locally (if no server connection)
 
 -(void) storeData  {
     NSMutableArray *myNotes = [self getMyNotes];
@@ -1611,8 +1839,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 #pragma mark -
 #pragma mark FTP Callbacks
 
-
-
 - (void) dataUploadFinished: (NSNumber *) bytes;
 {
 	NSLog (@"Uploaded %@ bytes", bytes);
@@ -1627,11 +1853,14 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [self uploadActivityIndicator: NO];
 }
 
+
 - (void) downloadFinished
 {
     NSFileManager *fm = [NSFileManager defaultManager];
     
     if (download == kTimecode) {
+        // We've downloaded the timecode (.tc) file.  Let's just read it in and parse it
+        
         startTimecode = 0.0;
         
         NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -1652,13 +1881,15 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             [self updateTimeLabel];
         }        
         
+        // Try to download the avid locator file next
+        
         if ([txtPaths count]) {
             download = kAvidTXT;
             
             [self getAvid: [txtPaths objectAtIndex: 0]];
         }
         
-        // XML file access is done via http:
+        // XML file access is done via http: so we can start that now
         
         if ([xmlPaths count]) 
             [self getXML: [xmlPaths objectAtIndex: 0]];
@@ -1666,7 +1897,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         return;
     }
     else if (download == kAvidTXT) {
-        // Avid import support is done through ftp download
+        // Avid import support is done through ftp download--so it's done
 
         self.markers = [self parseAvidMarkers];
         download  = kNotes;
@@ -1674,7 +1905,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         return;
     }
     
-    // Download notes files
+    // Download notes files now
     
     NSString *path = [self archiveFilePath];
     
@@ -1735,6 +1966,10 @@ Next:
     [notes reloadData];
 }
 
+// 
+// FTP download failed
+//
+
 - (void) dataDownloadFailed: (NSString *) reason
 {
 	NSLog (@"Download failed... %@", reason);
@@ -1753,6 +1988,13 @@ Next:
 
 #pragma mark -
 #pragma mark FCPPro export
+
+// 
+// Export the notes in XML format
+// This is for FCP support
+// The XML file is created locally and will be attached to any emails
+// sent for this clip
+//
 
 -(NSString *) exportXML     // Final Cut Pro Marker export
 {
@@ -1810,7 +2052,8 @@ Next:
     [XML appendString: @"</clip>\n</xmeml>\n"];
     NSLog (@"\n%@", XML);
     
-    // Write the XML out to a local file
+    // Write the XML out to a local file - Note that we should do this to the same file each
+    // time (or at least to a tmp file) so that the local file systems doesn't fill up with old files
     
     NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *docDir = [dirList objectAtIndex: 0];
@@ -1843,6 +2086,12 @@ Next:
 
 #pragma mark -
 #pragma mark Avid Locator import/export
+
+//
+// Write the notes into a Locator file
+// The file will be added as an attachment to any emails
+// (If the appropriate option is selected)
+//
                                    
 
 -(NSString *) exportAvid
@@ -1879,6 +2128,13 @@ Next:
         return fileName;
 }
 
+// 
+// Parse the downloaded Avid markers file
+// Note we do this one line at a time
+// Fields are tab-delimited
+//
+
+
 -(NSArray *) parseAvidMarkers
 {
     // Create an array of dictionaries to match the output from the XML parser
@@ -1898,6 +2154,8 @@ Next:
     NSArray *allLines = [content componentsSeparatedByString: @"\n"];
     
     for (NSString *aLine in allLines) {
+        // Create a new note to store the parsed data
+        
         Note *AvidNote = [[Note alloc] init];
         
         // Separate each line into fields
@@ -1919,6 +2177,8 @@ Next:
         AvidNote.colors = [NSMutableArray array];
         
         if ([fields count] > 1) {
+            // Put the note into the table in the correct order
+            
             if (fps < .001)
                 fps = 24;
             
@@ -1938,7 +2198,7 @@ Next:
                 ++row;
             }
             
-            // Insert the note into the array and table
+            // Insert the note into the array (and table)
             
             [noteData insertObject: AvidNote atIndex: row];
         }
@@ -1954,6 +2214,10 @@ Next:
     return locators;
 }
 
+//
+// We have a txt file, presumably with Avid markers
+// We'll download the file and then parse it in the previous method
+//
 
 -(void) getAvid: (NSString *) file
 {
@@ -1990,15 +2254,26 @@ Next:
 	// printf("%0.2f\n", aPercent.floatValue);
 }
 
-
 #pragma mark -
 #pragma mark PDF, email and printing
 
+//
+// The print button
+//
+
+// This method handles printing the notes to an AirPrint printer
+// We first generate the notes in PDF format
+// before dispatching to a printer
+
 -(IBAction) printNotes
 {
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"demo" ofType:@"jpg"];
+    if (! [noteData count])   // make sure there's something to print!
+        return;
     
     isPrinting = YES;
+    
+    // Generate the PDF file for printing
+    
     [self saveToPDF];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
@@ -2006,19 +2281,28 @@ Next:
     NSString *saveFileName = @"Notes.pdf";
     NSString *newFilePath = [saveDirectory stringByAppendingPathComponent:saveFileName];
     
+    // Convert the PDF file to NSData
+    
     NSData *myData = [NSData dataWithContentsOfFile: newFilePath];
+    
+    // Create and present a printer interface dialog
+    
     UIPrintInteractionController *pic = [UIPrintInteractionController sharedPrintController];
     
     if ( pic && [UIPrintInteractionController canPrintData: myData] ) {
         pic.delegate = self;
         
+        // Set up various options for printing
+        
         UIPrintInfo *printInfo = [UIPrintInfo printInfo];
         printInfo.outputType = UIPrintInfoOutputGeneral;
-        printInfo.jobName = [path lastPathComponent];
+        printInfo.jobName = @"VideoTree Notes";
         printInfo.duplex = UIPrintInfoDuplexLongEdge;
         pic.printInfo = printInfo;
         pic.showsPageRange = YES;
         pic.printingItem = myData;
+        
+        // Define the completion handler block
         
         void (^completionHandler)(UIPrintInteractionController *, BOOL, NSError *) = ^(UIPrintInteractionController *pic, BOOL completed, NSError *error) {
             //self.content = nil;
@@ -2029,21 +2313,27 @@ Next:
             } 
         };
         
+        // Take it away...
+        
         [pic presentAnimated:YES completionHandler: completionHandler];
     }
 	
     isPrinting = NO;
 }
 
+//
+// The email button
+//
+
 -(IBAction) emailNotes
 {
     NSString *emailBody;
+    
+    // Make sure email account is installed and available here
 
     if (! [MFMailComposeViewController canSendMail]) {
-        // Alert for saving the image or copying it to the pasteboard 
-		
 		[UIAlertView doAlert: @"email" 
-                    withMsg: @"Your device is not setup for email"];
+            withMsg: @"You need to setup an email account"];
 
         return;
     }
@@ -2051,10 +2341,10 @@ Next:
     if (emailPDF) 
         [self saveToPDF];
  
-    // Make sure email account is installed and available here
-    
 	MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
 	picker.mailComposeDelegate = self;
+    
+    // set the subject line for the email
 	
 	[picker setSubject: [NSString stringWithFormat: @"Notes for %@",
                 [[clip stringByReplacingOccurrencesOfString: @"%20" withString:@" "]
@@ -2063,13 +2353,15 @@ Next:
     
 	// Set up recipients
     
-	NSArray *toRecipients = [NSArray arrayWithObject: @"steve_kochan@mac.com"]; 
+//	NSArray *toRecipients = [NSArray arrayWithObject: @"steve_kochan@mac.com"]; 
 	NSArray *ccRecipients = [NSArray array];
 	NSArray *bccRecipients = [NSArray array];
 	
 //	[picker setToRecipients: toRecipients];
-	[picker setCcRecipients: ccRecipients];	
-	[picker setBccRecipients: bccRecipients];
+	[picker setCcRecipients: ccRecipients];	   // empty here
+	[picker setBccRecipients: bccRecipients];  // ditto
+    
+    // Attach FCP XML if option is selected
     
     if (FCPXML) {
         NSString *file = [self exportXML];
@@ -2082,6 +2374,8 @@ Next:
         }
     }
 	
+    // Attach Avid Locator file if option is selected
+    
     if (AvidExport) {
         NSString *file = [self exportAvid];
         
@@ -2093,25 +2387,26 @@ Next:
         }
     }
     
-	// Attach the PDF file to the email
-    
-    NSArray *paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *saveDirectory = [paths objectAtIndex:0];
-    NSString *saveFileName = @"Notes.pdf";
-    NSString *newFilePath = [saveDirectory stringByAppendingPathComponent:saveFileName];
-    
+    // Send the notes in either PDF or HTML format
+        
     if (emailPDF) {
+        // Attach the PDF file to the email
+        
+        NSArray  *paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *saveDirectory = [paths objectAtIndex:0];
+        NSString *saveFileName = @"Notes.pdf";
+        NSString *newFilePath = [saveDirectory stringByAppendingPathComponent:saveFileName];
+        
         NSData *myData = [[NSData alloc] initWithContentsOfFile: newFilePath];
         [picker addAttachmentData:myData mimeType:@"application/pdf" fileName:@"Notes.pdf"];
         [myData release];
-    }
-    
-	// Fill out the email body text
+
+        // Fill out the email body text
         
-    if (emailPDF) {
         emailBody = [NSString stringWithFormat: 
                     @"Sent from VideoTree (v%@.%@), \u00A9 2010-2011 by DFT Software", 
                     [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],  [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
+        
         [picker setMessageBody:emailBody isHTML:NO];
    }
     else  {
@@ -2119,7 +2414,7 @@ Next:
         
         //  NSString *theTitle = [
         //    [clip stringByReplacingOccurrencesOfString: @"_" withString: @" : "]
-        //     stringByReplacingOccurrencesOfString: @"%20" withString:@" "];
+        //    stringByReplacingOccurrencesOfString: @"%20" withString:@" "];
         
         NSString *saveFileName = [NSString stringWithFormat: @"%@_%lu.html", initials, (long) [NSDate timeIntervalSinceReferenceDate]];
         
@@ -2131,6 +2426,9 @@ Next:
                 [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],  
                 [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
 
+        // Upload the HTML file to the server (as long as we use ftp and http from the same place)
+        // And place a hyperlink in the emailed HTML
+        
         if (kFTPMode && kSameServerAddress) 
             emailBody = [emailBody stringByAppendingString: 
                 [NSString stringWithFormat: @"<a href=\"%@\">Click here to view this page in your browser.</a><p>%@</p>", fileName, theTitle]];
@@ -2146,14 +2444,14 @@ Next:
     [picker release];
 }
 
-
-// Dismisses the email composition interface when users tap Cancel or Send. Proceeds to update the message field with the result of the operation.
+// Dismisses the email composition interface when users tap Cancel or Send. Proceed to update the message field with the result of the operation.
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error 
 {
 	NSString *message = @"";
     
 	// Notifies users about errors associated with the interface
+    
 	switch (result)
 	{
 		case MFMailComposeResultCancelled:
@@ -2173,7 +2471,8 @@ Next:
 			break;
 	}
     
-    // display message to user here
+    // display message to user here (note: we're not doing that!)
+    
 	[self dismissModalViewControllerAnimated:YES];
 }
 
@@ -2183,6 +2482,10 @@ Next:
     result = [result substringWithRange:NSMakeRange(1, [result length] - 2)];
     return result;
 }
+
+//
+// We need to encode the images in base64 for inclusion directly in the HTML
+//
 
 - (NSString *) base64EncodedString: (NSData *) theData
 {
@@ -2213,7 +2516,6 @@ Next:
 -(NSString *) outputImage: (Note *) theNote {
    NSString *result = [NSString stringWithFormat: @"<img width=400  src=\"data:image/jpeg;base64,%@\">", 
                        [self base64EncodedString: theNote.thumb ]];
-//  NSLog (@"%@", result);
     return result;
 }   
 
@@ -2243,6 +2545,7 @@ Next:
     NSMutableString *emailBody = [NSMutableString string];
     
     // output the image
+    
     [emailBody appendString: @"<tr align=top><td>"];
     [emailBody appendString: [self outputImage: theNote]];
     [emailBody appendString: @"</td>"];
@@ -2255,6 +2558,7 @@ Next:
     comment = [[comment stringByReplacingOccurrencesOfString:  @"<" withString: @"&lt;"] stringByReplacingOccurrencesOfString: @">" withString: @"&gt;"];
     
     // output the note
+    
     NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
     [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
     
@@ -2320,18 +2624,23 @@ Next:
 -(void) createPDFFile: (NSString *) fileName title: (NSString *) title
 {
 	// This code block sets up our PDF Context so that we can draw to it
+    
 	CFStringRef path;
 	CFURLRef url;
 	CFMutableDictionaryRef myDictionary = NULL;
     pageRect = CGRectMake (0, 0, 612, 792);
     
 	// Create a CFString from the filename we provide to this method when we call it
+    
 	path = CFStringCreateWithCString (NULL, [fileName UTF8String], kCFStringEncodingUTF8);
+    
 	// Create a CFURL using the CFString we just defined
+    
 	url = CFURLCreateWithFileSystemPath (NULL, path, kCFURLPOSIXPathStyle, 0);
 	CFRelease (path);
     
 	// This dictionary contains extra options mostly for 'signing' the PDF
+    
 	myDictionary = CFDictionaryCreateMutable(NULL, 0,
                 &kCFTypeDictionaryKeyCallBacks,
                 &kCFTypeDictionaryValueCallBacks);
@@ -2340,9 +2649,11 @@ Next:
     
     
 	// Create our PDF Context with the CFURL, the CGRect we provide, and the above defined dictionary
+    
 	pdfContext = CGPDFContextCreateWithURL (url, &pageRect, myDictionary);
     
 	// Cleanup our mess
+    
 	CFRelease(myDictionary);
 	CFRelease(url);
 }
@@ -2404,6 +2715,9 @@ Next:
 //  CGContextShowTextAtPoint (pdfContext, 25 + CGImageGetWidth (ref) / 5 + 15, .65 inches - 10, text, strlen(text));
 }
 
+//
+// Uploads the full HTML Notes to the server
+//
 
 -(void) uploadHTML: (NSString *) theHTML file: (NSString *) fileName
 {
@@ -2428,11 +2742,18 @@ Next:
     NSLog2 (@"upload returned...in process");
 }
 
+//
+// Upolaoads an audio note to the server as an aac file for playback from the HTML or PDF notes
+//
+
 -(NSString *) uploadAudio: (Note *) aNote
 {
     // Save the audio file and upload to the server
     NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *docDir = [dirList objectAtIndex: 0];
+    
+    // If the audio link is in a PDF file, we need to use the .mov.aac extension for proper playback
+    // We'll write the audio clip to a local file first before uploading
     
     NSString *fileName = [NSString stringWithFormat: @"%@_%i_%@.%@", 
                           [clip stringByDeletingPathExtension], noteNumber, initials, emailPDF ? @"mov.aac" : @"aac"];  // DUH!
@@ -2457,6 +2778,10 @@ Next:
             kHTTPserver, userDir, fileName]; 
 }
 
+//
+// Converts a single note to PDF format -- used pdfContext for the drawing context
+//
+
 -(void) noteToPDF: (Note *) aNote {
     const char *noteText = [[aNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""] UTF8String];
     
@@ -2470,59 +2795,11 @@ Next:
 
     strcpy (date, [aNote.date UTF8String]);
     
-#ifdef OLDSTUFF
-    AVAssetImageGenerator *imageGen = [[AVAssetImageGenerator alloc] initWithAsset: [[player currentItem] asset]];
+    // We'll use the thumbnail for the note image....the quality is acceptable
     
-    if (!imageGen)
-        NSLog (@"AVAssetImageGenerator failed!");
-
-    [imageGen setMaximumSize: CGSizeMake (250., 150.)];
-    [imageGen setAppliesPreferredTrackTransform:YES];
-    
-    Float64 secs = [self convertTimeToSecs: aNote.timeStamp];
-    CGImageRef imageRef = [imageGen copyCGImageAtTime: kCMTimeMakeWithSeconds(secs) 
-                            actualTime: NULL error: NULL];
-    
-    int wid = CGImageGetWidth (imageRef) + CGImageGetWidth (imageRef) % 8;
-    int ht = CGImageGetHeight (imageRef) + CGImageGetHeight (imageRef) % 8;
-    
-    CGRect thumbRect = { 
-        {0.0f, 0.0f}, 
-        {(float) wid, (float) ht}
-    };
-    
-    CGImageAlphaInfo	alphaInfo = CGImageGetAlphaInfo(imageRef);
-        
-    CGContextRef bitmap = CGBitmapContextCreate(
-            NULL,
-            thumbRect.size.width,		// width
-            thumbRect.size.height,		// height
-            CGImageGetBitsPerComponent(imageRef),	
-            4 * thumbRect.size.width,	// rowbytes
-            CGImageGetColorSpace(imageRef),
-            alphaInfo
-    );
-
-    if (alphaInfo == kCGImageAlphaNone)
-        alphaInfo = kCGImageAlphaNoneSkipLast;
-    
-    // Draw into the context, this scales the image
-    CGContextDrawImage(bitmap, thumbRect, imageRef);
-    
-    drawView.myDrawing = aNote.drawing;
-    drawView.colors = aNote.colors;
-    [self drawMarkups: bitmap width: thumbRect.size.width height: thumbRect.size.height];
-    
-    CGImageRef	ref = CGBitmapContextCreateImage(bitmap);
-    CGContextDrawImage (pdfContext, CGRectMake(40, currentY - 155, thumbRect.size.width, thumbRect.size.height), ref);
-    CGImageRelease (imageRef);
-    CGImageRelease (ref);
-    CGContextRelease (bitmap);	// ok if NULL
-    [imageGen release];
-    
-#else
     CGContextDrawImage (pdfContext, CGRectMake (40, currentY - 155, 250, 150), [UIImage imageWithData: aNote.thumb].CGImage);
-#endif
+
+    // Fill in the usual suspects for the note info: date/time stamp, initials, note text
     
     CGContextSelectFont (pdfContext, "Helvetica-Bold", 12, kCGEncodingMacRoman);
     CGContextSetRGBFillColor (pdfContext, 1, 0, 0, 1);
@@ -2534,8 +2811,12 @@ Next:
     char *dateInitials = strcat (strcat (date, "   "), who);
 	CGContextShowTextAtPoint (pdfContext, 490, currentY - 20, dateInitials, strlen(dateInitials));
     CGContextSetRGBFillColor (pdfContext, 0, 0, 0, 1);
+    
+    // I think there's an easier way to do the line wrapping for the note.... I chose the hard way!
  
     CGContextShowMultilineText (pdfContext, noteText, currentY - 40);
+    
+    // If there's an audio note, upload the note and insert the hyperlink....but note if we're printing!
     
     if (aNote.voiceMemo && kFTPMode && !isPrinting) {
         NSURL *addr = [NSURL URLWithString: [self uploadAudio: aNote]];
@@ -2544,6 +2825,8 @@ Next:
         CGContextSetRGBFillColor (pdfContext, 0, 0, 1, 1);
         CGContextShowTextAtPoint (pdfContext, 330, currentY - 140, "Click to Hear Note", strlen("Click to Hear Note"));
     }
+    
+    // Time for a new page?
 
     if (noteNumber % 4) {
         // Draws a line separator for the note
@@ -2551,14 +2834,21 @@ Next:
         CGContextAddLineToPoint (pdfContext, pageRect.size.width - 25, currentY - 165);
         CGContextStrokePath (pdfContext);
     }
+    
     currentY -= 170;
 }
+
+// All done generating the PDF
      
 -(void) closePDFFile
 {     
      // We are done with our context now, so we release it
     CGContextRelease (pdfContext);
 }
+
+//
+// This is my brute force approach to word wrapping the text....uggh, there's gotta be a better way!
+//
 
 void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, int curY)
 {
@@ -2572,6 +2862,8 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
 
     i = 0;
     int saveI;
+    
+    // Word wrap code... enuf said
     
     while (i < numChars) {        
         while (noteText[i] == '\n' || noteText[i] == '\r') {
@@ -2590,9 +2882,13 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
         
         wordSize = i - saveI;
          
+        // How far to the right are we going?
+        
         CGContextSetTextDrawingMode (pdfContext, kCGTextInvisible);
         CGContextShowText (pdfContext, &noteText [saveI], wordSize);
         whereTo = CGContextGetTextPosition (pdfContext);
+        
+        // Do we need to wrap the line?
         
         if (whereTo.x > rightMargin) {
             currentPoint.x = leftMargin;
@@ -2604,6 +2900,8 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
         
         wordSize = i - saveI;
         
+        // Draw the text on the current line or at the beginning of the next line
+        
         CGContextSetTextPosition (pdfContext, currentPoint.x, currentPoint.y);
         CGContextSetTextDrawingMode (pdfContext, kCGTextFill);
         CGContextShowText (pdfContext, &noteText [saveI], wordSize);
@@ -2611,43 +2909,11 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
     }
 }    
 
-#if 0
-// Displays an email composition interface inside the application. Populates all the Mail fields. 
--(IBAction) emailNotes 
-{
-    if (!player || [noteData count] == 0)
-    return;
-
-    if (player.rate != 0)
-        [self pauseIt];  
-    
-    NSLog (@"emailing notes");
-    
-    NSArray *keys = [NSArray arrayWithObject: @"tracks"];
-    
-    [player.currentItem.asset loadValuesAsynchronouslyForKeys:keys completionHandler:
-      ^(void) {
-          NSError *error = nil;
-          
-          switch (tracksStatus) {
-              case AVKeyValueStatusLoaded: 
-                  NSLog (@"tracksStatus loaded");
-                  [self emailTheNotes];
-                  break;
-              case AVKeyValueStatusFailed:
-                  break;
-              case AVKeyValueStatusCancelled:
-                  break;
-          }
-      }
-     ];
-}
-#endif
          
 #pragma mark -
 #pragma mark scrubber
 
-// Format the time either in timecode or absolute frame format
+// Format the time either in timecode or absolute frame number format
 
 - (NSString *) timeFormat: (CMTime) aTime
 {
@@ -2680,6 +2946,9 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
     return time1;
 }
 
+// Take an NSString in xx:xx:xx:xx format and convert it to a floating
+// point number
+
 -(Float64) convertTimeToSecs: (NSString *) timeStamp
 {
     Float64 secs = NAN;
@@ -2699,6 +2968,9 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
     
     return secs;
 }
+
+// Format the current date.  The argument says whether to include
+// the time in the format as well
 
 -(NSString *) formatDate: (BOOL) includeTime
 {
@@ -2728,6 +3000,8 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
 
 static int saveRate;
 
+// Scrubbing started
+
 - (void)sliderDragBeganAction
 {
 	isSeeking = YES;
@@ -2738,6 +3012,8 @@ static int saveRate;
     newNote.text = @"";
     [self erase];
 }
+
+// Scrubbing ended
 
 - (void)sliderDragEndedAction
 {
@@ -2750,6 +3026,8 @@ static int saveRate;
         pausePlayButton.image = pauseImage;
 }
 
+// Scrubbing in-process.  Seek to the time indicated by the scrubber's relative position from 0 to 1.
+
 - (void)sliderValueChange
 {
     Float64 playerTime = movieTimeControl.value * kCVTime ([[[player currentItem] asset] duration]); 
@@ -2757,6 +3035,11 @@ static int saveRate;
  	[player seekToTime: kCMTimeMakeWithSeconds(playerTime)];
 }
 
+//
+// Update the displayed time as a timecode or frame number
+// Note that there's a lot of first time things that happen
+// in this method (should probably be moved elsewhere)
+//
 
 - (void) updateTimeControl
 {
@@ -2764,6 +3047,10 @@ static int saveRate;
 
     if (!asset)
 		return;
+    
+    // If we never set the frame rate, then let's initialize some stuff
+    // If it's a local file, let's try to get the star timecode
+    // (doesn't work for any non-local media files)
     
     if (fps < 0.001) {
         NSArray *tracks = [asset tracks];
@@ -2781,12 +3068,20 @@ static int saveRate;
             }
          }
         
+        //
+        // We've had to kludge the timecode for nonlocal files since
+        // we can't seem to get it out of the timecode track.  The 
+        // solution was to create a separate .tc file
+        //
+        
         if (! kFTPMode) {
             NSLog (@"trying to read start time code");
             startTimecode = [self getStartTimecode];
         }
         
-
+        // If we haven't set the frame rate by now, something has gone
+        // horribly wrong
+        
         if (fps == 0) {
             [self cleanup];
             [UIAlertView doAlert:  @"Error" withMsg:
@@ -2796,9 +3091,11 @@ static int saveRate;
         }
 	}
 
+    // Set the clips duration
+    
     double duration;
         
-    if (!durationSet) {
+    if (! durationSet) {
         endOfVid = player.currentItem.asset.duration; // [asset duration];
 	    duration = kCVTime (endOfVid);
         
@@ -2807,6 +3104,8 @@ static int saveRate;
         if (timecodeFormat)
             duration += startTimecode;
 
+        // If we have a meaningful duration set, set the min/max times at the ends of the scrubber
+        
         if (isfinite(duration))
         {
             if (!maxLabelSet) {
@@ -2829,11 +3128,12 @@ static int saveRate;
         duration = kCVTime (endOfVid);
                     
     Float64 time = kCVTime([player currentTime]);
+    
+    // Set the scrubber to the current time as a percentage of the duration
      
     movieTimeControl.value = (float) (time / duration);
 
     // [self timeStats];
-        
     // Scroll the notes table in time with the video clip
     
     if ([noteData count] == 0 || player.rate == 0.0)
@@ -2865,10 +3165,20 @@ static int saveRate;
 #pragma mark -
 #pragma mark video management
 
+//
+// This method will look for a timecode track in the current video clip
+// If it finds one, it will attempt to read and decode the timecode
+// This is done with AVAssetReader
+// Note that AVAssetReader does not work with streams or even non-local video files
+// (bug report has been filed with Apple but never addressed)
+//
+
 -(Float64) getStartTimecode
 {
     if (!player)
         return 0.0;
+    
+    // Look for the timecode track
             
     NSArray *tcTracks = [player.currentItem.asset tracksWithMediaType:AVMediaTypeTimecode]; 
     
@@ -2876,6 +3186,8 @@ static int saveRate;
         NSLog (@"no timecode track");
         return 0.0;
     }
+    
+    // Set up a reader to read the track
         
     NSError *error;
 
@@ -2886,10 +3198,15 @@ static int saveRate;
         [assetReader release];
         return 0.0;
     }
+    
+    // Set up the output for the track
  
     AVAssetTrack *tcTrack = [tcTracks objectAtIndex: 0];
-    AVAssetReaderTrackOutput *assetReaderOutput = [[AVAssetReaderTrackOutput alloc] initWithTrack: tcTrack outputSettings: nil];
+    AVAssetReaderTrackOutput *assetReaderOutput = [[AVAssetReaderTrackOutput alloc] initWithTrack: 
+                                                   tcTrack outputSettings: nil];
   
+    // We're going to read in the Sample Buufer
+    
     [assetReader addOutput: assetReaderOutput];        
     if (! [assetReader startReading]) {
         NSLog (@"Can't start assetReader");
@@ -2903,10 +3220,17 @@ static int saveRate;
     
     NSLog (@"assetReader status = %i", [assetReader status]);
     
+    //
+    // This loop is setup to read the entire Sample Buffer.  
+    // However the first read is really good enough for us
+    //
+    
     while ( [assetReader status] == AVAssetReaderStatusReading || [assetReader status] == AVAssetReaderStatusUnknown ) {
         buffer = [assetReaderOutput copyNextSampleBuffer];
         
         long out;
+        
+        // If we read the data, we need to decode the starting timeocde and we're done!
         
         if (buffer) {  
             NSLog (@"asset reader buffer = %lx, buffer size = %li",  CMSampleBufferGetDataBuffer (buffer), (long) CMSampleBufferGetSampleSize (buffer, 0));
@@ -2928,12 +3252,18 @@ static int saveRate;
         }
     }
     
+    // Sorry, it didn't work
+    
      NSLog (@"getStartTimecode returning 0.0");
     [assetReader cancelReading];
     [assetReader release];
     [assetReaderOutput release];
     return 0.0;
 }
+
+//
+// Debugging aid; not call is currently commented out
+//
 
 -(void) timeStats
 {
@@ -2947,6 +3277,13 @@ static int saveRate;
         [self timeFormat: endTime], (player.currentItem != nil) &&
            ([player.currentItem status] == AVPlayerItemStatusReadyToPlay));
 }
+
+// 
+// This method is used to put the app back to a "sane" state
+// We don't do anything unless we have an active video clip
+// We'll pause it, remove the clip from playback, remove any observers, stop any activity indicators
+// We'll also leave fullScreen or airPlay modes if active
+//
 
 -(void) cleanup
 {
@@ -2975,22 +3312,31 @@ static int saveRate;
         else    
             [self movieControllerDetach];
 
+        // Clear any current note or markup
+    
         [self clearAnyNotes];
         [self erase];
         [drawView setNeedsDisplay];
+    
+        // Get rid of our player
+    
         self.playerLayer.player = nil; // this is the trick !
         [self.playerLayer removeFromSuperlayer];
         self.playerLayer = nil;
         self.currentlyPlaying = nil;
         player = nil;
+    
+        // We shouldn't be recording
 
         if ([voiceMemo audioRecorder].isRecording)            
             [voiceMemo stopRecording];
     
         recording.hidden = YES;
+    
+        // Reset various vars to sane values
+    
         fps = 0;
         isPrinting = NO;
-
         movieTimeControl.value = 0;
         durationSet = NO;
         theTime.text = [self timeFormat: kCMTimeZero];
@@ -3001,6 +3347,11 @@ static int saveRate;
         maxLabel.text = [self timeFormat: kCMTimeZero];
         minLabel.text = [self timeFormat: kCMTimeZero];
 }
+
+//
+// This is the method responsible for initiating playback of a video clip
+// We use the AVPlayer class for this
+//
 
 - (void)loadMovie: (id) theMovie
 {
@@ -3021,6 +3372,9 @@ static int saveRate;
     [[NSNotificationCenter defaultCenter] removeObserver:self
                 name:AVPlayerItemDidPlayToEndTimeNotification  object:nil];
 
+    // Generate an NSURL object from the argument if it's a string 
+    // (Otherwise assume it's already an NSURL
+    
     if ([theMovie isKindOfClass: [NSString class]]) {
         NSRange network = [theMovie rangeOfString: @"http:"];
         if (network.location == NSNotFound)
@@ -3046,6 +3400,8 @@ static int saveRate;
          self.movieURL = theMovie;
     
 #if 0
+    // This never worked!
+    
     NSError *error;
     
     if ([movieURL checkResourceIsReachableAndReturnError: &error] == NO) 
@@ -3056,8 +3412,7 @@ static int saveRate;
         return;
 
     self.clip = [theMovie lastPathComponent];
- 
-    [self showActivity];
+    [self showActivity];        // Get the spinner going while we load the movie
 
     // Load the notes table
     
@@ -3074,6 +3429,8 @@ static int saveRate;
     self.theAsset = [AVURLAsset URLAssetWithURL: movieURL options: optionsDict];
     NSString *tracksKey = @"tracks";
     
+    // We need some keys; we get them asynchronously
+    
     [theAsset loadValuesAsynchronouslyForKeys:[NSArray arrayWithObject:tracksKey] completionHandler:
      ^{ 
         NSLog2 (@"completion handler");
@@ -3087,9 +3444,13 @@ static int saveRate;
             self.playerItem = [AVPlayerItem playerItemWithAsset: theAsset];
             
         self.player = [AVPlayer playerWithPlayerItem:playerItem];
+         
+        // Do we have a player now and something to play?
 
         if (player && playerItem)
         {
+            // Tell us if we reach the end
+            
             [[NSNotificationCenter defaultCenter]
                  addObserver:self
                  selector:@selector(itemDidPlayToEnd:)
@@ -3098,8 +3459,12 @@ static int saveRate;
             
             seekToZeroBeforePlay = NO;
             
+            // Yeah, we want airPlay enabled
+            
             if (kRunningOS5OrGreater)
                 [player setAllowsAirPlayVideo: YES];
+            
+            // Tell us when the playback rate changes
             
             [player addObserver:self forKeyPath:@"rate" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerRateObservationContext];
             
@@ -3107,12 +3472,16 @@ static int saveRate;
                 [player addObserver:self forKeyPath:@"airPlayVideoActive" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerAirPlayObservationContext];
             }
             
+            // Tell us about changes in any of the following keys
+            
             [player addObserver:self forKeyPath:@"currentItem.status" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerStatusObservationContext];
             [player addObserver:self forKeyPath:@"currentItem.asset.duration" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerDurationObservationContext];
             [player addObserver:self forKeyPath:@"currentItem.asset.commonMetadata" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerCommonMetadataObserverContext];           
 //          [player addObserver:self forKeyPath:@"currentItem.timedMetadata" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:VideoTreeViewControllerTimedMetadataObserverContext];
 //			[playerItem addObserver:self forKeyPath:@"currentItem.seekableTimeRanges" options:NSKeyValueObservingOptionInitial context:VideoTreeViewControllerSeekableTimeRangesObserverContext];
 
+            // Set up the playerLayer for playback
+            
             self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:player]; 
             [player release];
 
@@ -3120,6 +3489,8 @@ static int saveRate;
             playerLayer.frame = playerLayerView.layer.bounds;
             [playerLayerView.layer addSublayer:playerLayer];
             playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;  // maintain aspect ratio
+  
+            // If we're watermarking, make our view visible
             
             if (watermark) {
   //            [playerLayerView bringSubviewToFront: stampLabel];
@@ -3127,6 +3498,8 @@ static int saveRate;
             }
             else
                 self.stampLabel.hidden = YES;
+            
+            // Let's add the drawView and make sure it's on top
 
             [playerLayerView addSubview:drawView];
             [playerLayerView bringSubviewToFront: drawView];
@@ -3144,6 +3517,8 @@ static int saveRate;
             NSLog (@"Failed to initiliaze the movie player!");
  
 #if 0
+         // Lots of cool info about the video clip
+         
         NSLog2 (@"playLayerView frame origin = (%g, %g), drawView frame origin = (%g, %g)",
                playerLayerView.frame.origin.x, playerLayerView.frame.origin.y,
                drawView.frame.origin.x, drawView.frame.origin.y);
@@ -3164,9 +3539,6 @@ static int saveRate;
              NSLog2 (@"*** %@", meta, [player.currentItem.asset metadataForFormat: meta]);
          
          NSLog2 (@"loaded time ranges = %@", player.currentItem.loadedTimeRanges);  
-         
- //      player.currentItem.reversePlaybackEndTime = kCMTimeMakeWithSeconds(10.0);
- //      player.currentItem.forwardPlaybackEndTime = kCMTimeMakeWithSeconds(25.0);
          NSLog2 (@"reverse playback end time = %@", [self timeFormat: player.currentItem.reversePlaybackEndTime]); 
          NSLog2 (@"forward playback end time = %@", [self timeFormat: player.currentItem.forwardPlaybackEndTime]);
          NSLog2 (@"timed metadata = %@", player.currentItem.timedMetadata); 
@@ -3184,6 +3556,7 @@ static int saveRate;
     } ];
 }
 
+// Make sure the play/pause button matches the current state of playback
 
 - (void)syncPlaybackButton {
 //    NSLog (@"syncPlaybackButton");
@@ -3210,13 +3583,23 @@ static int saveRate;
     }
 }
 
+//
+// The airPlay (play ouy) button
+// This button is only needed pre-iOS 5.0
+// because AVPlayer class did not support airPlay
+//
+
 -(IBAction) airPlay
 {
+    // Remove the "DVD Remote" if it shows
+    
     [UIView animateWithDuration: .3 animations: ^{ 
         remote.alpha = 0;
     }];
 
     runAllMode = NO;
+    
+    // airPlayWork will do all the work to enable airPlay mode
     
     if (! airPlayMode)  {   // Turn on airPlay mode if off
         [self airPlayWork];
@@ -3224,6 +3607,8 @@ static int saveRate;
     }
 
     // Turn off airPlay mode and return to normal screen
+    // Reenable all the disabled buttons and show all the
+    // stuff we've hidden
     
     [self movieControllerDetach];
     
@@ -3257,6 +3642,10 @@ static int saveRate;
     airPlayMode = NO;
 }
 
+//
+// We need to set up a new MPMoviePlayerController pre iOS 5.0
+// in order to support airPlay
+//
 
 -(void) airPlayWork
 {
@@ -3264,6 +3653,8 @@ static int saveRate;
     
     [self pauseIt];
     [self movieControllerDetach];
+    
+    // Create our movie player and register for notifications
     
     self.movieController = [[[MPMoviePlayerController alloc] initWithContentURL: movieURL] autorelease];
 
@@ -3281,6 +3672,8 @@ static int saveRate;
         
     [movieController prepareToPlay];   
     movieController.shouldAutoplay = NO;
+    
+    // Hide and disable things on the screen while in this special mode
 
     theTime.hidden = YES;
     backgroundLabel.hidden = YES;
@@ -3315,7 +3708,7 @@ static int saveRate;
     }
 #endif
 
-#ifdef iOS42   
+#ifdef iOS42   // This was the hidden API
     @try  {
         [movieController setAllowsWirelessPlayback:YES];
     }
@@ -3340,6 +3733,10 @@ static int saveRate;
     [movieController play];
 }  
 
+// This will detach the separate movie controller we needed to support
+// airPlay (pre iOS 5.0).   Remove the observers, stop the movie and 
+// destroy the player
+
 -(void) movieControllerDetach
 {
     if (movieController) {
@@ -3358,6 +3755,10 @@ static int saveRate;
     }
 }
 
+// If in autoPlay mode, automatically play the next clip in the table
+// Note: this just uses the nextClip method from the DetailViewController class
+// to do the work
+
 -(BOOL) nextClip
 {
     DetailViewController *dc =  [ kAppDel tvc];
@@ -3365,6 +3766,9 @@ static int saveRate;
     NSLog (@"autoplay next clip");
     return [dc nextClip];
 }
+
+// Notiication that a clip is done playing (MPMoviePlayer class)
+// Play the next clip if in autoPlay mode
 
 -(void) MPPlayerDone: (NSNotification *) aNotification {
     NSLog (@"MPPlayerDone: %i", [[aNotification.userInfo objectForKey: 
@@ -3381,6 +3785,9 @@ static int saveRate;
         }
 }
 
+// This is another notification sent when the MPMoviePlayerController
+// changes state
+
 -(void) changeState: (NSNotification*) aNotification {
     MPMoviePlayerController *thePlayer = [aNotification object];
     
@@ -3392,9 +3799,13 @@ static int saveRate;
         NSLog (@"mpmovieplayercontroller movie is playable");
     else if (thePlayer.loadState &  MPMovieLoadStateStalled)
         NSLog (@"mpmovieplayercontroller status is stalled");;
-        
-// MPMovieLoadStatePlaythroughOK:
 }
+
+//
+// Show the navigation controller
+// refresh the clip list
+//
+
 
 -(IBAction) showNav
 {
@@ -3402,6 +3813,11 @@ static int saveRate;
     nc.view.hidden = NO;
     [[kAppDel rootTvc] makeList];
 }
+
+//
+// The help button (marked ?)
+// Display the help screen overlay as a modal view
+//
 
 - (IBAction)showHelp {
     HelpScreenController *help = [[HelpScreenController alloc] initWithNibName: 
@@ -3438,6 +3854,8 @@ static int saveRate;
         playerLayer.frame = playerLayerView.frame;
     }];
         
+    // We have to hide everything so full screen playback looks nice
+    
     fullScreenMode = YES;
     notes.hidden = YES;
     notePaper.hidden = YES;
@@ -3450,6 +3868,8 @@ static int saveRate;
     myVolumeView.hidden = YES;
     drawingBar.hidden = YES;
     volLabel.hidden = YES;
+    
+    // Put the watermark on the full screen playback if the option is selected
     
     if (watermark && !stampLabelFull) {
         CGRect stampFrame = playerLayerView.frame;
@@ -3465,6 +3885,8 @@ static int saveRate;
     [player play];
 }
 
+// Leave full screen playback 
+
 -(void) leaveFullScreen: (id) foo   // AVPlayer
 {
     NSLog (@"leave full screen");
@@ -3474,12 +3896,16 @@ static int saveRate;
         playerLayer.frame = playerLayerView.layer.bounds;
     }];
     
+    // We hid the navgation controlller on the iPad (on the iPhone, it's a drop down)
+    
     if ( !iPHONE) {
         UINavigationController  *nc = 
                 [(VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] nc];
         nc.view.hidden = NO;
         [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation: UIStatusBarAnimationFade];
     }
+    
+    // reshow everything we hid before
     
     newNote.hidden = NO;
     theTime.hidden = NO;
@@ -3500,6 +3926,10 @@ static int saveRate;
         pausePlayButton.image = pauseImage;
 }
 
+//
+// Notification when player reaches the end of playback
+//
+
 - (void) itemDidPlayToEnd:(NSNotification*) aNotification 
 {
     NSLog (@"Item did play to end");
@@ -3511,6 +3941,10 @@ static int saveRate;
             [self leaveFullScreen: nil];
     }
 }
+
+//
+// Update our counter (and scrub bar) every frame
+//
 
 
 - (void)startObservingTimeChanges
@@ -3526,6 +3960,10 @@ static int saveRate;
 	}
 }
 
+//
+//  Kill our playback timer
+//
+
 - (void)stopObservingTimeChanges
 {
 	if (playerTimeObserver) {
@@ -3534,6 +3972,10 @@ static int saveRate;
 		playerTimeObserver = nil;
 	}
 }
+
+//
+// Observe various changes in playback, such as rate, duration, and status
+//
 
 - (void)observeValueForKeyPath:(NSString*) path ofObject:(id) object change:(NSDictionary*)change context:(void*)context
 {
@@ -3574,9 +4016,9 @@ static int saveRate;
     }
     else if (context == VideoTreeViewControllerAirPlayObservationContext) {
 
-        NSLog (@"observed AirPlay change in player, airPlayVideoActive = %i", [player airPlayVideoActive]);
+        NSLog (@"observed AirPlay change in player, airPlayVideoActive = %i", [player isAirPlayVideoActive]);
         
-        if ([player airPlayVideoActive])
+        if ([player isAirPlayVideoActive])
             airPlayImageView.hidden = NO; // unhide the airplay subview and bring to front
         else
             airPlayImageView.hidden = YES; // hide the airplay subview
@@ -3591,16 +4033,20 @@ static int saveRate;
 #pragma mark Notes table
 
 
-// Customize the number of sections in the table view.
+// The number of sections in the table view.
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {    
     return 1;
 }
 
 
-// Customize the number of rows in the table view.
+// The number of rows in the table view.
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [noteData count];
 }
+
+// The height of each row in the table
 
 - (CGFloat) tableView: (UITableView *) tableView heightForRowAtIndexPath: (NSIndexPath *) indexPath
 {
@@ -3609,6 +4055,8 @@ static int saveRate;
     else
         return 80.0;
 }
+
+// The background color for each row depends on whether it's my note or someone else's
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     Note *theNote = [noteData objectAtIndex: indexPath.row];
@@ -3620,11 +4068,13 @@ static int saveRate;
 }
 
 // Customize the appearance of table view cells.
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     static NSString *CellIdentifier = @"Cell";
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    
     if (cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
         [cell.textLabel setFont:[UIFont systemFontOfSize: 8.0]]; 
@@ -3645,16 +4095,30 @@ static int saveRate;
 
     }
 
+    // Fill in the cell with data from the note stored in noteData
+    
     Note *theNote = [noteData objectAtIndex: indexPath.row];
+    
+    // The marked up frame thumbnail
+    
     cell.imageView.image = [UIImage imageWithData: theNote.thumb]; 
+    
+    // The typed note 
    
     cell.detailTextLabel.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
     
+    // The time in either timecode or frame number format
+    
     NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
             [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
+    
+    // The time, the date of the note, and the initials of the user that made the note
+    
     cell.textLabel.text = [NSString stringWithFormat: @"%@ %@ %@", timeFormat, 
             [theNote.date length] > 3 ? 
             [theNote.date substringToIndex: [theNote.date length] - 3] : @"", theNote.initials];
+    
+    // My notes look different in the table than everyone else's
     
     if ([theNote.initials isEqualToString: initials] ) {
         cell.detailTextLabel.textColor = [UIColor blackColor];  
@@ -3672,42 +4136,32 @@ static int saveRate;
     return cell;
 }
 
-// #define ANIMATE_GRAPHICS_TRANSITION
+// Handle selection of a note from the notes table
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     Note *theNote = [noteData objectAtIndex: indexPath.row];
     
+    // See if we currently have a clip playing
+    
     if (player) {
         [self pauseIt];
         [audioPlayer stop];
-
-#ifdef ANIMATE_GRAPHICS_TRANSITION
-        [CATransaction begin];
-        [CATransaction disableActions];
-#endif
-        
+  
         if (fps == 0.0)
             [self updateTimeControl];
+        
+        // Seek to the frame indicated by the note
             
         Float64 secs = [self convertTimeToSecs: theNote.timeStamp] - startTimecode;
         NSLog (@"Seeking to %lg (%@) for Note", secs, theNote.timeStamp);
-
-#ifdef ANIMATE_GRAPHICS_TRANSITION
-        CATransition *animation = [CATransition animation];
-        [animation setType:kCATransitionFade];
-        animation.duration = .3;
-#endif
         
         seekToZeroBeforePlay = NO;
         [player seekToTime: kCMTimeMakeWithSeconds(secs * ((int)(fps + .50000001) / fps)) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
-
-#ifdef ANIMATE_GRAPHICS_TRANSITION
-        [playerLayerView.layer addAnimation:animation forKey:@"frameAnimation"]; 
-        [CATransaction commit];
-#endif
     }
 
     newNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
+    
+    // If there's an audio note, play it now
     
     if (theNote.voiceMemo) {
         NSError *error = nil;
@@ -3721,7 +4175,6 @@ static int saveRate;
         
         audioPlayer = [[AVAudioPlayer alloc] initWithData: theNote.voiceMemo error:&error];
     
-        fprintf (stderr, "audio playback time = %lf\n", audioPlayer.duration);
         if (error) {
             int errorCode = CFSwapInt32HostToBig ([error code]); 
             NSLog(@"Playback error: %@ [%4.4s])" , [error localizedDescription], (char*)&errorCode); 
@@ -3730,45 +4183,44 @@ static int saveRate;
         [audioPlayer play];
     }
         
+    // We want to draw the markups onto the frame
+    // Set up the data in the drawView object and then have the markups drawn
+
     drawView.colors = theNote.colors;
- 
-#ifdef ANIMATE_GRAPHICS_TRANSITION
-    [CATransaction begin];
-    [CATransaction disableActions];
-    CATransition *animation = [CATransition animation];
-    [animation setType:kCATransitionReveal];
-    animation.duration = .5;
-#endif
-    
     drawView.myDrawing = theNote.drawing;
     drawView.scaleWidth =  playerLayerView.frame.size.width  / theNote.frameWidth;
     drawView.scaleHeight =  playerLayerView.frame.size.height / theNote.frameHeight;
     
     if ( drawView.scaleWidth == 0.0 || drawView.scaleWidth == NAN)
         drawView.scaleWidth = drawView.scaleHeight = 1.0;
-    
-#ifdef ANIMATE_GRAPHICS_TRANSITION
-    [[drawView layer] addAnimation:animation forKey:@"layerAnimation"];
-    [CATransaction commit];
-#endif
 
-    [drawView setNeedsDisplay];
+    [drawView setNeedsDisplay];   // Draw the markups
     [self updateTimeLabel];
     [self updateTimeControl];
 }
+
+//
+// Allow or disable deletion of a note
+// Permission is granted if the initials on the note match the user's
+//
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle: (UITableViewCellEditingStyle)editingStyle forRowAtIndexPath: (NSIndexPath *)indexPath
 {
     if ([((Note *)[noteData objectAtIndex: indexPath.row]).initials isEqualToString: initials]) {
         NSLog (@"Commit editing style called");
-        [noteData removeObjectAtIndex: indexPath.row];
-        [self storeData];
+        [noteData removeObjectAtIndex: indexPath.row];  // remove the note from the table
+        [self storeData];                               // update local storage (and the server)
         [notes reloadData];
     }
     else 		
 		[UIAlertView doAlert: @"" withMsg: 
            @"You don't have permission to delete this note" ];
 }
+
+// 
+// The Edit button in the notes table
+// Once Edit mode has started, we change the button's title to "Done"
+//
 
 -(IBAction) editNotesTable: (UIBarButtonItem *) button
 {
@@ -3790,6 +4242,7 @@ static int saveRate;
     [player removeObserver: self forKeyPath:@"currentItem.status"];
     [player removeObserver: self forKeyPath:@"currentItem.asset.duration"];
     [player removeObserver: self forKeyPath:@"currentItem.asset.commonMetadata"];
+    [player removeObserver: self forKeyPath:@"airPlayVideoActive"];
     
     [theTimer invalidate];
     self.theTimer = nil;

@@ -69,23 +69,23 @@
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
 		<dict>
+            <key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+            <key>Title</key>
+			<string>Time Display Format</string>
 			<key>DefaultValue</key>
 			<string>Timecode</string>
 			<key>Key</key>
 			<string>Timecode</string>
-			<key>Title</key>
-			<string>Time Display Format</string>
+            <key>Values</key>
+			<array>
+                <string>1</string>
+                <string>0</string>
+			</array>
 			<key>Titles</key>
 			<array>
-				<string>Frame number</string>
+                <string>Frame number</string>
                 <string>Timecode</string>
-			</array>
-			<key>Type</key>
-			<string>PSMultiValueSpecifier</string>
-			<key>Values</key>
-			<array>
-				<integer>0</integer>
-				<integer>1</integer>
 			</array>
 		</dict>
 		<dict>
@@ -95,6 +95,8 @@
 			<string>PSGroupSpecifier</string>
 		</dict>
 		<dict>
+            <key>Type</key>
+			<string>PSMultiValueSpecifier</string>
 			<key>DefaultValue</key>
 			<string>HTML</string>
 			<key>Key</key>
@@ -106,8 +108,7 @@
 				<string>HTML</string>
 				<string>PDF</string>
 			</array>
-			<key>Type</key>
-			<string>PSMultiValueSpecifier</string>
+
 			<key>Values</key>
 			<array>
 				<integer>0</integer>

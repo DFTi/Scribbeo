@@ -9,13 +9,13 @@
 #import "DetailViewController.h"
 #import "VideoTreeViewController.h"
 
-
 @implementation DetailViewController
 
-@synthesize  clipList, levelCount, showName, episode, date, tape, clip;
-@synthesize currentClip, currentTape, clipCount, popoverController, moviePath;
+@synthesize currentClip, popoverController, moviePath;
+@synthesize currentPath, files, fileTypes;
+@synthesize progressView, activityIndicator;
 
-static int retryCount;
+static int retryCount;      // We don't give up on FTP failures that easily
 
 #pragma mark -
 #pragma mark View Loading
@@ -28,9 +28,13 @@ static int retryCount;
     
     appDel.tvc = self;
     
+    // If we've been here before, update the clip list
+    
     if (currentPath) {
         [self makeList];
     }
+    
+    // Various things related to the navigation bar and table view
     
     self.clearsSelectionOnViewWillAppear = NO;
     self.navigationController.navigationBar.tintColor = [UIColor blackColor];
@@ -41,13 +45,20 @@ static int retryCount;
 #pragma mark -
 #pragma mark Activity indicator
 
+//
+//  Show activity when the clip table is being loaded
+//
+
 -(void) showActivity
 {
     NSLog (@"show activity");
+    
+    // Create the semi-transparent view to hold the activity indicator
+    
 	if (! progressView) {
         CGPoint theOrigin = {0, 0};
-        CGSize  theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};
-        CGRect theFrame = {theOrigin, theSize};
+        CGSize  theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};  // hard-coded #'s--uggh!
+        CGRect  theFrame = {theOrigin, theSize};
         
         progressView = [[UIView alloc] initWithFrame: theFrame];
         progressView.alpha = 0.3;
@@ -62,9 +73,15 @@ static int retryCount;
         [progressView addSubview: activityIndicator];
     }
 	
+    // Start spinning and show it
+    
 	[activityIndicator startAnimating];
 	[[[kAppDel viewController] view] addSubview: progressView];
 }
+
+//
+// Stop activity when the clip table has loaded
+//
 
 -(void) stopActivity
 {
@@ -76,11 +93,13 @@ static int retryCount;
 #pragma mark -
 #pragma mark New folder code
 
-@synthesize currentPath, files, fileTypes;
-@synthesize progressView, activityIndicator;
-
 #define kDirectory  4
 #define kFile       8
+
+//
+// Create the clip list for the table
+// Show the camera roll icon if we're in local mode
+//
 
 -(void) makeList
 {
@@ -97,6 +116,8 @@ static int retryCount;
         self.navigationItem.leftBarButtonItem = nil;
 #endif
     
+    // Create our clip list arrays, or clear if already created
+    
     if (!files) {
         self.files = [NSMutableArray array];
         self.fileTypes = [NSMutableArray array];
@@ -107,34 +128,46 @@ static int retryCount;
     }
     
     if (kFTPMode)
-        self.title = @"Files";
+        self.title = @"Files";          // No title in local mode needed
     
-    [self.tableView reloadData];
+    [self.tableView reloadData];        // Refresh the table
+    
+    // Get the current settings
     
     [kAppDel makeSettings];
+    
+    // If running in local mode, populate the clip table
+    // with local video files
     
     if (!kFTPMode) {
         [self iTunesLoad];
         return;
     }
     
+    // If this is the first time populating the table...
+    
     if (! currentPath ) {
         self.title = @"Files";
         self.currentPath = homeDir;
     }
     
+    // Initiate an ftp list request to get a directory listing
+    
     [FTPHelper sharedInstance].delegate = self;
     [FTPHelper sharedInstance].uname = kFTPusername;
     [FTPHelper sharedInstance].pword = kFTPpassword;
 
-    // Listing
-
     [self showActivity];
     
-    NSLog (@"list %@",  [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, currentPath]);
+    NSLog2 (@"list %@",  [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, currentPath]);
     
     [FTPHelper list: [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, currentPath]];
 }
+
+//
+// Finished downloading the file listing--the files array should
+// be filled with the listing of clips
+//
 
 -(void) finishLoad
 {
@@ -158,6 +191,12 @@ static int retryCount;
     [self.tableView reloadData];
 }
 
+//
+// ftp callback says our listing is done
+// Let's look at each file and decide if its goes into the clip table or gets
+// skipped.  Valid entries are movie files or directories (excep special ones like Notes)
+//
+
 - (void) receivedListing: (NSArray *) listing
 {
     NSLog (@"receivedListing");
@@ -167,7 +206,7 @@ static int retryCount;
         
         int cfType = [(NSNumber *) CFDictionaryGetValue((CFDictionaryRef) dict, kCFFTPResourceType) intValue];
         
-        NSLog (@"Ftp file: %@ (%i)", fileName, cfType);
+        NSLog2 (@"Ftp file: %@ (%i)", fileName, cfType);
         
         NSString *extension = [fileName pathExtension];
         
@@ -187,6 +226,10 @@ static int retryCount;
     
     [self finishLoad];
 }
+
+//
+// ftp listing failed.  We will retry!
+//
 
 - (void) listingFailed
 {
@@ -256,6 +299,13 @@ static int retryCount;
 #ifdef CAMERAROLL
 #define S (NSString *)
 
+//
+// This method provides the control logic for allowing the user to
+// pick a video clip from the camera roll/photo library
+// On the iPad, this is done with a popover controller.
+//
+
+
 -(void) pickClip
 {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
@@ -291,6 +341,10 @@ static int retryCount;
     [picker release];
 }
 
+//
+// This method gets called after a choice is made from the image picker (e.g., a video clip is selected)
+//
+
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
     if (iPHONE) {
@@ -300,11 +354,14 @@ static int retryCount;
         [popoverController dismissPopoverAnimated: YES];
     
     NSURL *moviePicked = [info objectForKey: UIImagePickerControllerMediaURL];
-    NSLog (@"URL for movie %@", moviePicked);
     
     VideoTreeAppDelegate *appDel = kAppDel;
-    [appDel copyURLIntoApp: moviePicked];
+    [appDel copyURLIntoApp: moviePicked];   // Works like an "Open In..."
 }
+
+//
+// Image selection cancelled....dismiss the controller
+//
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
@@ -327,6 +384,7 @@ static int retryCount;
 #endif  // CAMERAROLL
 
 // Cougar Town/0201/Daiies/31G-1.m4v3
+
 #if 0
 -(NSMutableArray *) uniqueValuesForComponent: (int) component
 {
@@ -353,9 +411,10 @@ static int retryCount;
 
 
 #pragma mark -
-#pragma mark Table view data source
+#pragma mark Table view data source delegate methods
 
-// Customize the number of sections in the table view.
+// Customize the section in the table view.
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (iPHONE) {
         tableView.backgroundColor = [UIColor colorWithRed: .3 green: .3 blue: .3 alpha: .4];
@@ -381,12 +440,12 @@ static int retryCount;
         return 50;
 }
 
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return [files count];
 }
 
 // Customize the appearance of table view cells.
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     static NSString *CellIdentifier = @"Cell";
@@ -400,7 +459,7 @@ static int retryCount;
         cell.textLabel.adjustsFontSizeToFitWidth = YES;
         cell.textLabel.numberOfLines = 2;
         
-        if (! kFTPMode)
+        if (! kFTPMode)  // We only allow clip deletion when in local mode
             cell.editingAccessoryType = UITableViewCellEditingStyleDelete;
 
         if (!iPHONE) {
@@ -415,7 +474,8 @@ static int retryCount;
 
     int fType = [[fileTypes objectAtIndex: indexPath.row] intValue];
     
-    if ( fType == kDirectory ) {
+    if ( fType == kDirectory ) {  
+        // Directories get shown with the folder image
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.textLabel.text = [files objectAtIndex: indexPath.row];
         cell.imageView.image = [UIImage imageNamed: @"folder.png"];
@@ -431,7 +491,7 @@ static int retryCount;
 }
 
 #pragma mark -
-#pragma mark Table view delegate
+#pragma mark Table view delegate methods
 
 //
 // We allow deletion of clips from local storage (Documents folder).  These could be loaded from
@@ -456,6 +516,11 @@ static int retryCount;
     
 }
 
+// 
+// Select the next (non-Directory) clip from the current clip table for playback
+// Note that we do this by effectively simulating manual selection of the row
+//
+
 -(BOOL) nextClip
 {
     while (++currentClip < [files count]) {
@@ -479,6 +544,9 @@ static int retryCount;
     return NO;
 }
 
+//
+// Get the corerct path to the video clip for playback
+//
            
 -(void) setTheMoviePath: (NSString *) theMovie
 {
@@ -497,19 +565,29 @@ static int retryCount;
     }
 }
 
+// 
+// A row was selected from the table
+// If it's a directory, we want to drill down
+// Otherwise, it must be a movie clip so we'll go ahead and play it
+//
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     VideoTreeAppDelegate *appDel = kAppDel;
     VideoTreeViewController *vc = [appDel viewController];
     appDel.tvc = self;
-    
-    NSLog (@"=== Selected row %i (levelcount %i) with freemem = %.2f MB", indexPath.row, 
-           levelCount, [appDel freemem] / (1024. * 1024.));
   
     currentClip = indexPath.row;
     
     int fileType = [[fileTypes objectAtIndex: indexPath.row] intValue];
     
+    // If a folder gets selected, we need to drill down
+    
     if (fileType == kDirectory) {
+        //
+        // Create another controller to display the contents of the selected folder
+        // Note we push the same controller type here (i.e., we stay in this code)
+        //
+        
         DetailViewController *detailViewController = [[DetailViewController alloc] init];        
         detailViewController.title = [files objectAtIndex: indexPath.row];
         detailViewController.currentPath = [[NSString stringWithFormat: @"%@/%@", 
@@ -519,7 +597,9 @@ static int retryCount;
         [self.navigationController pushViewController: detailViewController animated:YES];
         [detailViewController release];
     }
-    else {        
+    else {   
+        // Play the selected movie
+        
         if (vc.runAllMode) {
             [vc airPlay];
             vc.runAllMode = NO;
@@ -532,7 +612,7 @@ static int retryCount;
          
         NSLog (@"The movie = %@", theMovie);
          
-        [self setTheMoviePath: theMovie];
+        [self setTheMoviePath: theMovie];  // Get the correct path to the selected movie
         
         vc.clip =  theMovie;
         vc.clipPath = theMovie;
@@ -555,7 +635,6 @@ static int retryCount;
     }
     
     NSLog (@"*** detail view controller did receive memory warning");
-    // Relinquish ownership of any cached data, images, etc that aren't in use.
 }
 
 - (void)viewDidUnload {
@@ -565,11 +644,6 @@ static int retryCount;
 
 - (void)dealloc {
     NSLog (@"dealloc of Detail View Controller");
-    [episode release];
-    [date release];
-    [tape release];
-    [clipList release];
-    [showName release];
     [moviePath release];
     
     [currentPath release];

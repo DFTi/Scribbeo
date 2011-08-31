@@ -5,6 +5,7 @@
 //  Created by Steve Kochan on 9/21/10.
 //  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.
 //
+
 //
 // This class defines the basic format for a Note
 //
@@ -13,15 +14,15 @@
 #import "myDefs.h"
 
 @interface Note : NSObject <NSCoding>{
-    NSData     *thumb;
-    NSData     *voiceMemo;
-    NSString    *text;
-    NSString    *timeStamp;
-    NSString    *date;
-    NSString    *initials;
+    NSData          *thumb;
+    NSData          *voiceMemo;
+    NSString        *text;
+    NSString        *timeStamp;
+    NSString        *date;
+    NSString        *initials;
     NSMutableArray  *drawing;
     NSMutableArray  *colors;
-    float       frameWidth, frameHeight;  
+    float           frameWidth, frameHeight;  
 }
 
 @property (nonatomic, retain)  NSData     *thumb;         // the thumbnail of the frame

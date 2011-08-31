@@ -10,6 +10,9 @@
 
 #undef NSLog
 
+// Custom sleep function that allows us to add a slight delay in the 
+// code where needed
+
 void mySleep(unsigned long millisec)
 {
     struct timespec req;

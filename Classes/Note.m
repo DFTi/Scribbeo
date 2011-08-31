@@ -10,7 +10,7 @@
 @implementation Note
 @synthesize thumb, text, timeStamp, drawing, colors, date, initials, voiceMemo, frameWidth, frameHeight;
 
-// The method used for archiving a note
+// The method used to archive a note
 
 -(void) encodeWithCoder: (NSCoder *) encoder {
     [encoder encodeObject:thumb forKey:@"NoteThumb"];

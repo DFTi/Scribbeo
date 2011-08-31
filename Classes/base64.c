@@ -1,4 +1,8 @@
-
+//
+// This file contains a C function we use to encode an image in Base64 so
+// we can encode a Note thumbnail for inclusion in an HTML document
+// Stephen Kochan -- 8/22/11
+//
 
 /*
  *  Base64Transcoder.c

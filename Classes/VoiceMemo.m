@@ -3,13 +3,15 @@
 //  VideoTree
 //
 //  Created by Steve Kochan on 1/31/11.
-//  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.//
+//  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.
 
 #import "VoiceMemo.h"
 #import "VideoTreeAlert.h"
 
 @implementation VoiceMemo
 @synthesize audioRecorder;
+
+// Returns a URL to a local file for storing an audio note
 
 -(NSURL *) memoURL 
 {
@@ -19,14 +21,17 @@
     return [NSURL fileURLWithPath: [docDir stringByAppendingPathComponent: @"memo.caf"]];
 }
 
+// Connected to the microphone button to begin recording of an audio note
+
 -(IBAction) startRecording
 {
     NSLog(@"startRecording");
     [audioRecorder release];
     audioRecorder = nil;
-    recordEncoding = ENC_AAC;
+    recordEncoding = ENC_AAC;   // Set the default encoding for recording
         
     // Init audio with record capability
+    
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     [audioSession setCategory:AVAudioSessionCategoryRecord error:nil];
     [audioSession setActive: YES error: NULL];
@@ -43,7 +48,7 @@
         [recordSettings setObject:[NSNumber numberWithBool:NO] forKey:AVLinearPCMIsBigEndianKey];
         [recordSettings setObject:[NSNumber numberWithBool:NO] forKey:AVLinearPCMIsFloatKey];   
     }
-    else
+    else   // keep this code in here in case we change the audio encoding format
     {
         NSNumber *formatObject;
         
@@ -75,6 +80,8 @@
         [recordSettings setObject:[NSNumber numberWithInt: AVAudioQualityMedium] forKey: AVEncoderAudioQualityKey];
     }
     
+    // Create an AVAudioRecorder object to record from the mic and store the recording locally
+    
     NSError *error = nil;
     audioRecorder = [[AVAudioRecorder alloc] initWithURL: [self memoURL] settings: recordSettings error:&error];
     
@@ -84,6 +91,8 @@
         return;
     }
     
+    // Go ahead and make the audio recording
+    
     if ([audioRecorder prepareToRecord] == YES) {
         [audioRecorder record];
     } else {
@@ -91,20 +100,23 @@
         NSLog(@"Error: %@ [%4.4s])" , [error localizedDescription], (char*)&errorCode); 
         
     }
-    NSLog(@"recording");
 }
+
+// Stop the audio recording
 
 -(IBAction) stopRecording
 {
-    NSLog(@"stopRecording");
     [audioRecorder stop];
-    NSLog(@"stopped");
 }
+
+// Playback an audio note from local storage
 
 -(IBAction) playRecording
 {
     NSLog(@"playRecording");
+    
     // Init audio with playback capability
+    
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
     [audioSession setActive: YES error: NULL];
@@ -114,6 +126,7 @@
     audioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL: [self memoURL] error:&error];
     
     NSLog (@"audio playback time = %lf", audioPlayer.duration);
+    
     if (error) {
         int errorCode = CFSwapInt32HostToBig ([error code]); 
         NSLog(@"Playback error: %@ [%4.4s])" , [error localizedDescription], (char*)&errorCode); 
@@ -125,9 +138,7 @@
 
 -(IBAction) stopPlaying
 {
-    NSLog(@"stopPlaying");
     [audioPlayer stop];
-    NSLog(@"stopped");
 }
 
 - (void)dealloc

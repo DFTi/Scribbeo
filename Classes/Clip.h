@@ -6,6 +6,8 @@
 //  Copyright © 2010-2011 DFT Software. All rights reserved.
 //
 
+// NOTE: This class is currently not being used
+
 #import <Foundation/Foundation.h>
 
 

@@ -7,6 +7,8 @@
 //
 
 // A category extension to the UIAlertView class for a customized alert
+// Added just to save a little work!
+//
 
 #import <UIKit/UIKit.h>
 

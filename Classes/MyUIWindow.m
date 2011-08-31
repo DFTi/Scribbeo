@@ -21,6 +21,8 @@
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     NSLog2 (@"My hit test");
     
+    // Only do this stuff if Demo Mode was selected from the Settings menu
+    
     if (kdemoView) {
         if (! spotView) {
             UIImage *spot = [UIImage imageNamed:@"spot.png"];
@@ -40,11 +42,16 @@
         theAnimation.duration = 0.8;	
         theAnimation.repeatCount = 0;
         theAnimation.autoreverses = NO;	
+        
+        // Fade out
+        
         theAnimation.fromValue = [NSNumber numberWithFloat: .9]; 
         theAnimation.toValue = [NSNumber numberWithFloat: 0];
         
         [spotView.layer addAnimation:theAnimation forKey:@"animateOpacity"];  
     }
+    
+    // Do whatever we normally do when the screen was touched
     
     return [super hitTest:point withEvent:event];
 }

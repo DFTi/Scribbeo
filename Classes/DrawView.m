@@ -12,12 +12,7 @@
 @implementation DrawView
 @synthesize color, colors, myDrawing, scaleWidth, scaleHeight;
 
--(void)drawPic {	    
-    first = YES;
-    twoBarMode = NO;
-    wasTwoBarMode = YES;
-	[self setNeedsDisplay];
-}
+// allocate a new drawing array 
 
 -(void) setMyDrawing: (NSMutableArray *) theDrawing
 {
@@ -27,6 +22,8 @@
     myDrawing = [theDrawing mutableCopy];
 }
 
+// set the corresponding colors array that parallels myDrawing
+
 -(void) setColors: (NSMutableArray *) theColors
 {
     if (colors != theColors)
@@ -35,6 +32,7 @@
     colors = [theColors mutableCopy];
 }
 
+// initialize the instance variables for this class
 
 -(id)initWithCoder: (NSCoder *) decoder
 {
@@ -45,6 +43,8 @@
 
     return self;
 }
+
+// triple tap displays free memory as an alert
 
 -(void) showDebugAlert
 {
@@ -59,6 +59,9 @@
     [alert release];
 }
 
+// Draws the current line segments in myDrawing according to the colors in the
+// colors array into the view
+
 - (void)drawRect:(CGRect)rect {   
     if (![myDrawing count])
         return;
@@ -66,13 +69,17 @@
     CGContextRef ctx = UIGraphicsGetCurrentContext();
 
     CGContextSetLineWidth(ctx, 4);
+    
+    // Each entry in myDrawing is an array of points that represent
+    // line segments.   For each array, there's a corresponding color in the 
+    // colors array.  Go through each array and draw each line according to that color
 
     for (int i = 0; i < [myDrawing count]; ++i) {	
         NSArray *thisArray = [myDrawing objectAtIndex: i];
         NSInteger theColor = [[colors objectAtIndex: i] integerValue];
         
         if ([thisArray count] > 2) {
-            switch ( theColor) {
+            switch (theColor) {
                 case RED:
                     CGContextSetRGBStrokeColor(ctx, (CGFloat) 1, (CGFloat) 0, (CGFloat) 0, (CGFloat) 1.0);
                     break;
@@ -84,11 +91,15 @@
                     break;
             }
             
+            // Get the first two points for the start of the line
+            
             float thisX = [[thisArray objectAtIndex:0] floatValue] * scaleWidth;
             float thisY = [[thisArray objectAtIndex:1] floatValue] * scaleHeight;
 
             CGContextBeginPath(ctx);
             CGContextMoveToPoint(ctx, thisX, thisY);
+            
+            // Now join the line segments together
             
             for (int j = 2; j < [thisArray count] ; j+=2) {
                 thisX = [[thisArray objectAtIndex:j] floatValue] * scaleWidth;
@@ -96,11 +107,18 @@
                 
                 CGContextAddLineToPoint(ctx, thisX,thisY);
             }
+            
+            // Stroke the line (i.e., paint it)
            
             CGContextStrokePath(ctx);
        }
     }
 }
+
+// case 1: Touch while playing clip pauses it
+// case 2: Touch while keyboard is showing hides it
+// case 3: Touch while in full screen playback mode exits full screen mode
+// Otherwise start a new line segment
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     VideoTreeAppDelegate *app = (VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate];
@@ -111,15 +129,15 @@
     if (!player)
         return;
     
-    if ([[app viewController] keyboardShows])  {
+    if ([[app viewController] keyboardShows])  {                  // 1
         [[[app viewController] newNote] resignFirstResponder];
         return;
     }
-    else if (player && [[app viewController] fullScreenMode]) {
+    else if (player && [[app viewController] fullScreenMode]) {   // 2
         [[app viewController] leaveFullScreen: nil];
         return;
     }
-    else if (player && ([player rate] != 0.0 || [[app viewController] theTimer])) {
+    else if (player && ([player rate] != 0.0 || [[app viewController] theTimer])) {   // 3
         [[app viewController] pauseIt];
         return;
     }
@@ -127,36 +145,44 @@
     scaleWidth = scaleHeight = 1.0;
 	[myDrawing addObject:[[NSMutableArray alloc] initWithCapacity:4]];
     
+#ifdef TWOBAR
     if (twoBarMode) 
         [myDrawing addObject:[[NSMutableArray alloc] initWithCapacity:4]];
+#endif
     
     int numObjs = [myDrawing count];
-//	NSLog (@"myDrawing = %i", numObjs);
     
 	CGPoint curPoint = [[touches anyObject] locationInView:self];
+    
+    // Add the new touch point to the end of the myDrawing array
     
     straightX = curPoint.x;
 	[[myDrawing objectAtIndex: numObjs - 1] addObject:[NSNumber numberWithFloat:curPoint.x]];
 	[[myDrawing objectAtIndex: numObjs - 1] addObject:[NSNumber numberWithFloat:curPoint.y]];
-    
+
+#ifdef TWOBAR
     if (twoBarMode) {
         [[myDrawing objectAtIndex: numObjs - 2] addObject:[NSNumber numberWithFloat:curPoint.x + 8]];
         [[myDrawing objectAtIndex: numObjs - 2] addObject:[NSNumber numberWithFloat:curPoint.y]];
     }
+#endif
+    
+    // Record the current color for drawing the new line segment
         
     [colors addObject: [NSNumber numberWithInteger: color]];
-    
+ 
+#ifdef TWOBAR
     if (twoBarMode)
         [colors addObject: [NSNumber numberWithInteger: color]];
+#endif
 }
+
+// Continue drawing line segment as long as we have a current video that's paused
 
 - (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     AVPlayer *player = [[(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] viewController] player];
     
-    if (player && [player rate]) 
-        return;
-    
-    if (!player)
+    if (!player ||[player rate]) 
         return;
     
 	CGPoint curPoint = [[touches anyObject] locationInView:self];
@@ -166,20 +192,28 @@
         theX = straightX;
     else
         theX = curPoint.x;
-
+    
+    // Add the current touch point to the end of the current line segment
     
 	[[myDrawing lastObject] addObject:[NSNumber numberWithFloat: theX]];
 	[[myDrawing lastObject] addObject:[NSNumber numberWithFloat: curPoint.y]];
-    
+ 
+#ifdef TWOBAR
     if (twoBarMode) {
         int numObjs = [myDrawing count];
         
         [[myDrawing objectAtIndex: numObjs - 2] addObject:[NSNumber numberWithFloat: theX + 8]];
         [[myDrawing objectAtIndex: numObjs - 2] addObject:[NSNumber numberWithFloat: curPoint.y]];
     }
+#endif
+    
+    // Draw the line
     
 	[self setNeedsDisplay];
 }
+
+// Double tap while playback paused resumes playback
+// Triple tap shows debug info
 
 - (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     VideoTreeAppDelegate *app = (VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate];
@@ -191,7 +225,11 @@
 	CGPoint curPoint = [[touches anyObject] locationInView:self];
     CGFloat  theX;
     
+    // Here we can check the number of taps
+    
     int taps = [[touches anyObject] tapCount];
+    
+    // Look at the start of the method to interpret the tap count
     
     if (taps == 3) {
         [[app viewController] erase];
@@ -209,36 +247,47 @@
     else
         theX = curPoint.x;
     
-	[[myDrawing lastObject] addObject:[NSNumber numberWithFloat:theX]];
-	[[myDrawing lastObject] addObject:[NSNumber numberWithFloat:curPoint.y]];
-    
+	[[myDrawing lastObject] addObject:[NSNumber numberWithFloat: theX]];
+	[[myDrawing lastObject] addObject:[NSNumber numberWithFloat: curPoint.y]];
+  
+#ifdef TWOBAR
     if (twoBarMode) {
         int numObjs = [myDrawing count];
         
         [[myDrawing objectAtIndex: numObjs - 2] addObject:[NSNumber numberWithFloat: theX + 8]];
         [[myDrawing objectAtIndex: numObjs - 2] addObject:[NSNumber numberWithFloat:curPoint.y]];
     }
+#endif
     
 	[self setNeedsDisplay];
-    
+ 
+#ifdef TWOBAR
     if (twoBarMode) {
         twoBarMode = NO;
         wasTwoBarMode = YES;
     }
     else
         wasTwoBarMode = NO;
+#endif
 }
+
+// All the twoBar is here for drawing parallel lines down the screen
+// This is legacy code for PDF markup
 
 -(IBAction) twoBars
 {
     twoBarMode = YES;
 }
 
+// Wipe out the current drawing
+
 -(void) cancelDrawing {
 	[myDrawing removeAllObjects];
     [colors removeAllObjects];
 	[self setNeedsDisplay];
 }
+
+// Erase the last line segment
 
 -(void) unDo
 {
@@ -247,11 +296,13 @@
     if (n) {
         [myDrawing removeObjectAtIndex: n - 1];
         [colors removeObjectAtIndex: n - 1];
-        
+    
+#ifdef TWOBAR   
         if (wasTwoBarMode) {
             [myDrawing removeObjectAtIndex: n - 2];
             [colors removeObjectAtIndex: n - 2];
         }
+#endif
     }
     
     wasTwoBarMode = NO;

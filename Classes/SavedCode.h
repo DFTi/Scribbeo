@@ -8,6 +8,13 @@
  */
 
 #if 0
+
+#ifdef  kOSXServer
+#define homeDir @"/Sites/VideoTree"
+#define userDir @"~VideoTree/VideoTree"  // for http access with OS X
+#endif
+
+
 // This creates a "picker" style gradient appearance
 // Prepare colors
 
@@ -737,4 +744,56 @@ dc.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithImage:
     vc.airPlayMode = YES;
     vc.remote.hidden = NO;
 }
+
+// This code regenerated the thumbnail for the PDF file 
+
+    AVAssetImageGenerator *imageGen = [[AVAssetImageGenerator alloc] initWithAsset: [[player currentItem] asset]];
+
+    if (!imageGen)
+    NSLog (@"AVAssetImageGenerator failed!");
+
+    [imageGen setMaximumSize: CGSizeMake (250., 150.)];
+    [imageGen setAppliesPreferredTrackTransform:YES];
+
+    Float64 secs = [self convertTimeToSecs: aNote.timeStamp];
+    CGImageRef imageRef = [imageGen copyCGImageAtTime: kCMTimeMakeWithSeconds(secs) 
+                                           actualTime: NULL error: NULL];
+
+    int wid = CGImageGetWidth (imageRef) + CGImageGetWidth (imageRef) % 8;
+    int ht = CGImageGetHeight (imageRef) + CGImageGetHeight (imageRef) % 8;
+
+    CGRect thumbRect = { 
+        {0.0f, 0.0f}, 
+        {(float) wid, (float) ht}
+    };
+
+    CGImageAlphaInfo	alphaInfo = CGImageGetAlphaInfo(imageRef);
+
+    CGContextRef bitmap = CGBitmapContextCreate(
+                                                NULL,
+                                                thumbRect.size.width,		// width
+                                                thumbRect.size.height,		// height
+                                                CGImageGetBitsPerComponent(imageRef),	
+                                                4 * thumbRect.size.width,	// rowbytes
+                                                CGImageGetColorSpace(imageRef),
+                                                alphaInfo
+                                                );
+
+    if (alphaInfo == kCGImageAlphaNone)
+    alphaInfo = kCGImageAlphaNoneSkipLast;
+
+    // Draw into the context, this scales the image
+    CGContextDrawImage(bitmap, thumbRect, imageRef);
+
+    drawView.myDrawing = aNote.drawing;
+    drawView.colors = aNote.colors;
+    [self drawMarkups: bitmap width: thumbRect.size.width height: thumbRect.size.height];
+
+    CGImageRef	ref = CGBitmapContextCreateImage(bitmap);
+    CGContextDrawImage (pdfContext, CGRectMake(40, currentY - 155, thumbRect.size.width, thumbRect.size.height), ref);
+    CGImageRelease (imageRef);
+    CGImageRelease (ref);
+    CGContextRelease (bitmap);	// ok if NULL
+    [imageGen release];
+
 #endif

@@ -5,6 +5,11 @@
 //  Created by Steve Kochan on 9/10/10.
 //  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.
 //
+// This class controls the overall operation of VideoTree.  It responds to 
+// all buttons pressed on the toolbars, with the exception of drawing on
+// the video overlay (handled by the DrawView class) or selection of a 
+// video clip, which is managed by the DetailViewController class
+//
 
 @class Note;
 
@@ -23,105 +28,101 @@
 #import "XMLURL.h"
 #import "HelpScreenController.h"
 
-
 void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, int currentY);
+
+// What type of file are we downloading?
 
 enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @interface VideoTreeViewController : UIViewController <UITableViewDelegate, UITableViewDataSource,
             UITextFieldDelegate, MFMailComposeViewControllerDelegate, UIPrintInteractionControllerDelegate>  {
-    NSMutableArray      *noteData;
-    UITextView          *newNote;
-    UIToolbar           *playerToolbar;
-    UILabel             *theTime;
-    UILabel             *stampLabel, *stampLabelFull;
-    UITableView         *notes;
-    UIImage             *newThumb;
+    NSMutableArray              *noteData;
+    UITextView                  *newNote;
+    UIToolbar                   *playerToolbar;
+    UILabel                     *theTime;
+    UILabel                     *stampLabel, *stampLabelFull;
+    UITableView                 *notes;
+    UIImage                     *newThumb;
     
-    UIView              *playerLayerView;
-    BOOL                seekToZeroBeforePlay;
-    BOOL                maxLabelSet;
-    BOOL                isSeeking;
-    BOOL                isSaving;
-    BOOL                fullScreenMode;
-	AVPlayer            *player;
-    AVPlayerLayer       *playerLayer;
-    AVPlayerItem        *playerItem;
-    AVURLAsset          *theAsset;
-    DrawView            *drawView;
-    UISlider            *movieTimeControl;
-    UIImage             *pauseImage, *playImage, *recImage, *isRecordingImage;
-    UIImageView         *notePaper;
+    UIView                      *playerLayerView;
+    BOOL                        seekToZeroBeforePlay;
+    BOOL                        maxLabelSet;
+    BOOL                        isSeeking;
+    BOOL                        isSaving;
+    BOOL                        fullScreenMode;
+	AVPlayer                    *player;
+    AVPlayerLayer               *playerLayer;
+    AVPlayerItem                *playerItem;
+    AVURLAsset                  *theAsset;
+    DrawView                    *drawView;
+    UISlider                    *movieTimeControl;
+    UIImage                     *pauseImage, *playImage, *recImage, *isRecordingImage;
+    UIImageView                 *notePaper;
 
-    id                  playerTimeObserver;
-    NSURL               *movieURL;
+    id                          playerTimeObserver;
+    NSURL                       *movieURL;
 
-    UILabel             *maxLabel;
-                UIBarButtonItem *playOutButton;
-    UILabel             *minLabel;
-    UILabel             *volLabel;
-    UILabel             *backgroundLabel;
-    float               fps;
-    dispatch_queue_t    mQueue;
+    UILabel                     *maxLabel;
+    UIBarButtonItem             *playOutButton;
+    UILabel                     *minLabel;
+    UILabel                     *volLabel;
+    UILabel                     *backgroundLabel;
+    float                       fps;
+    dispatch_queue_t            mQueue;
     
-    UIBarButtonItem     *pausePlayButton, *rewindToStartButton, *frameBackButton,
-                        *frameForwardButton, *forwardToEndButton, *fullScreenButton,
-                        *rewindButton, *fastForwardButton, *skipBackButton, *skipForwardButton;
-    UIBarButtonItem     *editButton;
-    UIButton            *recordButton;
-    UIPopoverController *popoverController;
+    UIBarButtonItem             *pausePlayButton, *rewindToStartButton, *frameBackButton,
+                                *frameForwardButton, *forwardToEndButton, *fullScreenButton,
+                                *rewindButton, *fastForwardButton, *skipBackButton, *skipForwardButton;
+    UIBarButtonItem             *editButton;
+    UIButton                    *recordButton;
+    UIPopoverController         *popoverController;
 
-    UIToolbar           *noteBar;
-    UIToolbar           *drawingBar;
+    UIToolbar                   *noteBar;
+    UIToolbar                   *drawingBar;
 
-    NSString            *show, *episode, *filmDate, *tape, *clip,  *clipPath, *currentlyPlaying;
-    BOOL                isediting;
-    NSString            *initials, *curInitials;
-    CGRect              saveFrame, saveFrame2;
-    CGContextRef        pdfContext;
-    CGRect              pageRect;
-    CGFloat             currentY;   // for PDF location
-    int                 pageNumber;
-    int                 noteNumber;
-    NSTimer             *theTimer;
-    BOOL                goingForward;
-    BOOL                keyboardShows, pendingSave;
-    BOOL                durationSet;
-    BOOL                autoPlay;
-    BOOL                watermark;
-    BOOL                runAllMode;
-    BOOL                FCPXML, AvidExport;
-    CMTime              endOfVid;
+    NSString                    *show, *episode, *filmDate, *tape, *clip,  *clipPath, *currentlyPlaying;
+    BOOL                        isediting;
+    NSString                    *initials, *curInitials;
+    CGRect                      saveFrame, saveFrame2;
+    CGContextRef                pdfContext;
+    CGRect                      pageRect;
+    CGFloat                     currentY;   // for PDF location
+    int                         pageNumber;
+    int                         noteNumber;
+    NSTimer                     *theTimer;
+    BOOL                        goingForward;
+    BOOL                        keyboardShows, pendingSave;
+    BOOL                        durationSet;
+    BOOL                        autoPlay;
+    BOOL                        watermark;
+    BOOL                        runAllMode;
+    BOOL                        FCPXML, AvidExport;
+    CMTime                      endOfVid;
                     
-//  Voice Note support
+//  Audio Note support
                     
-    VoiceMemo           *voiceMemo;
-    BOOL                madeRecording; 
-    AVAudioPlayer       *audioPlayer;
-    UILabel             *recording;
+    VoiceMemo                   *voiceMemo;
+    BOOL                        madeRecording; 
+    AVAudioPlayer               *audioPlayer;
+    UILabel                     *recording;
                     
-    NSMutableArray      *notePaths;
-    NSMutableArray      *xmlPaths, *txtPaths;   // FCP and Avid import files
-    NSMutableArray      *markers;
-    XMLURL              *XMLURLreader;
+    NSMutableArray              *notePaths;
+    NSMutableArray              *xmlPaths, *txtPaths;   // FCP and Avid import files
+    NSMutableArray              *markers;
+    XMLURL                      *XMLURLreader;
 
-    NSMutableArray      *allClips;
-    int                 clipNumber;
+    NSMutableArray              *allClips;
+    int                         clipNumber;
                     
 //   Show progress for clip loading
                     
-    UIView              *progressView;
-    UIActivityIndicatorView  *activityIndicator;
+    UIView                      *progressView;
+    UIActivityIndicatorView     *activityIndicator;
                     
 //   Show progress for note loading
                     
-    UIView              *noteProgressView;
-    UIActivityIndicatorView  *noteActivityIndicator;
-                    
-//   Show progress for switching to full screen mode
-                    
-    UIView                      *fullscreenProgressView;
-    UIActivityIndicatorView     *fullScreenActivityIndicator;
+    UIView                      *noteProgressView;
+    UIActivityIndicatorView     *noteActivityIndicator;
                     
     MPVolumeView                *myVolumeView;
     UIView                      *remote;
@@ -141,7 +142,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
     UIImage                     *FCPImage;
     UIImage                     *FCPChapterImage;
-                UIImageView *airPlayImageView;
+    UIImageView                 *airPlayImageView;
     UIImage                     *AvidImage;
 
     enum downloadType           download;
@@ -150,44 +151,41 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
     UITextField                 *saveFilename;
 }
 
-@property (nonatomic, retain)  NSString *showName;
-@property (nonatomic, retain)  NSURL *movieURL;
-@property (nonatomic, retain)  UIImage *FCPImage;
-@property (nonatomic, retain)  UIImage *AvidImage;
+@property (nonatomic, retain)  NSString                     *showName;
+@property (nonatomic, retain)  NSURL                        *movieURL;
+@property (nonatomic, retain)  UIImage                      *FCPImage;
+@property (nonatomic, retain)  UIImage                      *AvidImage;
 
-@property (nonatomic, retain)  UIImage *FCPChapterImage;
+@property (nonatomic, retain)  UIImage                      *FCPChapterImage;
 
-@property (nonatomic, retain) IBOutlet UIImageView *airPlayImageView;
-@property (nonatomic, retain)  AVPlayer *player;
-@property (nonatomic, retain)  AVURLAsset *theAsset;
-@property (nonatomic, retain)  AVPlayerLayer *playerLayer;
-@property (nonatomic, retain)  AVPlayerItem    *playerItem;
-@property (nonatomic, retain) NSTimer     *theTimer;
-@property (nonatomic, retain) UIView      *progressView;
-@property (nonatomic, retain) UIActivityIndicatorView  *activityIndicator;
-@property (nonatomic, retain) UIView      *noteProgressView;
-@property (nonatomic, retain) UIActivityIndicatorView  *noteActivityIndicator;
-@property (nonatomic, retain) UIView      *fullScreenProgressView;
-@property (nonatomic, retain) UIActivityIndicatorView  *fullScreenActivityIndicator;
-@property (nonatomic, retain) IBOutlet UIView     *uploadActivityIndicatorView;
-@property (nonatomic, retain) UIActivityIndicatorView  *uploadActivityIndicator;
-@property (nonatomic, retain) IBOutlet UIImageView  *notePaper;
-@property (nonatomic, retain) IBOutlet UIView         *filenameView;
-@property (nonatomic, retain) IBOutlet UITextField         *saveFilename;
-
+@property (nonatomic, retain)  IBOutlet UIImageView         *airPlayImageView;
+@property (nonatomic, retain)  AVPlayer                     *player;
+@property (nonatomic, retain)  AVURLAsset                   *theAsset;
+@property (nonatomic, retain)  AVPlayerLayer                *playerLayer;
+@property (nonatomic, retain)  AVPlayerItem                 *playerItem;
+@property (nonatomic, retain)  NSTimer                      *theTimer;
+@property (nonatomic, retain)  UIView                       *progressView;
+@property (nonatomic, retain)  UIActivityIndicatorView      *activityIndicator;
+@property (nonatomic, retain)  UIView                       *noteProgressView;
+@property (nonatomic, retain)  UIActivityIndicatorView      *noteActivityIndicator;
+@property (nonatomic, retain)  IBOutlet UIView              *uploadActivityIndicatorView;
+@property (nonatomic, retain)  UIActivityIndicatorView      *uploadActivityIndicator;
+@property (nonatomic, retain)  IBOutlet UIImageView         *notePaper;
+@property (nonatomic, retain)  IBOutlet UIView              *filenameView;
+@property (nonatomic, retain)  IBOutlet UITextField         *saveFilename;
 
 @property  int    uploadCount;
 
 @property (nonatomic, retain) NSMutableArray     *notePaths;
 @property (nonatomic, retain) NSMutableArray     *xmlPaths, *txtPaths;
 @property (nonatomic, retain) NSArray            *markers;
-@property (nonatomic, retain) XMLURL  *XMLURLreader;
+@property (nonatomic, retain) XMLURL             *XMLURLreader;
 
 @property (nonatomic, retain) NSMutableArray      *allClips;
-@property  int                 clipNumber, skipValue;
+@property (nonatomic)        int                clipNumber, skipValue;
 
-@property (nonatomic, retain)  NSString *initials;
-@property (nonatomic, retain)  NSString *curInitials;
+@property (nonatomic, retain) NSString           *initials;
+@property (nonatomic, retain) NSString           *curInitials;
 
 @property BOOL seekToZeroBeforePlay;
 @property BOOL isSaving;
@@ -302,8 +300,6 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(void) stopActivity;
 -(void) noteShowActivity;
 -(void) noteStopActivity;
--(void) fullScreenShowActivity;
--(void) fullScreenStopActivity;
 -(void) uploadActivityIndicator: (BOOL) startOrStop;
 -(void) movieControllerDetach;
 -(Float64) getStartTimecode;

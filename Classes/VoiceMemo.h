@@ -3,7 +3,12 @@
 //  VideoTree
 //
 //  Created by Steve Kochan on 1/31/11.
-//  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.//
+//  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.
+
+//
+// This class handles the recording of an audio note
+// The audio note is stored in a Note object and archived as an NSData object
+//
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>

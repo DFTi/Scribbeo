@@ -69,7 +69,10 @@ static int tryOne = 0;
 #pragma mark Handle "Open in" and Camera Roll support
 
 
-// This method is called to open a file from another application
+// This method is called to open a file from another application (that is, it handles "Open In...")
+// The clip will be copied into the local file system's sandbox.  We force the app into "local" mode
+// here so there are no conflicts related to server mode vs. local mode.
+
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
 {
@@ -77,17 +80,27 @@ static int tryOne = 0;
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
+    // Force the server into local mode; as we don't want to deal with
+    // where to store the notes or where to play the clips from
+    
     [defaults setBool: NO forKey: @"FTPMode"];
     [defaults setBool: NO forKey: @"BonjourMode"];
     FTPMode = NO;
     BonjourMode = NO;
     
     [defaults synchronize];
+    
+    // Update the clip list to reflect the switch to local mode
+    
     [tvc makeList];
     
     [self copyURLIntoApp: url];
     return YES;
 }
+
+//
+// Drop down animation for the dialog box to allow the local clip to be named
+//
 
 -(void) animateTransition: (BOOL) start
 {
@@ -108,6 +121,9 @@ static int tryOne = 0;
 
 	[viewController.filenameView.layer addAnimation:transition forKey:nil];
 }
+
+// Copy a clip selected by "Open In..." or from the camera roll into the app's
+// local storage.  Give the user the option to rename the clip
      
 -(void) copyURLIntoApp: (NSURL *) url
 {    
@@ -129,6 +145,10 @@ static int tryOne = 0;
     [viewController.saveFilename becomeFirstResponder];
 }
 
+// A file name has been entered for local clip storage.  Make sure the file
+// doesn't already exists.  If it does, give the user the option to overwrite or rename
+
+
 -(void) saveFileNameEntered
 {    
     [self animateTransition: NO];
@@ -139,7 +159,7 @@ static int tryOne = 0;
     
     self.outputFilename =  [NSString stringWithFormat: @"%@.%@", 
         [docDir stringByAppendingPathComponent: viewController.saveFilename.text], theExtension];
-    NSLog (@"Output file name = %@", outputFilename);
+    NSLog2 (@"Output file name = %@", outputFilename);
     
     NSURL *toURL = [NSURL fileURLWithPath: outputFilename];
     
@@ -166,9 +186,7 @@ static int tryOne = 0;
     }
     
     [tvc makeList];
-    NSLog (@"makeList cp 5 - saveFileNameEntered");
 
-    
     viewController.clip  =  outputFilename;
     [viewController.saveFilename resignFirstResponder];
     [viewController loadMovie:  viewController.clip];
@@ -193,7 +211,8 @@ static int tryOne = 0;
 	else if (buttonIndex == 1)          // try again
 		[self copyURLIntoApp: theURL]; // display the file save dialog again
 }
-    
+
+// See how much free memory is available
 
 -(natural_t) freemem 
 {
@@ -252,6 +271,8 @@ static int tryOne = 0;
 #pragma mark -
 #pragma mark Bonjour
 
+// Part of Bonjour server support; connect to a discovered VideoTree server
+
 - (void)updateServerList {
     if (serverBrowser.servers.count == 0) {
         NSLog (@"VideoTree Server disconnected!");
@@ -277,9 +298,12 @@ static int tryOne = 0;
 #pragma mark -
 #pragma mark settings
 
+// When we receive the IP address from the Bonjour server, it will be stored
+// in the FTPHomeDir variable.  We're observing that variable so we are alerted
+// when it changes
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    
     NSLog (@"Observe value change for FTPHomeDir: %@", FTPHomeDir);
     
     if ([[change objectForKey: NSKeyValueChangeKindKey] integerValue] !=  NSKeyValueChangeSetting) {
@@ -297,7 +321,6 @@ static int tryOne = 0;
     else
         tryOne = 1;
     
-
     // Note that bonjour connection sets some server ivars
  
     serverBase = kFTPserver;
@@ -361,6 +384,7 @@ static int tryOne = 0;
            [[UIDevice currentDevice] uniqueIdentifier], FTPusername, FTPpassword, kHTTPserver);
 }
 
+// This method looks at the user defaults and sets up various parameters
 
 -(void) makeSettings
 {
@@ -420,7 +444,7 @@ static int tryOne = 0;
         if (!FTPpassword || [FTPpassword isEqualToString: @""])
             FTPpassword = @""; 
         
-        // Get HTTP server address
+        // Get HTTP server address (okay to be nil)
         
         self.HTTPserver = [defaults objectForKey: @"HTTPserver"];
         
@@ -449,6 +473,8 @@ static int tryOne = 0;
     else
         NSLog (@"Running in iTunes Document sharing mode");
 }
+
+// Create our DetailViewController, which manages clip selection
 
 -(void) makeDetailTableViewController
 { 
@@ -489,12 +515,15 @@ static int tryOne = 0;
     nc.toolbar.translucent = YES;
 }
 
+// If we're moving into the background, let's stop video playback; however, let's
+// record where we are so we can resume playback when we become active again
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     /*
      Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-     Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-     */
+        Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. 
+        Games should use this method to pause the game.
+    */
     
     if (viewController.player) {
         NSLog (@"stopping player");
@@ -504,8 +533,6 @@ static int tryOne = 0;
         if (viewController.player.rate)
             [viewController playPauseButtonPressed: nil];
     }
-
-    //  [viewController cleanup];
 
 #ifdef kMakeLogFile
     uploadLogFile ();
@@ -521,22 +548,13 @@ static int tryOne = 0;
     
     NSLog (@"app did become active");
     retryCount = 0;
- 
-#if 0
-    // only do this if app not already running
-    
-    if (! [viewController.view isDescendantOfView: window]) {
-        NSLog (@"adding back subview");
-        [window addSubview:viewController.view];
-        [self finishLoad];
-        [self releasemem];
-    }
-#endif
     
     [[NSUserDefaults standardUserDefaults] synchronize];
     [viewController uploadActivityIndicator: NO];
     
     // NSLog (@"player = %@, moviePath = %@", viewController.player, tvc.moviePath);
+    
+    // Restart playback as appropriate
     
     if ([viewController player] && tvc.moviePath) {
         NSLog (@"setting playback rate to %g", theRate);
@@ -546,11 +564,15 @@ static int tryOne = 0;
         return;
     }
     
+    // We've never selected a clip, let's get the app's settings
+    
     if (! tvc.currentPath) {
         [self makeSettings];
         [viewController makeSettings];  
-//      [nc popToRootViewControllerAnimated: NO];
     }
+    
+    // We're either loading clips locally or over the network 
+    // (but not via Bonjour)  Load the clip table (if we're not in the process of loading it)
     
     if (!BonjourMode)
         if (!iPHONE) {
@@ -582,7 +604,6 @@ static int tryOne = 0;
 -(void) finishLoad
 {
 
-//    NSLog (@"setting levelCount to %i", rootTvc.levelCount);
 }
 
 #pragma mark Log File
@@ -610,6 +631,7 @@ static int tryOne = 0;
 #endif
 
 #pragma mark Missing Credentials
+
 - (void) credentialsMissing
 {
 	NSLog (@"Please supply both user name and password before using FTP Helper");
