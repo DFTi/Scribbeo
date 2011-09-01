@@ -1176,7 +1176,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
 //
 // Code to rotate an image
-// We need this because we run in landscape mode and GetScreenImage will
+// We need this because we run in landscape mode and UIGetScreenImage will
 // give us an image that we'll need to rotate
 //
 
