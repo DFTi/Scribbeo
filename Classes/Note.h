@@ -13,7 +13,7 @@
 #import <Foundation/Foundation.h>
 #import "myDefs.h"
 
-@interface Note : NSObject <NSCoding>{
+@interface Note : NSObject <NSCoding> {
     NSData          *thumb;
     NSData          *voiceMemo;
     NSString        *text;
@@ -23,6 +23,8 @@
     NSMutableArray  *drawing;
     NSMutableArray  *colors;
     float           frameWidth, frameHeight;  
+    NSString        *imageName;   
+    int             rotation;
 }
 
 @property (nonatomic, retain)  NSData     *thumb;         // the thumbnail of the frame
@@ -31,8 +33,10 @@
 @property (nonatomic, retain)  NSString    *timeStamp;    // the timecode for the frame
 @property (nonatomic, retain)  NSString    *date;         // when the note was made
 @property (nonatomic, retain)  NSString    *initials;     // who made the note
+@property (nonatomic, retain)  NSString    *imageName;    // who made the note
 @property (nonatomic, copy)    NSMutableArray  *drawing;  // an array (of an array) of line segments
 @property (nonatomic, copy)    NSMutableArray  *colors;   // an array of colors for each line segment
 @property float frameWidth, frameHeight;                  // a scale factor so iPhone/iPad notes work
+@property int   rotation;
 
 @end

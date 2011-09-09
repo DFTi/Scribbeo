@@ -116,29 +116,35 @@
 }
 
 // case 1: Touch while playing clip pauses it
-// case 2: Touch while keyboard is showing hides it
-// case 3: Touch while in full screen playback mode exits full screen mode
+// case 2: Touch while autoplaying a still pauses autoplay
+// case 3: Touch while keyboard is showing hides it
+// case 4: Touch while in full screen mode exits full screen mode
 // Otherwise start a new line segment
 
 - (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    VideoTreeAppDelegate *app = (VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate];
-    AVPlayer *player = [[app viewController] player];
+    VideoTreeViewController *vc = [kAppDel viewController];
+    AVPlayer *player = [vc player];
+    BOOL still = [vc stillShows];
 
     NSLog (@"touches began in DrawView");
     
-    if (!player)
+    if (!player && !still)
         return;
-    
-    if ([[app viewController] keyboardShows])  {                  // 1
-        [[[app viewController] newNote] resignFirstResponder];
-        return;
-    }
-    else if (player && [[app viewController] fullScreenMode]) {   // 2
-        [[app viewController] leaveFullScreen: nil];
+        
+    if ([vc keyboardShows])  {                                      // 3
+        [[[kAppDel viewController] newNote] resignFirstResponder];
         return;
     }
-    else if (player && ([player rate] != 0.0 || [[app viewController] theTimer])) {   // 3
-        [[app viewController] pauseIt];
+    else if ((player || still) && [vc fullScreenMode]) {            // 4
+        [vc leaveFullScreen: nil];
+        return;
+    }
+    else if ([vc slideshowTimer]) {                                 // 2
+        [vc playPauseButtonPressed: nil];
+        return;
+    }
+    else if (player && ([player rate] != 0.0 || [vc theTimer])) {   // 1
+        [vc pauseIt];
         return;
     }
 
@@ -180,11 +186,12 @@
 // Continue drawing line segment as long as we have a current video that's paused
 
 - (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-    AVPlayer *player = [[(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] viewController] player];
-    
-    if (!player ||[player rate]) 
+    AVPlayer *player = [[kAppDel viewController] player];
+    BOOL still = [[kAppDel viewController] stillShows];
+
+    if ((!player || [player rate]) && !still) 
         return;
-    
+        
 	CGPoint curPoint = [[touches anyObject] locationInView:self];
     CGFloat theX;
     
@@ -216,10 +223,10 @@
 // Triple tap shows debug info
 
 - (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    VideoTreeAppDelegate *app = (VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate];
-    AVPlayer *player = [[app viewController] player];
+    AVPlayer *player = [[kAppDel viewController] player];
+    BOOL still = [[kAppDel viewController] stillShows];
 
-    if (player && [player rate] ) 
+    if ((player && [player rate]) || still ) 
         return;
     
 	CGPoint curPoint = [[touches anyObject] locationInView:self];
@@ -232,13 +239,13 @@
     // Look at the start of the method to interpret the tap count
     
     if (taps == 3) {
-        [[app viewController] erase];
+        [[kAppDel viewController] erase];
         [self showDebugAlert];
         
         return;
     }
     else if (taps == 2) {
-        [[app viewController] playPauseButtonPressed: nil];
+        [[kAppDel viewController] playPauseButtonPressed: nil];
         return;
     }
     

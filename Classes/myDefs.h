@@ -20,6 +20,9 @@ extern int gIOSMajorVersion;
 #define EQUALS(x,y) ([x caseInsensitiveCompare: y] == NSOrderedSame)
 #define kdemoView  [kAppDel demoView]
 
+#define kIsMovie(x) (EQUALS (x, @"mp4") || EQUALS (x, @"mov") || EQUALS (x, @"m4v") || EQUALS (x, @"m3u8"))
+#define kIsStill(x)  (EQUALS (x, @"jpg") || EQUALS (x, @"jpeg") || EQUALS (x, @"png"))
+
 #define CAMERAROLL          // We support import from the camera roll
 
 // Are we running on iOS 5.0 or greater?  
@@ -54,7 +57,7 @@ extern int gIOSMajorVersion;
           : [NSString stringWithFormat: @"/iPad/%@", [kAppDel FTPusername]] )
 #endif
 
-#ifndef APPSTORE
+#ifdef DEBUG
 #define kMakeLogFile        // Only make log files for our own use (not the app store version)
 #endif
 

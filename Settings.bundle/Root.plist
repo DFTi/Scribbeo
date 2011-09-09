@@ -48,13 +48,23 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
+        <dict>
+			<key>DefaultValue</key>
+			<string>5</string>
+			<key>Key</key>
+			<string>slideTime</string>
+			<key>Title</key>
+			<string>Slide Show Time (secs)     </string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+		</dict>
 		<dict>
 			<key>DefaultValue</key>
 			<string>30</string>
 			<key>Key</key>
 			<string>skipValue</string>
 			<key>Title</key>
-			<string>Skip Value (seconds)     </string>
+			<string>Skip Value (secs)     </string>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 		</dict>

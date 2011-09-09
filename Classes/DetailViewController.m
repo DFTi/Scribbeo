@@ -210,8 +210,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
         
         NSString *extension = [fileName pathExtension];
         
-        if ( cfType != kDirectory && !(EQUALS (extension, @"mov")|| EQUALS (extension, @"m4v")
-                        ||EQUALS (extension,  @"mp4") || EQUALS (extension,  @"m3u8")) ) {
+        if ( cfType != kDirectory && !(kIsMovie (extension) || kIsStill (extension)) ) {
             continue;
         }
         
@@ -274,8 +273,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
     for (NSString *path in clips) {
         NSString *extension = [path pathExtension];
         
-        if ( ! (EQUALS (extension,  @"mov") || EQUALS (extension,  @"m4v")
-                || EQUALS (extension,  @"mp4") || EQUALS (extension,   @"m3u8")) )
+        if ( ! (kIsMovie (extension) || kIsStill (extension)) )
             continue;
          
         [files addObject: path];
@@ -481,9 +479,18 @@ static int retryCount;      // We don't give up on FTP failures that easily
         cell.imageView.image = [UIImage imageNamed: @"folder.png"];
     }
     else {
+        NSString *path = [files objectAtIndex: indexPath.row];
+        
+        NSString *extension = [path pathExtension];
         cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.textLabel.text = [[files objectAtIndex: indexPath.row] stringByDeletingPathExtension];
-        cell.imageView.image = nil;
+        cell.textLabel.text = [path stringByDeletingPathExtension];
+        
+        if ( kIsMovie (extension))
+            cell.imageView.image = [UIImage imageNamed: @"movies.png"];
+        else if ( kIsStill (extension) )
+            cell.imageView.image = [UIImage imageNamed: @"camera.png"];
+        else
+            cell.imageView.image = nil;
     }
     
     return cell;
@@ -598,25 +605,31 @@ static int retryCount;      // We don't give up on FTP failures that easily
         [detailViewController release];
     }
     else {   
-        // Play the selected movie
+        // Play the selected movie or display the selected still
         
         if (vc.runAllMode) {
             [vc airPlay];
             vc.runAllMode = NO;
         }
         
-         NSString *theMovie;
+         NSString *theMedia;
          
-         theMovie = [NSString stringWithFormat: @"%@/%@", currentPath, 
+         theMedia = [NSString stringWithFormat: @"%@/%@", currentPath, 
                      [files objectAtIndex: indexPath.row]];
          
-        NSLog (@"The movie = %@", theMovie);
+        NSLog (@"The movie/still = %@", theMedia);
          
-        [self setTheMoviePath: theMovie];  // Get the correct path to the selected movie
+        [self setTheMoviePath: theMedia];  // Get the correct path to the selected movie
         
-        vc.clip =  theMovie;
-        vc.clipPath = theMovie;
-        [vc loadMovie: moviePath];
+        vc.clip =  theMedia;
+        vc.clipPath = theMedia;
+        
+        NSString *extension = [[files objectAtIndex: indexPath.row] pathExtension];
+        
+        if ( kIsMovie (extension) )
+            [vc loadMovie: moviePath];
+        else
+            [vc loadStill: moviePath];
     }
 }
 

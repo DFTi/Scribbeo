@@ -6,7 +6,6 @@
 //  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.
 //
 
-
 #import "VideoTreeViewController.h"
 #import "VideoTreeAppDelegate.h"
 #import "DetailViewController.h"
@@ -17,6 +16,17 @@
 #import <Endian.h>
 #import "VoiceMemo.h"
 
+// Both of these map to the value of "rotate".  The first array maps before the rotation, the second after 
+// (just has to do with the way the rotate ivar is incremented)
+
+static int rotatePositions [] = { UIImageOrientationLeft, UIImageOrientationDown,  UIImageOrientationRight, UIImageOrientationUp };
+static float rotAngles [] = { 0, 90, 180, 270};
+
+typedef enum _transitionEffects
+{
+    TransitionEffectFade, // represents fade image transition effect
+    TransitionEffectSlide // represents slide image transition effect
+} TransitionEffect;
 
 #define MYGRAY [UIColor colorWithRed: .8 green: .8 blue: .9 alpha: 1]
 #define MYWHITE [UIColor colorWithRed: .9 green: .9 blue: .9 alpha: 1]
@@ -32,18 +42,20 @@ static void *VideoTreeViewControllerStatusObservationContext = @"VideoTreeViewCo
 static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewControllerAirPlayObservationContext";
 
 @implementation VideoTreeViewController
+@synthesize stillView;
 @synthesize airPlayImageView;
 @synthesize playerToolbar;
 @synthesize playOutButton;
 
 @synthesize showName, newNote, fullScreenMode, drawView, movieTimeControl, notes, newThumb, noteBar, drawingBar;
 @synthesize player, seekToZeroBeforePlay, movieURL, playerLayerView, theTime, maxLabel, minLabel, noteData, currentlyPlaying, isSaving, markers;
-@synthesize pausePlayButton, pauseImage, playImage, recImage, isRecordingImage, clip, clipPath, show, tape, filmDate, playerLayer, editButton, initials, episode, playerItem, theTimer;
+@synthesize pausePlayButton, pauseImage, playImage, recImage, isRecordingImage, clip, clipPath, show, tape, filmDate, playerLayer, 
+            editButton, initials, episode, playerItem, slideshowTimer, theTimer;
 @synthesize progressView, activityIndicator, notePaths, xmlPaths, txtPaths, noteProgressView, noteActivityIndicator, volLabel, curInitials, movieController;
 @synthesize  stampLabel, stampLabelFull, theAsset, startTimecode, download, clipLabel, runAllMode;
 @synthesize rewindToStartButton, frameBackButton, frameForwardButton, forwardToEndButton, fullScreenButton, rewindButton, fastForwardButton, airPlayMode, remote;
 @synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo;
-@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView;;
+@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage;
 
 #pragma mark -
 #pragma mark view loading/unloading
@@ -62,6 +74,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     NSLog (@"view controller view did load");
     
     [super viewDidLoad];
+    
     CGPoint theOrigin = {0, 0};
     CGSize theSize;
     CGRect theFrame;
@@ -73,7 +86,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         theFrame.origin = theOrigin;
         drawView.frame = theFrame;
     }
-             
+            
+    drawViewFrame = drawView.frame;
+    
     // Add a volume control for Airplay; Add a Route Button if >= iOS5
  
     if (! iPHONE)  {
@@ -260,6 +275,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [uploadActivityIndicator stopAnimating];
     
     uploadCount = 0;
+    
+    // [self loadStill: @"http://noirfeathers.blog.com/files/2011/07/ansel_adams_mountains1.jpg"]; 
+    // @"http://db.tt/5PkAJLX"];
 }
 
 - (void) viewDidAppear: (BOOL) animated {
@@ -272,6 +290,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 }
 
 // Only observe time changes when the view controller's view is visible.
+
 - (void)viewWillAppear:(BOOL)animated
 {    
 	[super viewWillAppear:animated];
@@ -294,8 +313,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-	[super viewDidDisappear:animated];
-	[self stopObservingTimeChanges];
+    [super viewDidDisappear:animated];
+    [self stopObservingTimeChanges];
     [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
     [self resignFirstResponder];
 }
@@ -328,10 +347,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 }
 
 - (void)viewDidUnload {
+    NSLog (@"Viewcontroller view did unload");
+    [self setStillView:nil];
     [self setAirPlayImageView:nil];
     [self setPlayerToolbar:nil];
     [self setPlayOutButton:nil];
-    NSLog (@"Viewcontroller view did unload");
     self.newNote = nil;
     self.theTime = nil;
     self.movieTimeControl = nil;
@@ -340,6 +360,228 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     self.maxLabel = nil;
 }
 
+#pragma mark -
+#pragma mark Still support
+  
+-(void) dumpRect: (CGRect) r title: (NSString *) title
+{
+    NSLog (@"%@: origin = (%g, %g), size = (%g, %g)", title, r.origin.x, r.origin.y,
+           r.size.width, r.size.height);
+}
+
+// called when the image transition animation finishes
+
+- (void)transitionFinished:(NSString *)animationId finished:(BOOL)finished
+                   context:(UIImageView *) context
+{
+    [context removeFromSuperview];   // remove the old image
+    stillView.userInteractionEnabled = YES;
+} 
+
+//
+//  Load in a still image given its address
+//
+
+-(void) loadStill: (NSString *) link 
+{
+    NSData *imageData = [NSData dataWithContentsOfURL: [NSURL URLWithString: link]];
+    
+    // Are we currently showing a still or a video player?
+    
+    if (player)
+        [self cleanup];
+    else {
+        drawView.frame = drawViewFrame;
+        [self erase];
+        [self clearAnyNotes];
+    }
+ 
+    // No current rotation
+    
+    rotate = 0;
+    self.clip = [link lastPathComponent];
+    
+    UIImageView *currentView = stillView;
+
+    // Load the image
+    
+    if (stillImage) {
+        [stillImage release];
+        stillImage = nil;
+    }
+    
+    stillImage = [[UIImage alloc] initWithData: imageData];
+    stillView = [[UIImageView alloc] initWithImage: stillImage];
+    
+    if (fullScreenMode)
+        drawView.frame = stillView.frame = playerLayerView.frame;
+    
+    NSLog (@"Stillview.image size = (%g, %g)", stillView.image.size.width, stillView.image.size.height);
+    [self dumpRect: drawView.frame title: @"drawView.frame"];
+    
+    //set contentMode to scale aspect to fit
+    
+    stillView.contentMode = UIViewContentModeScaleAspectFit;
+    
+    // Compute a scale factor so we can adjust the size of the drawing frame
+    
+    CGFloat widDiff = stillView.image.size.width - drawView.frame.size.width;
+    CGFloat htDiff = stillView.image.size.height - drawView.frame.size.height;
+    CGFloat scale;
+    
+    CGRect newFrame = drawView.frame;
+    
+    // Adjust the frame to keep the markups inside the still (or close to it)
+    
+    if (htDiff > widDiff) {
+        scale = drawView.frame.size.height / stillView.image.size.height;
+        newFrame.size.width *= scale;
+        newFrame.origin.x = (drawView.frame.size.width - newFrame.size.width) / 2;
+    }
+    else {
+        scale = drawView.frame.size.width / stillView.image.size.width;
+        newFrame.size.height *= scale;
+        newFrame.origin.y = (drawView.frame.size.height - newFrame.size.height) / 2;
+    }
+    
+    NSLog (@"widDiff = %g, htDiff = %g, scale = %g", widDiff, htDiff, scale);
+    
+    stillView.frame = drawView.frame; 
+    drawView.frame = newFrame;
+        
+    [self dumpRect: drawView.layer.frame title: @"new drawView.layer.frame"];
+    
+    // Show the still now and add the drawing frame on top
+    
+    drawView.hidden = NO;
+    stillView.userInteractionEnabled = YES;
+    [playerLayerView addSubview: stillView];
+    [stillView addSubview: drawView];
+    
+    if (autoPlay)
+        pausePlayButton.image = pauseImage;
+
+    
+    if (stillShows) {
+        stillView.alpha = 0;
+
+        [UIView beginAnimations:nil context: currentView];
+        [UIView setAnimationDuration: 2.0]; // set the animation length
+        [UIView setAnimationDelegate:self]; // set the animation delegate
+        
+        // call the given method when the animation ends
+        [UIView setAnimationDidStopSelector: @selector(transitionFinished:finished:context:)];
+        
+        // make the next image appear with the chosen effect
+        
+        TransitionEffect theEffect =  TransitionEffectFade;
+        
+        switch (theEffect)
+        {
+            case TransitionEffectFade: // the user chose the fade effect
+                [stillView setAlpha: 1.0]; // fade in the next image
+                [currentView setAlpha: 0.0]; // fade out the old image
+                break;
+                
+            case TransitionEffectSlide: // the user chose the slide effect
+                // frame.origin.x -= frame.size.width; // slide new image left
+                // nextImageView.frame = frame; // apply the repositioned frame
+                // CGRect currentImageFrame = currentImageView.frame;
+                
+                // slide the old image to the left
+                // currentImageFrame.origin.x -= currentImageFrame.size.width;
+                // currentImageView.frame = currentImageFrame; // apply frame
+                break;
+        } 
+        
+        [UIView commitAnimations]; // end animation block
+    }
+    else {
+        // hide buttons that don't apply
+        
+        theTime.hidden = YES;
+        backgroundLabel.hidden = YES;
+        movieTimeControl.hidden = YES;
+        maxLabel.hidden = YES;
+        minLabel.hidden = YES;
+        rewindToStartButton.enabled = NO; 
+        frameBackButton.enabled = NO; 
+        frameForwardButton.enabled = NO; 
+        forwardToEndButton.enabled = NO; 
+        rewindButton.enabled = NO;
+        fastForwardButton.enabled = NO;
+        myVolumeView.hidden = YES;
+
+
+        if (autoPlay) {
+            pausePlayButton.enabled = YES;
+        }
+        else
+            pausePlayButton.enabled = NO;
+        
+        skipForwardButton.enabled = NO;
+        skipBackButton.enabled = NO;
+        skipForwardButton.title = @"";
+        skipBackButton.title = @"";
+        stillShows = YES;
+    }
+    
+    if (autoPlay)
+        self.slideshowTimer = [NSTimer scheduledTimerWithTimeInterval: slideshowTime target:self 
+                                                       selector:@selector(stillDidTimeOut:) userInfo:nil repeats: NO]; 
+}
+
+- (void) rotateStill {
+    // Yucch!  We'll need to rotate the markups as well?
+    
+    [self erase];
+            
+    // Compute a scale factor so we can adjust the size of the drawing frame
+    // This is ugly due to the rotation--uggh
+    
+    CGRect newFrame = drawView.frame;
+    
+    CGFloat widDiff = newFrame.size.width - stillView.image.size.height;
+    CGFloat htDiff =  newFrame.size.height - stillView.image.size.width;
+    CGFloat scale;
+    
+    // Adjust the frame to keep the markups inside the still (or close to it)
+    
+    CGFloat curWid = drawView.frame.size.width, curHt = drawView.frame.size.height;
+    
+    NSLog (@"drawView wid, ht before rotation = (%g, %g)", curWid, curHt);
+    float scaleX, scaleY;
+    
+    scaleX = newFrame.size.height / stillView.image.size.width;
+    scaleY = newFrame.size.width / stillView.image.size.height;
+    
+    NSLog (@"scaleX = %g, scaleY = %g", scaleX, scaleY);
+    
+    if (scaleX * stillView.image.size.height > drawViewFrame.size.width)
+        scale = scaleY;
+    else
+        scale = scaleX;
+    
+    newFrame.size.width = stillView.image.size.height * scale;
+    newFrame.size.height = stillView.image.size.width * scale;
+    newFrame.origin.x += (curWid - newFrame.size.width) / 2;
+    newFrame.origin.y += (curHt - newFrame.size.height) / 2;
+
+    // Now rotate the image
+    
+    
+    CGImageRef imageRef = [stillImage CGImage];
+    stillView.image =  [UIImage imageWithCGImage: imageRef scale: 1
+                                     orientation: rotatePositions [rotate % 4]];
+    
+    ++rotate;
+    
+    NSLog (@"image wid, ht after rotation = (%g, %g)", stillView.image.size.width, stillView.image.size.height);    
+    NSLog (@"widDiff = %g, htDiff = %g, scale = %g", widDiff, htDiff, scale);
+    
+    [self dumpRect: newFrame title: @"newFrame"];
+    drawView.frame = newFrame;
+}
 
 #pragma mark -
 #pragma mark remote control (e.g. headphones)
@@ -658,7 +900,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     // I had to invert this since DefaultValue doesn't seem to work
     
     timecodeFormat =  !(BOOL) [[defaults objectForKey: @"Timecode"] integerValue];
-        
+    
+    // Display time for slide show
+    
+    slideshowTime = [[defaults objectForKey: @"slideTime"] floatValue];
+    
+    if (slideshowTime == 0)
+        slideshowTime = 5;
+    
+    NSLog (@"Setting slide show time interval to %g", slideshowTime);   
+    
     // Skip value
     
     skipValue = [[defaults objectForKey: @"skipValue"] integerValue];
@@ -832,6 +1083,29 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
                     
 - (IBAction)playPauseButtonPressed:(id)sender
 {    
+    // If the slideshowTimer is running, we're in slide show playback mode
+    // Pause the playback (i.e., kill the timer)
+    
+    if (slideshowTimer) {
+        [slideshowTimer invalidate];
+        self.slideshowTimer = nil;
+        pausePlayButton.image = playImage;
+
+        return;
+    }
+    
+    //
+    //  If a still is showing and we're in autoPlay mode, resume playback
+    //
+    
+    if (stillShows && autoPlay) {
+        self.slideshowTimer = [NSTimer scheduledTimerWithTimeInterval: slideshowTime target:self 
+                        selector:@selector(stillDidTimeOut:) userInfo:nil repeats: NO]; 
+        pausePlayButton.image = pauseImage;
+        return;
+    }
+        
+    
     // If a timer's running we're in single frame playback
     // In that case, we'll pause playback below
     
@@ -839,19 +1113,19 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         player.rate = 1.0;
     
 	if (player.rate == 0.0) {
-		// if we are at the end of the movie we must seek to the beginning first before starting playback
+            // if we are at the end of the movie we must seek to the beginning first before starting playback
+            
+            if (YES == seekToZeroBeforePlay) {
+                seekToZeroBeforePlay = NO;
+                [player seekToTime: kCMTimeZero];
+            }
         
-		if (YES == seekToZeroBeforePlay) {
-			seekToZeroBeforePlay = NO;
-			[player seekToTime: kCMTimeZero];
-		}
-        
-        newNote.text = @"";       // Clear any note or markups
-        [self erase];
-		player.rate = 1.0;        // Start playback and set the play/pause button to pause icon
-        pausePlayButton.image = pauseImage;
+            newNote.text = @"";       // Clear any note or markups
+            [self erase];
+            player.rate = 1.0;        // Start playback and set the play/pause button to pause icon
+            pausePlayButton.image = pauseImage;
 	} else {
-		[self pauseIt];
+            [self pauseIt];
 	}
 }
 
@@ -1009,15 +1283,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 // #define APPSTORE
 
 #ifdef APPSTORE
+
 //
 // Once we grab the frame, we have to draw the markups (line segments) onto the frame
 // This is the purpose of this method.  On input it gets a reference to a bitmap
 // context to render into, along with the width and height of the captured frame
 //
 
--(void)drawMarkups: (CGContextRef) ctx width: (float) wid height: (float) ht { 
+-(void) drawMarkups: (CGContextRef) ctx width: (float) wid height: (float) ht { 
     CGContextTranslateCTM (ctx, 0, ht);
-    CGContextScaleCTM (ctx, ((wid * 8) / drawView.bounds.size.width) / 8, - ((ht * 8) / drawView.bounds.size.height) / 8 ); 
+    CGContextScaleCTM (ctx, (wid / drawView.bounds.size.width), - (ht  / drawView.bounds.size.height)); 
     
     NSArray *myDrawing = drawView.myDrawing;
     NSArray *colors = drawView.colors;
@@ -1045,20 +1320,105 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
                 float thisX = [[thisArray objectAtIndex:0] floatValue];
                 float thisY = [[thisArray objectAtIndex:1] floatValue];
                 
-                CGContextBeginPath(ctx);
-                CGContextMoveToPoint(ctx, thisX, thisY);
+                CGContextBeginPath (ctx);
+                CGContextMoveToPoint (ctx, thisX, thisY);
                 
                 for (int j = 2; j < [thisArray count] ; j += 2) {
-                    thisX = [[thisArray objectAtIndex:j] floatValue];
-                    thisY = [[thisArray objectAtIndex:j + 1] floatValue];
+                    thisX = [[thisArray objectAtIndex: j] floatValue];
+                    thisY = [[thisArray objectAtIndex: j + 1] floatValue];
                     
-                    CGContextAddLineToPoint(ctx, thisX,thisY);
+                    CGContextAddLineToPoint (ctx, thisX, thisY);
                 }
                 CGContextStrokePath(ctx);
             }
         }
     }
 }
+
+//
+// Scale the captured still for the thumbnail
+//
+
+-(UIImage *) scaleImage: (CGImageRef) image  andRotate: (float) angle
+{
+    // We grabbed the frame, let's make it smaller
+
+    CGImageAlphaInfo	alphaInfo = CGImageGetAlphaInfo(image);
+
+    if (alphaInfo == kCGImageAlphaNone)
+    alphaInfo = kCGImageAlphaNoneSkipLast;
+    
+    int wid, ht;
+    
+    wid = CGImageGetWidth (image) + CGImageGetWidth (image) % 8;
+    ht =  CGImageGetHeight (image)  + CGImageGetHeight(image) % 8;  
+    
+    NSLog (@"image width,height = (%i, %i)", wid, ht);
+
+
+    ht =  (320. / wid) * ht;
+    wid = 320.;
+    
+    NSLog (@"image width,height = (%i, %i)", wid, ht);
+
+    CGRect thumbRect = { 
+        {0.0f, 0.0f}, 
+        {(float) wid, (float) ht}
+    };
+
+    NSLog (@"bits per component = %i, color space = %i",  CGImageGetBitsPerComponent(image), CGImageGetColorSpace(image));
+    
+    CGFloat angleInRadians = angle * (M_PI / 180);
+
+    CGAffineTransform transform = CGAffineTransformMakeRotation(angleInRadians);
+    thumbRect = CGRectApplyAffineTransform(thumbRect, transform);
+
+    // Build a bitmap context that's the size of the thumbRect
+
+    CGContextRef bitmap = CGBitmapContextCreate(
+            NULL,
+            thumbRect.size.width,		// width
+            thumbRect.size.height,		// height
+            CGImageGetBitsPerComponent(image),	
+            4 * thumbRect.size.width,	// rowbytes
+            CGImageGetColorSpace(image),
+            alphaInfo
+            );
+    
+    CGContextTranslateCTM(bitmap, +(thumbRect.size.width/2), +(thumbRect.size.height/2));
+    CGContextRotateCTM(bitmap, angleInRadians);
+    CGContextDrawImage(bitmap, CGRectMake(-wid/2, -ht/2, wid, ht), image);
+
+    // Draw into the context, this scales the image
+
+    CGContextRotateCTM(bitmap, -angleInRadians);
+    CGContextTranslateCTM(bitmap, -(thumbRect.size.width/2), -(thumbRect.size.height/2));
+    
+    int w = wid, h = ht;
+    
+    if (angle == 90 || angle == 270) {
+        w = ht;
+        h = wid;
+    }
+        
+    [self drawMarkups: bitmap width: w height: h];
+
+    // Get an image from the context and create a UIImage
+
+    CGImageRef	ref = CGBitmapContextCreateImage(bitmap);
+    
+    UIImage *resultImage = [UIImage imageWithCGImage:ref];
+    
+    NSLog (@"saved image size = %f x %f", resultImage.size.width, resultImage.size.height);
+
+    // Clean up
+
+    CGContextRelease (bitmap);	
+    CGImageRelease (ref);
+    
+    return resultImage;
+}
+
 
 //
 // This method will capture the paused video frame so we can save the 
@@ -1117,58 +1477,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             NSLog (@"Async Request for frame at %@, actual = %@ (fps = %f)", [self timeFormat: requestedTime], [self timeFormat: actualTime], fps);
         }];
 #endif
-
-    // We grabbed the frame, let's make it smaller
     
-    CGImageAlphaInfo	alphaInfo = CGImageGetAlphaInfo(image);
-        
-    if (alphaInfo == kCGImageAlphaNone)
-        alphaInfo = kCGImageAlphaNoneSkipLast;
-    
-    int  wid = CGImageGetWidth (image) + CGImageGetWidth (image) % 8;
-    int  ht =  CGImageGetHeight (image)  + CGImageGetHeight(image) % 8;  
-    
-    wid = 320;   // We've hardcoded the thumbnail size for now!
-    ht = 192;
-    
-    NSLog (@"image width,height = (%i, %i)", wid, ht);
-    
-    CGRect thumbRect = { 
-        {0.0f, 0.0f}, 
-        {(float) wid, (float) ht}
-    };
-    
-    NSLog (@"bits per component = %i, color space = %i",  CGImageGetBitsPerComponent(image), CGImageGetColorSpace(image));
-    
-    // Build a bitmap context that's the size of the thumbRect
-    
-    CGContextRef bitmap = CGBitmapContextCreate(
-                NULL,
-                thumbRect.size.width,		// width
-                thumbRect.size.height,		// height
-                CGImageGetBitsPerComponent(image),	
-                4 * thumbRect.size.width,	// rowbytes
-                CGImageGetColorSpace(image),
-                alphaInfo
-                );
-    
-    // Draw into the context, this scales the image
-    
-    CGContextDrawImage(bitmap, thumbRect, image);
-    
-    [self drawMarkups: bitmap width: wid height: ht];
-    
-    // Get an image from the context and create a UIImage
-    
-    CGImageRef	ref = CGBitmapContextCreateImage(bitmap);
-    self.newThumb = [UIImage imageWithCGImage:ref];
-    NSLog (@"saved image size = %f x %f", newThumb.size.width, newThumb.size.height);
-    
-    // Clean up
-    
-    CGContextRelease (bitmap);	
-    CGImageRelease (ref);
-    CGImageRelease (image);
+    self.newThumb = [self scaleImage: image andRotate: 0.0];
     [imageGen release];
 }
 
@@ -1180,7 +1490,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 // give us an image that we'll need to rotate
 //
 
-- (CGImageRef)CGImageRotatedByAngle:(CGImageRef)imgRef angle:(CGFloat)angle
+- (CGImageRef) CGImageRotatedByAngle:(CGImageRef)imgRef angle:(CGFloat)angle
 {
 	CGFloat angleInRadians = angle * (M_PI / 180);
 	CGFloat width = CGImageGetWidth(imgRef);
@@ -1303,9 +1613,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         return;
     }
     
-    // If there's no video player, or we're playing--ignore this save
+    // If there's no video player, or we're playing and there's no still showing--ignore this save
     
-    if (!player || player.rate != 0.0)
+    if ((!player || player.rate != 0.0) && !stillShows)
         return;
 
     // We're here, so we really want to save a note
@@ -1314,21 +1624,43 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     Note *aNewNote = [[Note alloc] init];
     
     // Capture the frame and draw the markups on it
-
-    [self frameDraw];
     
-    CMTime curTime =  kCMTimeMakeWithSeconds (kCVTime ([player currentTime]) + startTimecode);
+    if ( !stillShows )
+        [self frameDraw];
+    else {
+        self.newThumb = [self scaleImage: [stillImage CGImage] andRotate: rotAngles [rotate % 4]];     // markups drawn on top by the method
+    }
     
     // Capture any text typed into the note pad area
-
+    
     aNewNote.text = newNote.text;
+    CMTime curTime;
     
-    // Always store the time in timecode format
+    if ( !stillShows ) {
+        curTime =  kCMTimeMakeWithSeconds (kCVTime ([player currentTime]) + startTimecode);
     
-    BOOL saveFormat = timecodeFormat;
-    timecodeFormat = YES;
-    aNewNote.timeStamp = [self timeFormat: curTime];
-    timecodeFormat = saveFormat;
+        // Always store the time in timecode format
+        
+        BOOL saveFormat = timecodeFormat;
+        timecodeFormat = YES;
+        aNewNote.timeStamp = [self timeFormat: curTime];
+        timecodeFormat = saveFormat;
+        
+        // We use this to scale the markups as needed so it
+        // works on both the iPhone and iPad
+        
+        aNewNote.frameWidth = playerLayerView.frame.size.width;
+        aNewNote.frameHeight = playerLayerView.frame.size.height;
+        aNewNote.imageName = nil;
+        aNewNote.rotation = 0;
+    }
+    else {
+        aNewNote.frameWidth = drawView.frame.size.width;
+        aNewNote.frameHeight = drawView.frame.size.height;
+        aNewNote.timeStamp = @"";
+        aNewNote.imageName = [clip copy];
+        aNewNote.rotation = rotate;
+    }
     
     // Save the markups
     
@@ -1339,12 +1671,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     aNewNote.date = [self formatDate: NO];
     aNewNote.initials = initials;
-    
-    // We use this to scale the markups as needed so it
-    // works on both the iPhone and iPad
-    
-    aNewNote.frameWidth = playerLayerView.frame.size.width;
-    aNewNote.frameHeight = playerLayerView.frame.size.height;
 
     // If we made an audio note, save it as NSData
     
@@ -1357,22 +1683,27 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     isSaving = YES;
     aNewNote.thumb = UIImageJPEGRepresentation(newThumb, 0.25f);
+    assert (aNewNote.thumb);
     
     // Love this part.  Animate the frame and note going into the notes table
 
     [self animateSave];
     
-    // Find where to put the note in the table (sorted in timecode order)
+    int     row = 0;
     
-    Float64 now = CMTimeGetSeconds(curTime);
-                                         
-    int row = 0;
-    for (Note *theNote in noteData) {
-        if ([self convertTimeToSecs: theNote.timeStamp] > now)
-            break;
-        ++row;
+    if ( !stillShows ) {
+        // Find where to put the note in the table (sorted in timecode order)
+        
+        Float64 now = CMTimeGetSeconds(curTime);
+                                             
+        row = 0;
+        for (Note *theNote in noteData) {
+            if ([self convertTimeToSecs: theNote.timeStamp] > now)
+                break;
+            ++row;
+        }
     }
-    
+        
     // Insert the note into the array and table
     
     NSIndexPath *indexP = [NSIndexPath indexPathForRow: row inSection:0];
@@ -1396,13 +1727,14 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         //do nothing
         NSLog (@"Race condition with notes table exception: %@", [e reason]);
     }
+    
+    [indexPaths release];
 
     // Clear the note
     
     newNote.text = @"";
     [self erase];
     madeRecording = NO;
-    [indexPaths release];
     [self storeData];
     
     pendingSave = NO;
@@ -1809,7 +2141,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 -(void) storeData  {
     NSMutableArray *myNotes = [self getMyNotes];
     NSString *archivePath = [self archiveFilePath];
-    
+        
     // Write the notes to a local archive file first 
     
     if ([NSKeyedArchiver archiveRootObject: myNotes toFile: archivePath] == NO) {
@@ -2559,11 +2891,20 @@ Next:
     
     // output the note
     
-    NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
-    [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
-    
-    [emailBody appendString: [NSString stringWithFormat: @"<td valign=top><font color=red>%@</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;%@<p></p>%@", 
-                timeFormat, theNote.date, theNote.initials, comment]];
+    if (! theNote.imageName ) {
+        NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
+        [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
+        
+        [emailBody appendString: [NSString stringWithFormat: @"<td valign=top><font color=red>%@</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;%@<p></p>%@", 
+                    timeFormat, theNote.date, theNote.initials, comment]];
+    }
+    else {
+        NSString *image = [[theNote.imageName lastPathComponent] stringByDeletingPathExtension];
+        
+        [emailBody appendString: [NSString stringWithFormat: @"<td valign=top><font color=red>%@</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;%@<p></p>%@", 
+                                  image, theNote.date, theNote.initials, comment]];
+    }
+        
  
     // audio -- upload to server and embed in HTML
     
@@ -2797,19 +3138,34 @@ Next:
     
     // We'll use the thumbnail for the note image....the quality is acceptable
     
-    CGContextDrawImage (pdfContext, CGRectMake (40, currentY - 155, 250, 150), [UIImage imageWithData: aNote.thumb].CGImage);
+    UIImage *theImage = [UIImage imageWithData: aNote.thumb];
+    float wid = theImage.size.width;
+    float ht = theImage.size.height;
+    
+    wid =  (150 / ht) * wid;
+    ht = 150;
+    
+    CGContextDrawImage (pdfContext, CGRectMake (40, currentY - 155, wid, ht), theImage.CGImage);
 
     // Fill in the usual suspects for the note info: date/time stamp, initials, note text
     
-    CGContextSelectFont (pdfContext, "Helvetica-Bold", 12, kCGEncodingMacRoman);
-    CGContextSetRGBFillColor (pdfContext, 1, 0, 0, 1);
-    CGContextShowTextAtPoint (pdfContext, 330, currentY - 20, noteTime, strlen(noteTime));
+    if (! aNote.imageName) {
+        CGContextSelectFont (pdfContext, "Helvetica-Bold", 12, kCGEncodingMacRoman);
+        CGContextSetRGBFillColor (pdfContext, 1, 0, 0, 1);
+        CGContextShowTextAtPoint (pdfContext, 330, currentY - 20, noteTime, strlen(noteTime));
+    }
+    else {
+        const char *image = [[[aNote.imageName lastPathComponent] stringByDeletingPathExtension] UTF8String];
+        CGContextSelectFont (pdfContext, "Helvetica-Bold", 12, kCGEncodingMacRoman);
+        CGContextSetRGBFillColor (pdfContext, 1, 0, 0, 1);
+        CGContextShowTextAtPoint (pdfContext, 330, currentY - 20, image, strlen(image));
+    }
     
     CGContextSelectFont (pdfContext, "Helvetica", 12, kCGEncodingMacRoman);
     CGContextSetRGBFillColor (pdfContext, 0, 0, 1, 1);
  
     char *dateInitials = strcat (strcat (date, "   "), who);
-	CGContextShowTextAtPoint (pdfContext, 490, currentY - 20, dateInitials, strlen(dateInitials));
+    CGContextShowTextAtPoint (pdfContext, 490, currentY - 20, dateInitials, strlen(dateInitials));
     CGContextSetRGBFillColor (pdfContext, 0, 0, 0, 1);
     
     // I think there's an easier way to do the line wrapping for the note.... I chose the hard way!
@@ -3280,72 +3636,108 @@ static int saveRate;
 
 // 
 // This method is used to put the app back to a "sane" state
-// We don't do anything unless we have an active video clip
-// We'll pause it, remove the clip from playback, remove any observers, stop any activity indicators
+// We don't do anything unless we have an active video clip or a still showing
+// For a still, we'll remove its display, and clear any markups and notes
+// For a video, we'll pause it, remove the clip from playback, remove any observers, stop any activity indicators
 // We'll also leave fullScreen or airPlay modes if active
 //
 
 -(void) cleanup
 {
-        if (!player)
-            return;
+    NSLog (@"cleaning up");
 
-        NSLog (@"cleaning up");
-
-        [player removeObserver: self forKeyPath:@"rate"];
-        [player removeObserver: self forKeyPath:@"currentItem.status"];
-        [player removeObserver: self forKeyPath:@"currentItem.asset.duration"];
-        [player removeObserver: self forKeyPath:@"currentItem.asset.commonMetadata"];
-        [self stopObservingTimeChanges];
-
-        player.rate = 0;
+    newNote.text = @"";
     
-        [self pauseIt];
-        [self stopActivity];
-        [self noteStopActivity];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                        name:AVPlayerItemDidPlayToEndTimeNotification  object:nil];
 
-        if (!autoPlay && fullScreenMode)
-            [self leaveFullScreen: nil];
-        
-       if (airPlayMode && !runAllMode && !autoPlay)
-           [self airPlay];
-        else    
-            [self movieControllerDetach];
-
-        // Clear any current note or markup
-    
-        [self clearAnyNotes];
+    if (stillShows) {
+        [stillView removeFromSuperview];
+        stillShows = NO;
+        drawView.frame = drawViewFrame;
         [self erase];
-        [drawView setNeedsDisplay];
+        [self clearAnyNotes];
+        
+        // hide buttons that don't apply
+        
+        theTime.hidden = NO;
+        backgroundLabel.hidden = NO;
+        movieTimeControl.hidden = NO;
+        maxLabel.hidden = NO;
+        minLabel.hidden = NO;
+        rewindToStartButton.enabled = YES; 
+        frameBackButton.enabled = YES; 
+        frameForwardButton.enabled = YES; 
+        forwardToEndButton.enabled = YES; 
+        rewindButton.enabled = YES;
+        fastForwardButton.enabled = YES;
+        //  pausePlayButton.enabled = NO;
+        
+        skipForwardButton.enabled = YES;
+        skipBackButton.enabled = YES;
+        skipForwardButton.title = [NSString stringWithFormat: @"+%i", skipValue];
+        skipBackButton.title = [NSString stringWithFormat: @"-%i", skipValue];;
+        
+        return;
+    }
     
-        // Get rid of our player
+    if (!player)
+        return;
     
-        self.playerLayer.player = nil; // this is the trick !
-        [self.playerLayer removeFromSuperlayer];
-        self.playerLayer = nil;
-        self.currentlyPlaying = nil;
-        player = nil;
-    
-        // We shouldn't be recording
+    [self stopObservingTimeChanges];
 
-        if ([voiceMemo audioRecorder].isRecording)            
-            [voiceMemo stopRecording];
+    [player removeObserver: self forKeyPath:@"rate"];
+    [player removeObserver: self forKeyPath:@"currentItem.status"];
+    [player removeObserver: self forKeyPath:@"currentItem.asset.duration"];
+    [player removeObserver: self forKeyPath:@"currentItem.asset.commonMetadata"];
+
+    player.rate = 0;
+
+    [self pauseIt];
+    [self stopActivity];
+    [self noteStopActivity];
+
+    if (!autoPlay && fullScreenMode)
+        [self leaveFullScreen: nil];
     
-        recording.hidden = YES;
-    
-        // Reset various vars to sane values
-    
-        fps = 0;
-        isPrinting = NO;
-        movieTimeControl.value = 0;
-        durationSet = NO;
-        theTime.text = [self timeFormat: kCMTimeZero];
-        newNote.text = @"";
-        maxLabelSet = NO;  
-        startTimecode = 0.0;
-        reTryCount = 0;
-        maxLabel.text = [self timeFormat: kCMTimeZero];
-        minLabel.text = [self timeFormat: kCMTimeZero];
+   if (airPlayMode && !runAllMode && !autoPlay)
+       [self airPlay];
+    else    
+        [self movieControllerDetach];
+
+    // Clear any current note or markup
+
+    [self clearAnyNotes];
+    [self erase];
+    [drawView setNeedsDisplay];
+
+    // Get rid of our player
+
+    self.playerLayer.player = nil; // this is the trick !
+    [self.playerLayer removeFromSuperlayer];
+    self.playerLayer = nil;
+    self.currentlyPlaying = nil;
+    player = nil;
+
+    // We shouldn't be recording
+
+    if ([voiceMemo audioRecorder].isRecording)            
+        [voiceMemo stopRecording];
+
+    recording.hidden = YES;
+
+    // Reset various vars to sane values
+
+    fps = 0;
+    isPrinting = NO;
+    movieTimeControl.value = 0;
+    durationSet = NO;
+    theTime.text = [self timeFormat: kCMTimeZero];
+    maxLabelSet = NO;  
+    startTimecode = 0.0;
+    reTryCount = 0;
+    maxLabel.text = [self timeFormat: kCMTimeZero];
+    minLabel.text = [self timeFormat: kCMTimeZero];
 }
 
 //
@@ -3357,7 +3749,7 @@ static int saveRate;
 {
     editButton.title = @"Edit";
 
-    if (player) 
+    if (player || stillShows) 
         [self cleanup];
     else
         [self erase];
@@ -3592,6 +3984,12 @@ static int saveRate;
 -(IBAction) airPlay
 {
     // Remove the "DVD Remote" if it shows
+
+    
+    if (stillShows) {  /// kludge here!
+        [self rotateStill];
+        return;
+    }
     
     [UIView animateWithDuration: .3 animations: ^{ 
         remote.alpha = 0;
@@ -3761,7 +4159,7 @@ static int saveRate;
 
 -(BOOL) nextClip
 {
-    DetailViewController *dc =  [ kAppDel tvc];
+    DetailViewController *dc =  [kAppDel tvc];
     
     NSLog (@"autoplay next clip");
     return [dc nextClip];
@@ -3834,24 +4232,31 @@ static int saveRate;
 // FullScreen support using AVPlayer
 
 -(IBAction) fullScreen
-{    
-    if (!player)
+{ 
+    if (!player && !stillShows)
         return;
-    
-    [self pauseIt];
-    [self erase];
     
     if (! iPHONE) {
         [[UIApplication sharedApplication] setStatusBarHidden: YES 
-            withAnimation: UIStatusBarAnimationFade];
+                                                withAnimation: UIStatusBarAnimationFade];
         
         UINavigationController  *nc = [(VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] nc];
         nc.view.hidden = YES;
     }
     
+    if (player) {
+        [self pauseIt];
+        [self erase];
+    }
+
     [UIView animateWithDuration: .3 animations: ^{ 
         playerLayerView.frame = CGRectMake (0.0, 0.0, [UIScreen mainScreen].applicationFrame.size.height, [UIScreen mainScreen].applicationFrame.size.width);
         playerLayer.frame = playerLayerView.frame;
+        
+        if (stillShows) {
+            saveFrame2 = stillView.frame;
+            stillView.frame = playerLayerView.frame;
+        }
     }];
         
     // We have to hide everything so full screen playback looks nice
@@ -3882,7 +4287,9 @@ static int saveRate;
     }
     
     [playerLayerView addSubview: stampLabelFull];
-    [player play];
+    
+    if (player)
+        [player play];
 }
 
 // Leave full screen playback 
@@ -3894,6 +4301,9 @@ static int saveRate;
     [UIView animateWithDuration: .3 animations: ^{
         playerLayerView.frame = saveFrame;
         playerLayer.frame = playerLayerView.layer.bounds;
+        
+        if (stillShows)
+            stillView.frame = saveFrame2;
     }];
     
     // We hid the navgation controlller on the iPad (on the iPhone, it's a drop down)
@@ -3926,6 +4336,14 @@ static int saveRate;
         pausePlayButton.image = pauseImage;
 }
 
+// 
+// Leave full screen for still autoplay
+//
+
+-(void) leaveFullScreenStill
+{
+}
+
 //
 // Notification when player reaches the end of playback
 //
@@ -3934,12 +4352,27 @@ static int saveRate;
 {
     NSLog (@"Item did play to end");
     
-	seekToZeroBeforePlay = YES;
+    seekToZeroBeforePlay = YES;
     
     if (autoPlay) {
         if (! [self nextClip] && fullScreenMode)
             [self leaveFullScreen: nil];
     }
+}
+
+//
+// Notification when still has been displayed for slideTime secs
+//
+
+-(void) stillDidTimeOut: (NSTimer *) theTimer
+{
+    NSLog (@"Still did time out autoplay");
+    
+    [slideshowTimer invalidate];
+    self.slideshowTimer = nil;
+    
+    if (! [self nextClip] && fullScreenMode )
+        [self leaveFullScreenStill];
 }
 
 //
@@ -4103,20 +4536,27 @@ static int saveRate;
     
     cell.imageView.image = [UIImage imageWithData: theNote.thumb]; 
     
+    [self dumpRect: cell.imageView.frame title: @"cell.imageView.frame"];
+    NSLog (@"tableView image size = (%g, %g)", cell.imageView.image.size.width, cell.imageView.image.size.height);
+    
     // The typed note 
    
     cell.detailTextLabel.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
     
-    // The time in either timecode or frame number format
-    
-    NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
-            [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
-    
-    // The time, the date of the note, and the initials of the user that made the note
-    
-    cell.textLabel.text = [NSString stringWithFormat: @"%@ %@ %@", timeFormat, 
-            [theNote.date length] > 3 ? 
-            [theNote.date substringToIndex: [theNote.date length] - 3] : @"", theNote.initials];
+    if (! theNote.imageName)  { // means it's a video 
+        // The time in either timecode or frame number format
+        
+        NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
+                [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
+        
+        // The time, the date of the note, and the initials of the user that made the note
+        
+        cell.textLabel.text = [NSString stringWithFormat: @"%@ %@ %@", timeFormat, 
+                [theNote.date length] > 3 ? 
+                [theNote.date substringToIndex: [theNote.date length] - 3] : @"", theNote.initials];
+    }
+    else
+        cell.textLabel.text = [NSString stringWithFormat: @"%@ %@", [[theNote.imageName lastPathComponent] stringByDeletingPathExtension], theNote.initials];
     
     // My notes look different in the table than everyone else's
     
@@ -4188,8 +4628,11 @@ static int saveRate;
 
     drawView.colors = theNote.colors;
     drawView.myDrawing = theNote.drawing;
-    drawView.scaleWidth =  playerLayerView.frame.size.width  / theNote.frameWidth;
-    drawView.scaleHeight =  playerLayerView.frame.size.height / theNote.frameHeight;
+    drawView.scaleWidth =  drawView.frame.size.width  / theNote.frameWidth;
+    drawView.scaleHeight =  drawView.frame.size.height / theNote.frameHeight;
+    
+    // drawView.scaleWidth =  playerLayerView.frame.size.width  / theNote.frameWidth;
+    // drawView.scaleHeight =  playerLayerView.frame.size.height / theNote.frameHeight;
     
     if ( drawView.scaleWidth == 0.0 || drawView.scaleWidth == NAN)
         drawView.scaleWidth = drawView.scaleHeight = 1.0;
@@ -4246,6 +4689,10 @@ static int saveRate;
     
     [theTimer invalidate];
     self.theTimer = nil;
+    
+    [slideshowTimer invalidate];
+    self.slideshowTimer = nil;
+    [stillImage release];
     
     [theAsset release];
     [noteData release];
