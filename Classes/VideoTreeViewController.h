@@ -56,6 +56,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
     id                          playerTimeObserver;         // timer for frame forward/reverse
     NSURL                       *movieURL;                  // As its name implies
+    NSString                    *mediaPath;                 // For loading stills from notes
 
     UILabel                     *stampLabel, *stampLabelFull;   // The labels for the watermark (one for full screen)
     UILabel                     *theTime;                   // The current time
@@ -168,6 +169,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
                 
     UIImageView                 *stillView;             // The view to hold the still
     BOOL                        stillShows;
+    BOOL                        noteTableSelected;
     int                         rotate;                 // 0 - 3 for 90 degree rotations
     CGRect                      drawViewFrame;
     UIImage                     *stillImage;
@@ -175,6 +177,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @property (nonatomic, retain)  NSString                     *showName;
 @property (nonatomic, retain)  NSURL                        *movieURL;
+@property (nonatomic, retain)  NSString                     *mediaPath;
 @property (nonatomic, retain)  UIImage                      *FCPImage;
 @property (nonatomic, retain)  UIImage                      *AvidImage;
 
@@ -220,7 +223,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property BOOL isPrinting;
 @property BOOL keyboardShows;
 @property BOOL stillShows;
-
+@property BOOL noteTableSelected;
 
 @property (nonatomic, retain)  UIImageView *stillView;
 @property (nonatomic, retain)  UIImage *stillImage;
@@ -332,6 +335,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 // Data storage and loading
 
 -(void) loadData: (NSString *) theInitials;
+-(void) getAllFTPNotes;
 -(void) storeData;
 #ifdef APPSTORE
 -(void) drawMarkups: (CGContextRef) ctx width: (float) wid height: (float) ht;
@@ -373,6 +377,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(UIImage *) scaleImage: (CGImageRef) image  andRotate: (float) angle;
 -(void) leaveFullScreenStill;
 
+-(NSURL *) getTheURL: (NSString *) thePath;   // Used by loadMovie: and loadStill:
 
 @end
 

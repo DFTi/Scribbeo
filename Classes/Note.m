@@ -58,6 +58,7 @@
     [colors release];
     [date release];
     [initials release];
+    [imageName release];
     
     [super dealloc];
 }

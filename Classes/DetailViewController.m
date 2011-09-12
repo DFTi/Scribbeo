@@ -626,6 +626,8 @@ static int retryCount;      // We don't give up on FTP failures that easily
         
         NSString *extension = [[files objectAtIndex: indexPath.row] pathExtension];
         
+        vc.noteTableSelected = NO;
+        
         if ( kIsMovie (extension) )
             [vc loadMovie: moviePath];
         else

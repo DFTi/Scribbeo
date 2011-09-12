@@ -50,11 +50,12 @@ static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewC
 @synthesize showName, newNote, fullScreenMode, drawView, movieTimeControl, notes, newThumb, noteBar, drawingBar;
 @synthesize player, seekToZeroBeforePlay, movieURL, playerLayerView, theTime, maxLabel, minLabel, noteData, currentlyPlaying, isSaving, markers;
 @synthesize pausePlayButton, pauseImage, playImage, recImage, isRecordingImage, clip, clipPath, show, tape, filmDate, playerLayer, 
-            editButton, initials, episode, playerItem, slideshowTimer, theTimer;
+editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSelected;
+;
 @synthesize progressView, activityIndicator, notePaths, xmlPaths, txtPaths, noteProgressView, noteActivityIndicator, volLabel, curInitials, movieController;
 @synthesize  stampLabel, stampLabelFull, theAsset, startTimecode, download, clipLabel, runAllMode;
 @synthesize rewindToStartButton, frameBackButton, frameForwardButton, forwardToEndButton, fullScreenButton, rewindButton, fastForwardButton, airPlayMode, remote;
-@synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo;
+@synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo, mediaPath;
 @synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage;
 
 #pragma mark -
@@ -102,6 +103,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [self.view addSubview: myVolumeView];
     }
     
+#if 0
     // remove the playout button from the toolbar if iOS 5 or greater
     
     if (kRunningOS5OrGreater) {
@@ -109,6 +111,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [items removeObject: playOutButton];
         playerToolbar.items = items;
     }
+#endif
+    
+    playOutButton.image = [UIImage imageNamed: @"rotate.png"];
     
     // Make sure the upload indicator is off
     
@@ -190,6 +195,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     durationSet = NO;
     selectedNextClip = NO;
     airPlayMode = NO;
+    noteTableSelected = NO;
     
     fps = 0.0;
     pausePlayButton.enabled = NO;
@@ -384,18 +390,46 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
 -(void) loadStill: (NSString *) link 
 {
-    NSData *imageData = [NSData dataWithContentsOfURL: [NSURL URLWithString: link]];
+    self.movieURL = [self getTheURL: link];
+    self.mediaPath = link;
+    
+    NSData *imageData = [NSData dataWithContentsOfURL: movieURL];
+    
+    if (!imageData) {
+        [UIAlertView doAlert: @"Still Image" 
+                     withMsg: @"I couldn't read the image!"];
+        return;
+    }
+    
+    // currentFolder = [link stringByDeletingLastPathComponent];
     
     // Are we currently showing a still or a video player?
+    // If we selected the still from the notes table, we don't want to do any cleanup work here
+    // If we selected the still from the clip table (or it's being autoplayed) we do want to
+    // load the notes
     
-    if (player)
-        [self cleanup];
-    else {
-        drawView.frame = drawViewFrame;
-        [self erase];
-        [self clearAnyNotes];
+    if (! noteTableSelected) 
+        if (player)
+            [self cleanup];
+        else {
+            [self erase];
+            [self clearAnyNotes];
+        }
+
+    stillShows = YES;
+
+    if (! noteTableSelected) {
+        // Load the notes table
+        
+        if (kFTPMode)
+            [self getAllFTPNotes];
+        else {
+            [self loadData: initials];
+        }
     }
- 
+    
+    drawView.frame = drawViewFrame;
+
     // No current rotation
     
     rotate = 0;
@@ -405,13 +439,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
     // Load the image
     
-    if (stillImage) {
+    if (stillImage) 
         [stillImage release];
-        stillImage = nil;
-    }
     
     stillImage = [[UIImage alloc] initWithData: imageData];
-    stillView = [[UIImageView alloc] initWithImage: stillImage];
+    stillView = [[[UIImageView alloc] initWithImage: stillImage] autorelease];
     
     if (fullScreenMode)
         drawView.frame = stillView.frame = playerLayerView.frame;
@@ -432,24 +464,26 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     CGRect newFrame = drawView.frame;
     
     // Adjust the frame to keep the markups inside the still (or close to it)
+    // This won't necessarily work for an image that larger in both dimensions
     
-    if (htDiff > widDiff) {
+    if (htDiff > widDiff)  {
         scale = drawView.frame.size.height / stillView.image.size.height;
-        newFrame.size.width *= scale;
-        newFrame.origin.x = (drawView.frame.size.width - newFrame.size.width) / 2;
+//      newFrame.size.width *= scale;
+//      newFrame.origin.x = (drawView.frame.size.width - newFrame.size.width) / 2;
     }
     else {
         scale = drawView.frame.size.width / stillView.image.size.width;
-        newFrame.size.height *= scale;
-        newFrame.origin.y = (drawView.frame.size.height - newFrame.size.height) / 2;
+//      newFrame.size.height *= scale;
+//      newFrame.origin.y = (drawView.frame.size.height - newFrame.size.height) / 2;
     }
-    
+
     NSLog (@"widDiff = %g, htDiff = %g, scale = %g", widDiff, htDiff, scale);
     
     stillView.frame = drawView.frame; 
     drawView.frame = newFrame;
         
     [self dumpRect: drawView.layer.frame title: @"new drawView.layer.frame"];
+    [self dumpRect: drawView.layer.bounds title: @"new drawView.layer.bounds"];
     
     // Show the still now and add the drawing frame on top
     
@@ -458,15 +492,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [playerLayerView addSubview: stillView];
     [stillView addSubview: drawView];
     
-    if (autoPlay)
+    if (autoPlay) {
         pausePlayButton.image = pauseImage;
+        pausePlayButton.enabled = YES;
+    }
 
-    
     if (stillShows) {
         stillView.alpha = 0;
 
         [UIView beginAnimations:nil context: currentView];
-        [UIView setAnimationDuration: 2.0]; // set the animation length
+        [UIView setAnimationDuration: (noteTableSelected) ? .25 : 2.0]; // set the animation length
         [UIView setAnimationDelegate:self]; // set the animation delegate
         
         // call the given method when the animation ends
@@ -526,13 +561,13 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         stillShows = YES;
     }
     
-    if (autoPlay)
+    if (autoPlay && ! noteTableSelected)
         self.slideshowTimer = [NSTimer scheduledTimerWithTimeInterval: slideshowTime target:self 
                                                        selector:@selector(stillDidTimeOut:) userInfo:nil repeats: NO]; 
 }
 
 - (void) rotateStill {
-    // Yucch!  We'll need to rotate the markups as well?
+    // Yucch!  We'll need to rotate the markups as well? -- no, we'll just clear them--it's easier that way!
     
     [self erase];
             
@@ -568,7 +603,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     newFrame.origin.y += (curHt - newFrame.size.height) / 2;
 
     // Now rotate the image
-    
     
     CGImageRef imageRef = [stillImage CGImage];
     stillView.image =  [UIImage imageWithCGImage: imageRef scale: 1
@@ -1659,7 +1693,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         aNewNote.frameHeight = drawView.frame.size.height;
         aNewNote.timeStamp = @"";
         aNewNote.imageName = [clip copy];
-        aNewNote.rotation = rotate;
+        aNewNote.rotation = rotate % 4;
     }
     
     // Save the markups
@@ -2051,10 +2085,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     [xmlPaths removeAllObjects];
     [txtPaths removeAllObjects];
     
-    // We will look at each file to see if it contains the clip name.  Then look at the extension:
+    // We will look at each file to see if it contains the clip name.  Then look at the extension.
     // 1. XML: FCP XML file for import
     // 2. txt: Avid Locator file for import
-    // 3. movie file: Skip it
+    // 3. movie or still file: Skip it
     // 4. Anything else: assume it's a note file (the extension is the initials)
 
 	for (NSDictionary *dict in listing) {
@@ -2068,19 +2102,19 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         
         NSString *extension = [fileName pathExtension];
         
-        if ( EQUALS (extension, @"mp4") || EQUALS (extension, @"m4v")  
-            || EQUALS (extension, @"mov") || EQUALS (extension, @"m3u8")) {
+        if ( kIsMovie (extension) || kIsStill (extension) ) {
             NSLog2 (@"Skipping FTP file %@", fileName);
             continue;
         }
         
         // Look for an XML or txt (Avid import) or note file
         
-        if ( EQUALS (extension, @"xml") ) {
+        
+        if ( !stillShows && EQUALS (extension, @"xml") ) {
             [xmlPaths addObject: fileName];
             NSLog (@"Found XML file %@", fileName );
         }
-        else if ( EQUALS (extension, @"txt") ) {
+        else if ( !stillShows && EQUALS (extension, @"txt") ) {
             [txtPaths addObject: fileName];
             NSLog (@"Found txt file (Avid import) %@", fileName );
         }
@@ -2096,7 +2130,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [self loadData: [notePaths objectAtIndex: 0]];
     else {
         [self noteStopActivity];
-        [self setStartTimecode];
+        
+        if (!stillShows)
+            [self setStartTimecode];
     }
 }
 
@@ -2282,7 +2318,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 Next:
     ++noteFileProcessed;
     if (noteFileProcessed >= [notePaths count]) {
-        [self setStartTimecode];        
+        if (!stillShows)
+            [self setStartTimecode]; 
+        
         [self noteStopActivity];
 
         return;
@@ -3647,11 +3685,17 @@ static int saveRate;
     NSLog (@"cleaning up");
 
     newNote.text = @"";
+    noteTableSelected = NO;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self
                         name:AVPlayerItemDidPlayToEndTimeNotification  object:nil];
 
     if (stillShows) {
+        if (slideshowTimer) {
+            [slideshowTimer invalidate];
+            self.slideshowTimer = nil;
+        }
+        
         [stillView removeFromSuperview];
         stillShows = NO;
         drawView.frame = drawViewFrame;
@@ -3740,6 +3784,39 @@ static int saveRate;
     minLabel.text = [self timeFormat: kCMTimeZero];
 }
 
+-(NSURL *) getTheURL: (NSString *) thePath
+{
+    NSURL  *theURL = (NSURL *) thePath;
+    
+    // Generate an NSURL object from the argument if it's a string 
+    // (Otherwise assume it's already an NSURL)
+
+    if ([thePath isKindOfClass: [NSString class]]) {
+        NSRange network = [thePath rangeOfString: @"http:"];
+        
+        if (network.location == NSNotFound)
+            network = [thePath rangeOfString: @"https:"];
+        if (network.location == NSNotFound)
+            network = [thePath rangeOfString: @"file:"];
+        
+        if (network.location == NSNotFound) {
+            NSLog (@"Loading movie/still %@", thePath);
+            
+            if ([thePath rangeOfString: @"Simulator"].location != NSNotFound)
+                theURL = [[NSURL alloc] initFileURLWithPath: [[NSBundle mainBundle] pathForResource: @"31-1A" ofType:@"m4v"]];
+            else
+                theURL = [[NSURL alloc] initFileURLWithPath: thePath];
+            
+        }
+        else {
+            NSLog (@"Loading movie/still %@ from Internet or camera roll", thePath);
+            theURL = [NSURL URLWithString: thePath];
+        }
+    }
+
+    return theURL;
+}
+
 //
 // This is the method responsible for initiating playback of a video clip
 // We use the AVPlayer class for this
@@ -3764,32 +3841,8 @@ static int saveRate;
     [[NSNotificationCenter defaultCenter] removeObserver:self
                 name:AVPlayerItemDidPlayToEndTimeNotification  object:nil];
 
-    // Generate an NSURL object from the argument if it's a string 
-    // (Otherwise assume it's already an NSURL
-    
-    if ([theMovie isKindOfClass: [NSString class]]) {
-        NSRange network = [theMovie rangeOfString: @"http:"];
-        if (network.location == NSNotFound)
-            network = [theMovie rangeOfString: @"https:"];
-        if (network.location == NSNotFound)
-            network = [theMovie rangeOfString: @"file:"];
-        
-        if (network.location == NSNotFound) {
-            NSLog (@"Loading movie %@", theMovie);
-            
-            if ([theMovie rangeOfString: @"Simulator"].location != NSNotFound)
-                movieURL = [[NSURL alloc] initFileURLWithPath: [[NSBundle mainBundle] pathForResource: @"31-1A" ofType:@"m4v"]];
-            else
-                movieURL = [[NSURL alloc] initFileURLWithPath: theMovie];
-            
-        }
-        else {
-            NSLog (@"Loading movie %@ from Internet or camera roll", theMovie);
-            self.movieURL = [NSURL URLWithString: theMovie];
-        }
-    }
-    else
-         self.movieURL = theMovie;
+    self.movieURL = [self getTheURL: theMovie];
+    self.mediaPath = theMovie;
     
 #if 0
     // This never worked!
@@ -4622,22 +4675,33 @@ static int saveRate;
         
         [audioPlayer play];
     }
-        
-    // We want to draw the markups onto the frame
-    // Set up the data in the drawView object and then have the markups drawn
-
+    
     drawView.colors = theNote.colors;
     drawView.myDrawing = theNote.drawing;
-    drawView.scaleWidth =  drawView.frame.size.width  / theNote.frameWidth;
-    drawView.scaleHeight =  drawView.frame.size.height / theNote.frameHeight;
     
-    // drawView.scaleWidth =  playerLayerView.frame.size.width  / theNote.frameWidth;
-    // drawView.scaleHeight =  playerLayerView.frame.size.height / theNote.frameHeight;
-    
-    if ( drawView.scaleWidth == 0.0 || drawView.scaleWidth == NAN)
+    if (theNote.imageName)  {  // Load in the still
+        noteTableSelected = YES;
+        
+        [self loadStill:  [[mediaPath stringByDeletingLastPathComponent] stringByAppendingPathComponent: theNote.imageName]];
+        
+        for (int i = 0; i < theNote.rotation; ++i)   // get the still in the right orientation---maybe not the most elegant solution here
+            [self rotateStill];
+        
         drawView.scaleWidth = drawView.scaleHeight = 1.0;
+    }
+    else {
+        // We want to draw the markups onto the frame
+        // Set up the data in the drawView object and then have the markups drawn
+
+        drawView.scaleWidth =  drawView.frame.size.width  / theNote.frameWidth;
+        drawView.scaleHeight =  drawView.frame.size.height / theNote.frameHeight;
+    
+        if ( drawView.scaleWidth == 0.0 || drawView.scaleWidth == NAN )
+            drawView.scaleWidth = drawView.scaleHeight = 1.0;
+    }
 
     [drawView setNeedsDisplay];   // Draw the markups
+    
     [self updateTimeLabel];
     [self updateTimeControl];
 }
