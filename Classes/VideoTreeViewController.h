@@ -173,6 +173,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
     int                         rotate;                 // 0 - 3 for 90 degree rotations
     CGRect                      drawViewFrame;
     UIImage                     *stillImage;
+    BOOL                        allStills;              // Does the folder contain all stills?
 }
 
 @property (nonatomic, retain)  NSString                     *showName;
@@ -224,6 +225,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property BOOL keyboardShows;
 @property BOOL stillShows;
 @property BOOL noteTableSelected;
+@property BOOL allStills;
 
 @property (nonatomic, retain)  UIImageView *stillView;
 @property (nonatomic, retain)  UIImage *stillImage;
@@ -338,7 +340,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(void) getAllFTPNotes;
 -(void) storeData;
 #ifdef APPSTORE
--(void) drawMarkups: (CGContextRef) ctx width: (float) wid height: (float) ht;
+-(void) drawMarkups: (CGContextRef) ctx;
 #endif
 -(void) animateSave;
 -(IBAction) save;

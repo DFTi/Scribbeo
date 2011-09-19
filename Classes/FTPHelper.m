@@ -691,7 +691,6 @@ static Boolean MySimpleDownload(CFStringRef urlString, CFURLRef downloadPath, CF
 	
     assert(urlString != NULL);
     assert( (username != NULL) || (password == NULL) );
-
     /* Create a CFURL from the urlString. */
     downloadURL = CFURLCreateWithString(kCFAllocatorDefault, urlString, NULL);
     assert(downloadURL != NULL);

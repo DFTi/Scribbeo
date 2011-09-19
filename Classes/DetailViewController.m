@@ -201,6 +201,8 @@ static int retryCount;      // We don't give up on FTP failures that easily
 {
     NSLog (@"receivedListing");
     
+    allStills = YES;
+    
 	for (NSDictionary *dict in listing) {
         NSString *fileName = [FTPHelper textForDirectoryListing:(CFDictionaryRef) dict];
         
@@ -210,9 +212,12 @@ static int retryCount;      // We don't give up on FTP failures that easily
         
         NSString *extension = [fileName pathExtension];
         
-        if ( cfType != kDirectory && !(kIsMovie (extension) || kIsStill (extension)) ) {
+        
+        if (cfType != kDirectory && kIsMovie (extension))
+            allStills = NO;
+        
+        if ( cfType != kDirectory && !(kIsMovie (extension) || kIsStill (extension)) )
             continue;
-        }
         
         if ( cfType == kDirectory && ([fileName isEqualToString: @"Notes"]
                         || [fileName isEqualToString: @"Library"]))
@@ -541,7 +546,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
             }
             @catch (NSException *exception) {
                 NSLog (@"Couldn't select next clip!");
-                return NO;
+                break;
             }
 
             return YES;
@@ -570,6 +575,11 @@ static int retryCount;      // We don't give up on FTP failures that easily
         NSString *docDir = [dirList objectAtIndex: 0];
         self.moviePath = [docDir stringByAppendingPathComponent: theMovie];
     }
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return (kFTPMode) ? NO : YES;
 }
 
 // 
@@ -623,6 +633,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
         
         vc.clip =  theMedia;
         vc.clipPath = theMedia;
+        vc.allStills = allStills;
         
         NSString *extension = [[files objectAtIndex: indexPath.row] pathExtension];
         

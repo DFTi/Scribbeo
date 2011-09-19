@@ -16,6 +16,20 @@
 #import <Endian.h>
 #import "VoiceMemo.h"
 
+@interface UIImage (TPAdditions)
+- (UIImage*)imageScaledToSize:(CGSize)size;
+@end
+
+@implementation UIImage (TPAdditions)
+- (UIImage *)imageScaledToSize:(CGSize)size {
+    UIGraphicsBeginImageContext(size);
+    [self drawInRect:CGRectMake(0, 0, size.width, size.height)];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+@end
+
 // Both of these map to the value of "rotate".  The first array maps before the rotation, the second after 
 // (just has to do with the way the rotate ivar is incremented)
 
@@ -46,6 +60,7 @@ static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewC
 @synthesize airPlayImageView;
 @synthesize playerToolbar;
 @synthesize playOutButton;
+@synthesize allStills;
 
 @synthesize showName, newNote, fullScreenMode, drawView, movieTimeControl, notes, newThumb, noteBar, drawingBar;
 @synthesize player, seekToZeroBeforePlay, movieURL, playerLayerView, theTime, maxLabel, minLabel, noteData, currentlyPlaying, isSaving, markers;
@@ -202,7 +217,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     self.pauseImage = [UIImage imageNamed: @"pause2.png"];
     self.playImage = [UIImage imageNamed: @"play.png"];
 
-    seekToZeroBeforePlay = YES;         // Only when we start playing or reached the end
+    seekToZeroBeforePlay = YES;     // Only when we start playing or reached the end
     movieTimeControl.value = 0; 
     drawView.hidden = NO;              
     notePaper.hidden = NO;          
@@ -400,9 +415,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
                      withMsg: @"I couldn't read the image!"];
         return;
     }
-    
-    // currentFolder = [link stringByDeletingLastPathComponent];
-    
+        
     // Are we currently showing a still or a video player?
     // If we selected the still from the notes table, we don't want to do any cleanup work here
     // If we selected the still from the clip table (or it's being autoplayed) we do want to
@@ -457,27 +470,24 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     // Compute a scale factor so we can adjust the size of the drawing frame
     
-    CGFloat widDiff = stillView.image.size.width - drawView.frame.size.width;
-    CGFloat htDiff = stillView.image.size.height - drawView.frame.size.height;
-    CGFloat scale;
-    
+    CGFloat curWid = drawView.frame.size.width, curHt = drawView.frame.size.height;
+    CGFloat scale, scaleX, scaleY;
     CGRect newFrame = drawView.frame;
     
-    // Adjust the frame to keep the markups inside the still (or close to it)
-    // This won't necessarily work for an image that larger in both dimensions
+    scaleX = drawView.frame.size.width / stillView.image.size.width;
+    scaleY = drawView.frame.size.height / stillView.image.size.height;
     
-    if (htDiff > widDiff)  {
-        scale = drawView.frame.size.height / stillView.image.size.height;
-//      newFrame.size.width *= scale;
-//      newFrame.origin.x = (drawView.frame.size.width - newFrame.size.width) / 2;
-    }
-    else {
-        scale = drawView.frame.size.width / stillView.image.size.width;
-//      newFrame.size.height *= scale;
-//      newFrame.origin.y = (drawView.frame.size.height - newFrame.size.height) / 2;
-    }
-
-    NSLog (@"widDiff = %g, htDiff = %g, scale = %g", widDiff, htDiff, scale);
+    NSLog (@"scaleX = %g, scaleY = %g", scaleX, scaleY);
+    
+    if (scaleX < scaleY)
+        scale = scaleX;
+    else
+        scale = scaleY;
+    
+    newFrame.size.width = stillView.image.size.width * scale;
+    newFrame.size.height = stillView.image.size.height * scale;
+    newFrame.origin.x += (curWid - newFrame.size.width) / 2;
+    newFrame.origin.y += (curHt - newFrame.size.height) / 2;
     
     stillView.frame = drawView.frame; 
     drawView.frame = newFrame;
@@ -531,45 +541,45 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         
         [UIView commitAnimations]; // end animation block
     }
-    else {
-        // hide buttons that don't apply
-        
-        theTime.hidden = YES;
-        backgroundLabel.hidden = YES;
-        movieTimeControl.hidden = YES;
-        maxLabel.hidden = YES;
-        minLabel.hidden = YES;
-        rewindToStartButton.enabled = NO; 
-        frameBackButton.enabled = NO; 
-        frameForwardButton.enabled = NO; 
-        forwardToEndButton.enabled = NO; 
-        rewindButton.enabled = NO;
-        fastForwardButton.enabled = NO;
-        myVolumeView.hidden = YES;
+
+    // hide buttons that don't apply
+    
+    theTime.hidden = YES;
+    backgroundLabel.hidden = YES;
+    movieTimeControl.hidden = YES;
+    maxLabel.hidden = YES;
+    minLabel.hidden = YES;
+    rewindToStartButton.enabled = NO; 
+    frameBackButton.enabled = NO; 
+    frameForwardButton.enabled = NO; 
+    forwardToEndButton.enabled = NO; 
+    rewindButton.enabled = NO;
+    fastForwardButton.enabled = NO;
+    myVolumeView.hidden = YES;
 
 
-        if (autoPlay) {
-            pausePlayButton.enabled = YES;
-        }
-        else
-            pausePlayButton.enabled = NO;
-        
-        skipForwardButton.enabled = NO;
-        skipBackButton.enabled = NO;
-        skipForwardButton.title = @"";
-        skipBackButton.title = @"";
-        stillShows = YES;
+    if (autoPlay) {
+        pausePlayButton.enabled = YES;
     }
+    else
+        pausePlayButton.enabled = NO;
+    
+    skipForwardButton.enabled = NO;
+    skipBackButton.enabled = NO;
+    skipForwardButton.title = @"";
+    skipBackButton.title = @"";
+    stillShows = YES;
     
     if (autoPlay && ! noteTableSelected)
         self.slideshowTimer = [NSTimer scheduledTimerWithTimeInterval: slideshowTime target:self 
-                                                       selector:@selector(stillDidTimeOut:) userInfo:nil repeats: NO]; 
+               selector:@selector(stillDidTimeOut:) userInfo:nil repeats: NO]; 
 }
 
 - (void) rotateStill {
     // Yucch!  We'll need to rotate the markups as well? -- no, we'll just clear them--it's easier that way!
     
-    [self erase];
+    if (!noteTableSelected)
+        [self erase];
             
     // Compute a scale factor so we can adjust the size of the drawing frame
     // This is ugly due to the rotation--uggh
@@ -1324,9 +1334,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 // context to render into, along with the width and height of the captured frame
 //
 
--(void) drawMarkups: (CGContextRef) ctx width: (float) wid height: (float) ht { 
-    CGContextTranslateCTM (ctx, 0, ht);
-    CGContextScaleCTM (ctx, (wid / drawView.bounds.size.width), - (ht  / drawView.bounds.size.height)); 
+-(void) drawMarkups: (CGContextRef) ctx { 
+//    CGContextTranslateCTM (ctx, 0, ht);
+//    CGContextScaleCTM (ctx, (wid / drawView.bounds.size.width), -(ht  / drawView.bounds.size.height)); 
     
     NSArray *myDrawing = drawView.myDrawing;
     NSArray *colors = drawView.colors;
@@ -1384,14 +1394,14 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     int wid, ht;
     
-    wid = CGImageGetWidth (image) + CGImageGetWidth (image) % 8;
-    ht =  CGImageGetHeight (image)  + CGImageGetHeight(image) % 8;  
+    wid = CGImageGetWidth (image);
+    ht =  CGImageGetHeight (image);  
     
     NSLog (@"image width,height = (%i, %i)", wid, ht);
 
-
-    ht =  (320. / wid) * ht;
-    wid = 320.;
+    ht =  (200. / wid) * ht;
+    ht = ht + ht % 8;
+    wid = 200;
     
     NSLog (@"image width,height = (%i, %i)", wid, ht);
 
@@ -1421,21 +1431,23 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     CGContextTranslateCTM(bitmap, +(thumbRect.size.width/2), +(thumbRect.size.height/2));
     CGContextRotateCTM(bitmap, angleInRadians);
-    CGContextDrawImage(bitmap, CGRectMake(-wid/2, -ht/2, wid, ht), image);
-
+    
     // Draw into the context, this scales the image
 
+    CGContextDrawImage(bitmap, CGRectMake(-wid/2, -ht/2, wid, ht), image);
     CGContextRotateCTM(bitmap, -angleInRadians);
     CGContextTranslateCTM(bitmap, -(thumbRect.size.width/2), -(thumbRect.size.height/2));
     
-    int w = wid, h = ht;
-    
     if (angle == 90 || angle == 270) {
-        w = ht;
-        h = wid;
+        CGContextTranslateCTM (bitmap, 0, wid);
+        CGContextScaleCTM (bitmap, (ht / drawView.bounds.size.width), -(wid / drawView.bounds.size.height)); 
+    }
+    else {
+        CGContextTranslateCTM (bitmap, 0, ht);
+        CGContextScaleCTM (bitmap, (wid / drawView.bounds.size.width), -(ht / drawView.bounds.size.height)); 
     }
         
-    [self drawMarkups: bitmap width: w height: h];
+    [self drawMarkups: bitmap];
 
     // Get an image from the context and create a UIImage
 
@@ -1691,9 +1703,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     else {
         aNewNote.frameWidth = drawView.frame.size.width;
         aNewNote.frameHeight = drawView.frame.size.height;
+        
         aNewNote.timeStamp = @"";
         aNewNote.imageName = [clip copy];
-        aNewNote.rotation = rotate % 4;
+        aNewNote.rotation = rotate % 4;     // Save the current orientation of the still
     }
     
     // Save the markups
@@ -1716,7 +1729,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     // Let's compress the frame we grabbed and store it as NSData
     
     isSaving = YES;
-    aNewNote.thumb = UIImageJPEGRepresentation(newThumb, 0.25f);
+    aNewNote.thumb = UIImageJPEGRepresentation(newThumb, 0.9f);
     assert (aNewNote.thumb);
     
     // Love this part.  Animate the frame and note going into the notes table
@@ -1870,16 +1883,28 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 {
 	NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
 	NSString *docDir = [dirList objectAtIndex: 0];
+
+#if 0
+    NSMutableString *filePath = [clipPath mutableCopy];
     
-    NSString *fileName = [NSString stringWithFormat: @"%@.%@", clip, initials];
+    if ([filePath characterAtIndex: 0] == '/')
+        [filePath deleteCharactersInRange: NSMakeRange (0, 1)];
+#endif
+        
+    NSString *fileName = [NSString stringWithFormat: @"%@.%@", 
+            [clipPath stringByReplacingOccurrencesOfString: @"/" withString: kNoteDelimiter], initials];
+    
     NSLog (@"Archive file name = %@", fileName);
 	return [docDir stringByAppendingPathComponent: fileName];
 }
 
 // Archiving methods for our data
 
--(void) loadData: (NSString *) theInitials  {
+-(void) loadData: (NSString *) fileInfo  {
     download = kNotes;
+    NSString *downloadPath = [NSString stringWithFormat: @"Notes/%@", fileInfo];
+    
+    NSLog (@"*** Download path = %@", downloadPath);
     
     if (kFTPMode) {
         [FTPHelper sharedInstance].delegate = self;
@@ -1897,7 +1922,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         NSLog (@"Trying to download file from %@",  urlString);
         [FTPHelper sharedInstance].urlString = urlString;
         
-        [FTPHelper download: [NSString stringWithFormat: @"Notes/%@.%@", clip, theInitials] to: [self archiveFilePath]];
+        [FTPHelper download: downloadPath to: [self archiveFilePath]];
         NSLog (@"download returned...in process");
     }
     else 
@@ -2077,11 +2102,13 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 -(void) receivedListing: (NSArray *) listing
 {
     [self noteShowActivity];
-    NSString *f = [[clip stringByReplacingOccurrencesOfString: @"%20" withString: @" "]
-                   stringByDeletingPathExtension];
+    NSString *f = [clipPath stringByReplacingOccurrencesOfString: @"%20" withString: @" "];
 
-    NSLog (@"receivedListing, clip is %@", f);
-    [notePaths removeAllObjects];
+    NSLog (@"receivedListing, clip is %@, allStills is %i", f, allStills);
+    
+    if ([notePaths count])
+        [notePaths removeAllObjects];
+    
     [xmlPaths removeAllObjects];
     [txtPaths removeAllObjects];
     
@@ -2090,25 +2117,37 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     // 2. txt: Avid Locator file for import
     // 3. movie or still file: Skip it
     // 4. Anything else: assume it's a note file (the extension is the initials)
+    
+    NSString *dirPath = [clipPath stringByDeletingLastPathComponent];
 
 	for (NSDictionary *dict in listing) {
         NSString *fileName = [FTPHelper textForDirectoryListing:(CFDictionaryRef) dict];
-		NSLog (@"Found ftp file: %@", fileName);
+        NSString *extension = [fileName pathExtension];
+        NSString *rootExtension = [[fileName stringByDeletingPathExtension] pathExtension];
+        NSString *translatedPath = [[fileName stringByReplacingOccurrencesOfString: kNoteDelimiter withString: @"/"] stringByDeletingPathExtension];   // Deletes the initials
         
-        if ( [fileName rangeOfString: f].location == NSNotFound ) {
+		NSLog (@"Found ftp file: %@ extension: %@\n\ttranslatedPath = %@", fileName, extension, translatedPath);
+        
+        if (allStills) {
+            NSLog (@"Testing %@ against %@ (%@)", dirPath, fileName, [translatedPath stringByDeletingLastPathComponent]);
+            
+            if ([dirPath isEqualToString: [translatedPath stringByDeletingLastPathComponent]] && kIsStill (rootExtension)) {
+                    NSLog (@"Found a still note: %@", fileName);
+                    [notePaths addObject: fileName];  // Make sure it's at the end of the path
+                }
+            
+            continue;
+        }
+        
+        if ( [translatedPath rangeOfString: f].location == NSNotFound ) {
             NSLog2 (@"Skipping file %@", fileName);
             continue;
         }
         
-        NSString *extension = [fileName pathExtension];
-        
-        if ( kIsMovie (extension) || kIsStill (extension) ) {
-            NSLog2 (@"Skipping FTP file %@", fileName);
+        if ( kIsMovie (extension) || kIsStill (extension))
             continue;
-        }
         
-        // Look for an XML or txt (Avid import) or note file
-        
+        // Look for an XML or txt (Avid import) or note file for a video clip
         
         if ( !stillShows && EQUALS (extension, @"xml") ) {
             [xmlPaths addObject: fileName];
@@ -2118,9 +2157,12 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             [txtPaths addObject: fileName];
             NSLog (@"Found txt file (Avid import) %@", fileName );
         }
-        else
-            [notePaths addObject: extension];
+        else {
+            NSLog (@"Adding %@ to notePaths", fileName);
+            [notePaths addObject: fileName];
+        }
     }
+        
     
     // kick off the loading of the individual note files; the rest are loaded from the downloadFinished callback
     
@@ -2166,7 +2208,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     NSMutableArray *myNotes = [[NSMutableArray alloc] init];
     
     for (Note *aNote in noteData) 
-        if ([aNote.initials isEqualToString: initials]) 
+        if (allStills) {
+            if ([aNote.imageName isEqualToString: clip] && [aNote.initials isEqualToString: initials])
+                [myNotes addObject: aNote];
+        }
+        else if ([aNote.initials isEqualToString: initials]) 
             [myNotes addObject: aNote];
     
     return myNotes;
@@ -2242,6 +2288,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         if (data) {
             startTimecode = [self convertTimeToSecs: data];
             NSLog (@"Read starting timecode from file: %@ (%lg)", data, startTimecode);
+            if (startTimecode == NAN)
+                startTimecode = 0;
 
             durationSet = NO;
             maxLabelSet = NO;
@@ -2716,9 +2764,15 @@ Next:
     
     // set the subject line for the email
 	
-	[picker setSubject: [NSString stringWithFormat: @"Notes for %@",
-                [[clip stringByReplacingOccurrencesOfString: @"%20" withString:@" "]
-                 stringByDeletingPathExtension], (FCPXML) ? @"(FCP XML attached)" : @"", 
+    NSString *noteName;
+    
+    if (! allStills) 
+        noteName = [[clip stringByReplacingOccurrencesOfString: @"%20" withString:@" "]
+                    stringByDeletingPathExtension];
+    else
+        noteName = [NSString stringWithFormat: @"Album %@", [[[clipPath stringByReplacingOccurrencesOfString: @"%20" withString:@" "] stringByDeletingLastPathComponent] lastPathComponent]];
+                    
+	[picker setSubject: [NSString stringWithFormat: @"Notes for %@ %@", noteName,  (FCPXML) ? @"(FCP XML attached)" : @"", 
                          (AvidExport) ? @"(Avid Locator file attached)" : @""]];
     
 	// Set up recipients
@@ -2778,7 +2832,7 @@ Next:
                     [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],  [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
         
         [picker setMessageBody:emailBody isHTML:NO];
-   }
+    }
     else  {
         NSString *theTitle = @"";
         
@@ -2884,7 +2938,7 @@ Next:
 // Save a thumbnail image as a base64-encoded string to insert in the HTML stream
 
 -(NSString *) outputImage: (Note *) theNote {
-   NSString *result = [NSString stringWithFormat: @"<img width=400  src=\"data:image/jpeg;base64,%@\">", 
+   NSString *result = [NSString stringWithFormat: @"<center><img height=175 src=\"data:image/jpeg;base64,%@\"></center>", 
                        [self base64EncodedString: theNote.thumb ]];
     return result;
 }   
@@ -2897,6 +2951,7 @@ Next:
         [emailBody appendString: @"<table border=2 cellpadding=10 cellspacing=10>"];
         
         noteNumber = 1;
+        NSLog (@"emailing %lu notes", [noteData count]);
 
         for (Note *theNote in noteData) {
             [emailBody appendString: [self noteToHTML: theNote]];
@@ -2933,14 +2988,14 @@ Next:
         NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
         [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
         
-        [emailBody appendString: [NSString stringWithFormat: @"<td valign=top><font color=red>%@</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;%@<p></p>%@", 
+        [emailBody appendString: [NSString stringWithFormat: @"<td valign=top>%@&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;&nbsp;<p></p>%@", 
                     timeFormat, theNote.date, theNote.initials, comment]];
     }
     else {
         NSString *image = [[theNote.imageName lastPathComponent] stringByDeletingPathExtension];
         
-        [emailBody appendString: [NSString stringWithFormat: @"<td valign=top><font color=red>%@</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;%@<p></p>%@", 
-                                  image, theNote.date, theNote.initials, comment]];
+        [emailBody appendString: [NSString stringWithFormat: @"<td valign=top><b>%@</b><br>%@&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;&nbsp;&nbsp;<p></p>%@", 
+                                 image, theNote.initials, theNote.date, comment]];
     }
         
  
@@ -3487,7 +3542,7 @@ static int saveRate;
 
     // Set the clips duration
     
-    double duration;
+    double duration = 0.0;
         
     if (! durationSet) {
         endOfVid = player.currentItem.asset.duration; // [asset duration];
@@ -3524,8 +3579,11 @@ static int saveRate;
     Float64 time = kCVTime([player currentTime]);
     
     // Set the scrubber to the current time as a percentage of the duration
-     
-    movieTimeControl.value = (float) (time / duration);
+    
+    if (! isfinite (duration))
+        duration = 0;
+    else
+        movieTimeControl.value = (float) (time / duration);
 
     // [self timeStats];
     // Scroll the notes table in time with the video clip
@@ -3806,7 +3864,6 @@ static int saveRate;
                 theURL = [[NSURL alloc] initFileURLWithPath: [[NSBundle mainBundle] pathForResource: @"31-1A" ofType:@"m4v"]];
             else
                 theURL = [[NSURL alloc] initFileURLWithPath: thePath];
-            
         }
         else {
             NSLog (@"Loading movie/still %@ from Internet or camera roll", thePath);
@@ -3864,7 +3921,11 @@ static int saveRate;
     if (kFTPMode)
         [self getAllFTPNotes];
     else {
-        [self loadData: initials];
+        if (!allStills)
+            [self loadData: [NSString stringWithFormat: @"%@.%@", 
+                    [clipPath stringByReplacingOccurrencesOfString: @"/" withString: kNoteDelimiter], initials]];   
+        else
+            ;  //  Need to get the local notes for all images in the album here
     }
     
     // Create the movie asset and get the tracks keys
@@ -4424,8 +4485,10 @@ static int saveRate;
     [slideshowTimer invalidate];
     self.slideshowTimer = nil;
     
-    if (! [self nextClip] && fullScreenMode )
-        [self leaveFullScreenStill];
+    BOOL next = [self nextClip];   // This will actually select the next clip/still from the table
+    
+    if (!next)
+        pausePlayButton.enabled = NO;
 }
 
 //
@@ -4568,17 +4631,14 @@ static int saveRate;
         cell.editingAccessoryType = UITableViewCellEditingStyleDelete;
         cell.textLabel.numberOfLines = 1;
         cell.detailTextLabel.numberOfLines = 3;
-        cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        cell.imageView.frame = CGRectMake (0, 0, 32, 32);
         cell.imageView.backgroundColor = MYGRAY;
         tableView.backgroundColor = [UIColor colorWithRed: .8 green: .8 blue: .9 alpha: 1];
         
- 
         CGRect theFrame = cell.selectedBackgroundView.frame;
         UIView *theBG = [[UIView alloc] initWithFrame: theFrame];
         theBG.backgroundColor =  [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: .7];;
         cell.selectedBackgroundView = theBG;
-
+        cell.imageView.layer.masksToBounds = YES;
     }
 
     // Fill in the cell with data from the note stored in noteData
@@ -4586,12 +4646,23 @@ static int saveRate;
     Note *theNote = [noteData objectAtIndex: indexPath.row];
     
     // The marked up frame thumbnail
+ 
+#if 0
+    UIImage *thumbnail = [UIImage imageWithData: theNote.thumb];
+    float width = 200;
+    float ht = (width / thumbnail.size.width) * thumbnail.size.height;
     
-    cell.imageView.image = [UIImage imageWithData: theNote.thumb]; 
+    cell.imageView.image = [[UIImage imageWithData: theNote.thumb] imageScaledToSize: CGSizeMake(width, ht)];
+#endif
     
-    [self dumpRect: cell.imageView.frame title: @"cell.imageView.frame"];
-    NSLog (@"tableView image size = (%g, %g)", cell.imageView.image.size.width, cell.imageView.image.size.height);
+    UIImage *thumbnail = [UIImage imageWithData: theNote.thumb];
+    cell.imageView.image = thumbnail;
     
+//  [self dumpRect: cell.imageView.frame title: @"cell.imageView.frame"];
+//  [self dumpRect: cell.imageView.bounds title: @"cell.imageView.bounds"];
+//   NSLog (@"cell imageView image size = (%g, %g)", cell.imageView.image.size.width, 
+//                    cell.imageView.image.size.height);
+ 
     // The typed note 
    
     cell.detailTextLabel.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
@@ -4688,6 +4759,13 @@ static int saveRate;
             [self rotateStill];
         
         drawView.scaleWidth = drawView.scaleHeight = 1.0;
+        
+        drawView.scaleWidth =  drawView.frame.size.width  / theNote.frameWidth;
+        drawView.scaleHeight =  drawView.frame.size.height / theNote.frameHeight;
+        
+        NSLog (@"framewidth = %g, frameheight = %g", theNote.frameWidth, theNote.frameHeight);
+        [self dumpRect: drawView.frame title: @"drawView.frame"];
+        noteTableSelected = NO;
     }
     else {
         // We want to draw the markups onto the frame

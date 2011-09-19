@@ -12,6 +12,8 @@
 
 extern int gIOSMajorVersion;
 
+#define kNoteDelimiter   @"+"
+
 // These are utility defines.  So just provide quick access to iVars in the app delegate class
 
 #define kAppDel (VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] 
