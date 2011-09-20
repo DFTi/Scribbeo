@@ -94,7 +94,7 @@ static int tryOne = 0;
     
     [tvc makeList];
     
-    [self copyURLIntoApp: url];
+    [self copyVideoOrImageIntoApp: url];
     return YES;
 }
 
@@ -122,21 +122,28 @@ static int tryOne = 0;
 	[viewController.filenameView.layer addAnimation:transition forKey:nil];
 }
 
-// Copy a clip selected by "Open In..." or from the camera roll into the app's
-// local storage.  Give the user the option to rename the clip
+// Copy a clip or image selected by "Open In..." or from the camera roll into the app's
+// local storage.  Give the user the option to rename the clip/image
+// Note that an image comes in as a UIImage reference, so in that case we already have the data
      
--(void) copyURLIntoApp: (NSURL *) url
+-(void) copyVideoOrImageIntoApp: (id) urlOrNil
 {    
-    // Present a dialog to the user for the saved file name
-    
-    NSString *outFilename = [NSString stringWithFormat: @"%@", 
-                       [[url filePathURL] lastPathComponent]];
-    
-    self.theURL = url;
-    
-    self.theExtension = [[outFilename pathExtension] lowercaseString];
-    
-    viewController.saveFilename.text = [outFilename stringByDeletingPathExtension];
+    if (! [urlOrNil isKindOfClass: [UIImage class]])  {    // nil if it's an image
+        NSURL *url = (NSURL *) urlOrNil;
+        
+        outputFilename = [NSString stringWithFormat: @"%@", 
+                    [[url filePathURL] lastPathComponent]];
+        
+        self.theURL = url;
+        self.theExtension = [[outputFilename pathExtension] lowercaseString];
+    }
+    else  {
+        self.theExtension = @"jpg";
+        outputFilename = @"myImage.jpg";
+        imageReference = (UIImage *) urlOrNil;
+    }
+        
+    viewController.saveFilename.text = [outputFilename stringByDeletingPathExtension];
     
     [self animateTransition: YES];
     viewController.filenameView.hidden = NO;
@@ -176,8 +183,21 @@ static int tryOne = 0;
     }
         
     // Now copy the file into the user's Documents folder -- first try to move it (may be in the Inbox)
+    // If it's a UIImage, write the data to the file
     
-    if (! [[NSFileManager defaultManager] moveItemAtURL: theURL toURL: toURL error: NULL] && 
+    if ([theExtension isEqualToString: @"jpg"]) {
+        NSLog (@"%@", imageReference);
+        NSData *imageData = UIImageJPEGRepresentation(imageReference, 1.0f);
+        [imageReference release];
+        
+        if (! [imageData writeToFile: outputFilename atomically: NO] ) {
+               [UIAlertView doAlert:  @"Error" 
+                             withMsg: @"Couldn't copy the imported file!"];
+                
+                return;
+        }
+    }
+    else if (! [[NSFileManager defaultManager] moveItemAtURL: theURL toURL: toURL error: NULL] && 
         ! [[NSFileManager defaultManager] copyItemAtURL: theURL toURL: toURL error: NULL] ) {
         [UIAlertView doAlert:  @"Error" 
                 withMsg: @"Couldn't copy the imported file!"];
@@ -189,7 +209,11 @@ static int tryOne = 0;
 
     viewController.clip  =  outputFilename;
     [viewController.saveFilename resignFirstResponder];
-    [viewController loadMovie:  viewController.clip];
+    
+    if ([theExtension isEqualToString: @"jpg"])
+        [viewController loadStill: outputFilename];
+    else
+        [viewController loadMovie:  viewController.clip];
 }
 
 // Handle alert if save file already exists
@@ -209,7 +233,7 @@ static int tryOne = 0;
         [self saveFileNameEntered];
     }
 	else if (buttonIndex == 1)          // try again
-		[self copyURLIntoApp: theURL]; // display the file save dialog again
+		[self copyVideoOrImageIntoApp: theURL]; // display the file save dialog again
 }
 
 // See how much free memory is available

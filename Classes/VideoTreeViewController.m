@@ -397,6 +397,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 {
     [context removeFromSuperview];   // remove the old image
     stillView.userInteractionEnabled = YES;
+    [context release];
 } 
 
 //
@@ -415,13 +416,27 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
                      withMsg: @"I couldn't read the image!"];
         return;
     }
+    
+    // On the iPhone, hide the clip table
+    
+    if (iPHONE) {
+        UINavigationController  *nc = [(VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] nc];
+        nc.view.hidden = YES;
+    }
+    
+    // Invalidate any timer that might still be running
+    
+    if (slideshowTimer) {
+        [slideshowTimer invalidate];
+        self.slideshowTimer = nil;
+    }
         
     // Are we currently showing a still or a video player?
     // If we selected the still from the notes table, we don't want to do any cleanup work here
     // If we selected the still from the clip table (or it's being autoplayed) we do want to
     // load the notes
     
-    if (! noteTableSelected) 
+    if (! noteTableSelected) {
         if (player)
             [self cleanup];
         else {
@@ -429,9 +444,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             [self clearAnyNotes];
         }
 
-    stillShows = YES;
-
-    if (! noteTableSelected) {
         // Load the notes table
         
         if (kFTPMode)
@@ -448,7 +460,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     rotate = 0;
     self.clip = [link lastPathComponent];
     
-    UIImageView *currentView = stillView;
+    UIImageView *currentView = nil;
+    
+    if (stillShows)
+        currentView = [stillView retain];
 
     // Load the image
     
@@ -2726,7 +2741,7 @@ Next:
             //self.content = nil;
             if (!completed && error) {
                 [UIAlertView doAlert: @"Printing" 
-                             withMsg: @"An error occurred trying to print"];
+                             withMsg: @"An error occurred while trying to print"];
                 NSLog(@"Failed due to error in domain %@ with error code %u", error.domain, error.code);
             } 
         };

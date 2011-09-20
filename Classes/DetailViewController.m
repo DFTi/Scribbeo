@@ -314,7 +314,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.allowsEditing = NO;
     picker.delegate = self;
-    picker.mediaTypes = [NSArray arrayWithObjects:  S kUTTypeAudiovisualContent, S kUTTypeMovie, S kUTTypeQuickTimeMovie, S kUTTypeMPEG,  S kUTTypeMPEG4, S kUTTypeVideo, nil]; 
+    picker.mediaTypes = [NSArray arrayWithObjects:  S kUTTypeImage, S kUTTypeAudiovisualContent, S kUTTypeMovie, S kUTTypeQuickTimeMovie, S kUTTypeMPEG,  S kUTTypeMPEG4, S kUTTypeVideo, nil]; 
     picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary; /* UIImagePickerControllerSourceTypeSavedPhotosAlbum; */
     picker.modalPresentationStyle = UIModalPresentationFormSheet;
     picker.videoQuality =   UIImagePickerControllerQualityTypeHigh;
@@ -345,7 +345,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
 }
 
 //
-// This method gets called after a choice is made from the image picker (e.g., a video clip is selected)
+// This method gets called after a choice is made from the image picker (e.g., a video clip or still is selected)
 //
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
@@ -356,10 +356,16 @@ static int retryCount;      // We don't give up on FTP failures that easily
     else
         [popoverController dismissPopoverAnimated: YES];
     
-    NSURL *moviePicked = [info objectForKey: UIImagePickerControllerMediaURL];
+    UIImage *thePhoto = [info objectForKey: UIImagePickerControllerOriginalImage];
     
-    VideoTreeAppDelegate *appDel = kAppDel;
-    [appDel copyURLIntoApp: moviePicked];   // Works like an "Open In..."
+    if (thePhoto)  {  // picked an image
+        NSLog (@"UIImagePickerControllerOriginalImage has data (%@)!", thePhoto);
+        [kAppDel copyVideoOrImageIntoApp: [thePhoto retain]];       // Works like an "Open In..."
+    }
+    else  {
+        NSURL *moviePicked = [info objectForKey: UIImagePickerControllerMediaURL];
+        [kAppDel copyVideoOrImageIntoApp: moviePicked]; 
+    }
 }
 
 //
