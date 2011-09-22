@@ -131,7 +131,7 @@ static int tryOne = 0;
     if (! [urlOrNil isKindOfClass: [UIImage class]])  {    // nil if it's an image
         NSURL *url = (NSURL *) urlOrNil;
         
-        outputFilename = [NSString stringWithFormat: @"%@", 
+        self.outputFilename = [NSString stringWithFormat: @"%@", 
                     [[url filePathURL] lastPathComponent]];
         
         self.theURL = url;
@@ -139,7 +139,7 @@ static int tryOne = 0;
     }
     else  {
         self.theExtension = @"jpg";
-        outputFilename = @"myImage.jpg";
+        self.outputFilename = @"myImage.jpg";
         imageReference = (UIImage *) urlOrNil;
     }
         
@@ -208,10 +208,14 @@ static int tryOne = 0;
     [tvc makeList];
 
     viewController.clip  =  outputFilename;
+    viewController.clipPath  =  outputFilename;
+
     [viewController.saveFilename resignFirstResponder];
     
-    if ([theExtension isEqualToString: @"jpg"])
+    if ([theExtension isEqualToString: @"jpg"]) {
+        viewController.noteTableSelected = NO;
         [viewController loadStill: outputFilename];
+    }
     else
         [viewController loadMovie:  viewController.clip];
 }

@@ -417,6 +417,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         return;
     }
     
+    playOutButton.image = [UIImage imageNamed: @"rotate.png"];
+    playOutButton.enabled = YES;
+
     // On the iPhone, hide the clip table
     
     if (iPHONE) {
@@ -439,10 +442,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     if (! noteTableSelected) {
         if (player)
             [self cleanup];
-        else {
-            [self erase];
-            [self clearAnyNotes];
-        }
+        
+        [self erase];
+        [self clearAnyNotes];
 
         // Load the notes table
         
@@ -3749,6 +3751,7 @@ static int saveRate;
 // This method is used to put the app back to a "sane" state
 // We don't do anything unless we have an active video clip or a still showing
 // For a still, we'll remove its display, and clear any markups and notes
+// If the sideshow timer is running, we'll stop it
 // For a video, we'll pause it, remove the clip from playback, remove any observers, stop any activity indicators
 // We'll also leave fullScreen or airPlay modes if active
 //
@@ -3807,6 +3810,9 @@ static int saveRate;
     [player removeObserver: self forKeyPath:@"currentItem.status"];
     [player removeObserver: self forKeyPath:@"currentItem.asset.duration"];
     [player removeObserver: self forKeyPath:@"currentItem.asset.commonMetadata"];
+    
+    if (kRunningOS5OrGreater) 
+        [player removeObserver: self forKeyPath:@"airPlayVideoActive"];
 
     player.rate = 0;
 
@@ -3908,6 +3914,14 @@ static int saveRate;
         nc.view.hidden = YES;
     }
     
+    if (! kRunningOS5OrGreater) {
+        playOutButton.enabled = NO;
+    }
+    else {
+        playOutButton.image = [UIImage imageNamed: @"playout.png"];
+        playOutButton.enabled = YES;
+    }
+
     self.currentlyPlaying = [theMovie retain];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self
@@ -4066,9 +4080,6 @@ static int saveRate;
 #endif
 
          NSLog (@"playbackLikelyToKeepUp = %i", player.currentItem.isPlaybackLikelyToKeepUp);
-//       NSLog (@"%@, %@", playerItem.asset.commonMetadata, playerItem.timedMetadata);
-         
-//         NSLog (@"%@, %@, %lu, %lu", player, player.currentItem, player.currentItem.asset.duration.value, player.currentItem.asset.duration.timescale);
 
          [self updateTimeControl];
          
@@ -4447,7 +4458,10 @@ static int saveRate;
     // reshow everything we hid before
     
     newNote.hidden = NO;
-    theTime.hidden = NO;
+    
+    if (! stillShows)
+        theTime.hidden = NO;
+    
     backgroundLabel.hidden = NO;
     noteBar.hidden = NO;
     myVolumeView.hidden = NO;
@@ -4842,7 +4856,8 @@ static int saveRate;
     [player removeObserver: self forKeyPath:@"currentItem.status"];
     [player removeObserver: self forKeyPath:@"currentItem.asset.duration"];
     [player removeObserver: self forKeyPath:@"currentItem.asset.commonMetadata"];
-    [player removeObserver: self forKeyPath:@"airPlayVideoActive"];
+    if (kRunningOS5OrGreater) 
+        [player removeObserver: self forKeyPath:@"airPlayVideoActive"];
     
     [theTimer invalidate];
     self.theTimer = nil;
