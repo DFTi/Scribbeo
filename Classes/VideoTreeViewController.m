@@ -3760,7 +3760,6 @@ static int saveRate;
 {
     NSLog (@"cleaning up");
 
-    newNote.text = @"";
     noteTableSelected = NO;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self
@@ -3777,6 +3776,7 @@ static int saveRate;
         drawView.frame = drawViewFrame;
         [self erase];
         [self clearAnyNotes];
+        newNote.text = @"";
         
         // hide buttons that don't apply
         
@@ -3804,6 +3804,7 @@ static int saveRate;
     if (!player)
         return;
     
+    newNote.text = @"";
     [self stopObservingTimeChanges];
 
     [player removeObserver: self forKeyPath:@"rate"];
@@ -4012,8 +4013,6 @@ static int saveRate;
             [player addObserver:self forKeyPath:@"currentItem.status" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerStatusObservationContext];
             [player addObserver:self forKeyPath:@"currentItem.asset.duration" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerDurationObservationContext];
             [player addObserver:self forKeyPath:@"currentItem.asset.commonMetadata" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerCommonMetadataObserverContext];           
-//          [player addObserver:self forKeyPath:@"currentItem.timedMetadata" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:VideoTreeViewControllerTimedMetadataObserverContext];
-//			[playerItem addObserver:self forKeyPath:@"currentItem.seekableTimeRanges" options:NSKeyValueObservingOptionInitial context:VideoTreeViewControllerSeekableTimeRangesObserverContext];
 
             // Set up the playerLayer for playback
             
