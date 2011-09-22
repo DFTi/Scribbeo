@@ -2502,20 +2502,6 @@ Next:
     }
     else
         return fileName;
-                                   
-#if 0  
-    [FTPHelper sharedInstance].delegate = self;
-    [FTPHelper sharedInstance].uname = [kAppDel FTPusername];
-    [FTPHelper sharedInstance].pword = [kAppDel FTPpassword];
-    
-    NSString *urlString = [NSString stringWithFormat: @"ftp://%@", [kAppDel FTPserver]];
-    
-    NSLog2 (@"Saving file %@ to %@", fileName, urlString);
-    [FTPHelper sharedInstance].urlString = urlString;
-    
-    [FTPHelper upload: fileName];
-    NSLog2 (@"upload returned...in process");
-#endif
 }
 
 
@@ -2681,7 +2667,7 @@ Next:
 
 - (void) credentialsMissing
 {
-	NSLog (@"Please supply both user name and password before using FTP Helper");
+	NSLog (@"Please supply both user name and password for ftp");
 }
 
 - (void) progressAtPercent: (NSNumber *) aPercent;
@@ -3915,7 +3901,7 @@ static int saveRate;
         nc.view.hidden = YES;
     }
     
-    if (! kRunningOS5OrGreater) {
+    if (kRunningOS5OrGreater) {
         playOutButton.enabled = NO;
     }
     else {
