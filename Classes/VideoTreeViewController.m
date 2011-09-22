@@ -1353,7 +1353,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
 -(void) drawMarkups: (CGContextRef) ctx { 
 //    CGContextTranslateCTM (ctx, 0, ht);
-//    CGContextScaleCTM (ctx, (wid / drawView.bounds.size.width), -(ht  / drawView.bounds.size.height)); 
+//    CGContextScaleCTM (ctx, (wid / drawView.bounds.size.width), -(ht / drawView.bounds.size.height)); 
     
     NSArray *myDrawing = drawView.myDrawing;
     NSArray *colors = drawView.colors;

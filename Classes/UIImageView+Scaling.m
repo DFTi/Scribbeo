@@ -12,6 +12,7 @@
 @implementation UIImageView (Scaling) // extensions to UIImageView
 
 // scale the view to fill the given bounds without distorting
+
 - (void)expandToFill:(CGRect)bounds
 {
     UIImage *image = self.image; // get the image of this view
