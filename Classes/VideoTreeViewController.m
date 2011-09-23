@@ -299,6 +299,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     // [self loadStill: @"http://noirfeathers.blog.com/files/2011/07/ansel_adams_mountains1.jpg"]; 
     // @"http://db.tt/5PkAJLX"];
+    
+    [stampLabel removeFromSuperview];  // Don't like the way IB places this
 }
 
 - (void) viewDidAppear: (BOOL) animated {
@@ -590,6 +592,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     if (autoPlay && ! noteTableSelected)
         self.slideshowTimer = [NSTimer scheduledTimerWithTimeInterval: slideshowTime target:self 
                selector:@selector(stillDidTimeOut:) userInfo:nil repeats: NO]; 
+    
+    if (watermark) {
+        [stillView addSubview: stampLabel];
+        stampLabel.hidden = NO;
+    }
 }
 
 - (void) rotateStill {
@@ -3750,6 +3757,9 @@ static int saveRate;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self
                         name:AVPlayerItemDidPlayToEndTimeNotification  object:nil];
+    
+    if (watermark)
+        [stampLabel removeFromSuperview];
 
     if (stillShows) {
         if (slideshowTimer) {
@@ -4009,15 +4019,6 @@ static int saveRate;
             playerLayer.frame = playerLayerView.layer.bounds;
             [playerLayerView.layer addSublayer:playerLayer];
             playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;  // maintain aspect ratio
-  
-            // If we're watermarking, make our view visible
-            
-            if (watermark) {
-  //            [playerLayerView bringSubviewToFront: stampLabel];
-                self.stampLabel.hidden = NO;
-            }
-            else
-                self.stampLabel.hidden = YES;
             
             // Let's add the drawView and make sure it's on top
 
@@ -4032,6 +4033,16 @@ static int saveRate;
                 else
                     airPlayImageView.hidden = YES;
             }
+            
+            // If we're watermarking, make our view visible
+            
+            if (watermark) {
+                [playerLayerView addSubview: stampLabel];
+                [playerLayerView bringSubviewToFront: stampLabel];
+                self.stampLabel.hidden = NO;
+            }
+            else
+                self.stampLabel.hidden = YES;
         }
         else
             NSLog (@"Failed to initiliaze the movie player!");
@@ -4411,7 +4422,8 @@ static int saveRate;
         stampLabelFull.textColor = [UIColor whiteColor];
     }
     
-    [playerLayerView addSubview: stampLabelFull];
+    if (watermark)
+        [playerLayerView addSubview: stampLabelFull];
     
     if (player)
         [player play];
