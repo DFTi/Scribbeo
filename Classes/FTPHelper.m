@@ -503,7 +503,8 @@ static Boolean MySimpleUpload(CFStringRef uploadDirectory, CFURLRef fileURL, CFS
     /* Copy the end of the file path and use it as the file name. */
     fileName0 = CFURLCopyLastPathComponent(fileURL);
     
-    NSString *home = homeDir;
+    //NSString *home = homeDir; // homeDir macro is failing... I will hardcode it to Sazeer's spec
+    NSString *home = [NSString stringWithFormat:@"/Storage/%@/", username]; // temporary fix
     
     if ([ (VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] BonjourMode] )
         home = @"/VideoTree";
