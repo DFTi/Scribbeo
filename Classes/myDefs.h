@@ -51,7 +51,7 @@ extern int gIOSMajorVersion;
 #else
     #define userDir  ([kAppDel BonjourMode] \
           ? [NSString stringWithFormat: @"/~%@", [kAppDel FTPusername]] \
-          : [NSString stringWithFormat: @"/iPad/%@", [kAppDel FTPusername]] )
+          : [NSString stringWithFormat: @"/%@", [kAppDel FTPusername]] )
 #endif
 
 #ifndef APPSTORE
