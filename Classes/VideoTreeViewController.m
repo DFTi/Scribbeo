@@ -3775,6 +3775,7 @@ static int saveRate;
         // hide buttons that don't apply
         
         theTime.hidden = NO;
+        myVolumeView.hidden = NO;
         backgroundLabel.hidden = NO;
         movieTimeControl.hidden = NO;
         maxLabel.hidden = NO;
