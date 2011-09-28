@@ -297,9 +297,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     uploadCount = 0;
     
-    // [self loadStill: @"http://noirfeathers.blog.com/files/2011/07/ansel_adams_mountains1.jpg"]; 
-    // @"http://db.tt/5PkAJLX"];
-    
     [stampLabel removeFromSuperview];  // Don't like the way IB places this
 }
 
@@ -2932,8 +2929,8 @@ Next:
         char base64Encoded[base64EncodedLength];
         if(Base64EncodeData([theData bytes], [theData length], base64Encoded, &base64EncodedLength))
         {
-            NSData* encodedData = [NSData dataWithBytes:base64Encoded length:base64EncodedLength];
-            NSString* base64EncodedString = [[NSString alloc] initWithData:encodedData encoding:NSUTF8StringEncoding];
+            NSData *encodedData = [NSData dataWithBytes:base64Encoded length:base64EncodedLength];
+            NSString *base64EncodedString = [[NSString alloc] initWithData:encodedData encoding:NSUTF8StringEncoding];
             return [base64EncodedString autorelease];
         }
     }
@@ -3687,7 +3684,8 @@ static int saveRate;
     // However the first read is really good enough for us
     //
     
-    while ( [assetReader status] == AVAssetReaderStatusReading || [assetReader status] == AVAssetReaderStatusUnknown ) {
+    while ( [assetReader status] == AVAssetReaderStatusReading || 
+           [assetReader status] == AVAssetReaderStatusUnknown ) {
         buffer = [assetReaderOutput copyNextSampleBuffer];
         
         long out;
@@ -3777,6 +3775,7 @@ static int saveRate;
         // hide buttons that don't apply
         
         theTime.hidden = NO;
+        myVolumeView.hidden = NO;
         backgroundLabel.hidden = NO;
         movieTimeControl.hidden = NO;
         maxLabel.hidden = NO;
