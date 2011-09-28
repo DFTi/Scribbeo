@@ -1345,9 +1345,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 // The second set uses UIGetScreenImage (), which is a private API and will not 
 // get through the app store
 
-// #define APPSTORE
-
-#ifdef APPSTORE
 
 //
 // Once we grab the frame, we have to draw the markups (line segments) onto the frame
@@ -1486,6 +1483,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     return resultImage;
 }
 
+#ifdef APPSTORE
 
 //
 // This method will capture the paused video frame so we can save the 
