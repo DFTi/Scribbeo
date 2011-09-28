@@ -4116,16 +4116,18 @@ static int saveRate;
 // This button is only needed pre-iOS 5.0
 // because AVPlayer class did not support airPlay
 //
+// Note that this button changes to the rotate button
+// when showing stills
+//
 
 -(IBAction) airPlay
 {
-    // Remove the "DVD Remote" if it shows
-
-    
-    if (stillShows) {  /// kludge here!
+    if (stillShows) { 
         [self rotateStill];
         return;
     }
+    
+    // Remove the "DVD Remote" if it shows
     
     [UIView animateWithDuration: .3 animations: ^{ 
         remote.alpha = 0;
