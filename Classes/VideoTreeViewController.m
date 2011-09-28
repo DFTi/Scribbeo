@@ -1729,7 +1729,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         aNewNote.frameHeight = drawView.frame.size.height;
         
         aNewNote.timeStamp = @"";
-        aNewNote.imageName = [clip copy];
+        aNewNote.imageName = clip;
         aNewNote.rotation = rotate % 4;     // Save the current orientation of the still
     }
     
@@ -1754,7 +1754,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     isSaving = YES;
     aNewNote.thumb = UIImageJPEGRepresentation(newThumb, 0.9f);
-    assert (aNewNote.thumb);
+//  assert (aNewNote.thumb);
     
     // Love this part.  Animate the frame and note going into the notes table
 
