@@ -12,6 +12,8 @@
 
 extern int gIOSMajorVersion;
 
+#define kNoteDelimiter   @"+"
+
 // These are utility defines.  So just provide quick access to iVars in the app delegate class
 
 #define kAppDel (VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] 
@@ -19,6 +21,9 @@ extern int gIOSMajorVersion;
 #define iPHONE  ([(VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] iPhone])
 #define EQUALS(x,y) ([x caseInsensitiveCompare: y] == NSOrderedSame)
 #define kdemoView  [kAppDel demoView]
+
+#define kIsMovie(x) (EQUALS (x, @"mp4") || EQUALS (x, @"mov") || EQUALS (x, @"m4v") || EQUALS (x, @"m3u8"))
+#define kIsStill(x)  (EQUALS (x, @"jpg") || EQUALS (x, @"jpeg") || EQUALS (x, @"png"))
 
 #define CAMERAROLL          // We support import from the camera roll
 
@@ -54,7 +59,7 @@ extern int gIOSMajorVersion;
           : [NSString stringWithFormat: @"/%@", [kAppDel FTPusername]] )
 #endif
 
-#ifndef APPSTORE
+#ifdef DEBUG
 #define kMakeLogFile        // Only make log files for our own use (not the app store version)
 #endif
 

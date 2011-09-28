@@ -6,7 +6,6 @@
 //  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.
 //
 
-
 #import "VideoTreeViewController.h"
 #import "VideoTreeAppDelegate.h"
 #import "DetailViewController.h"
@@ -17,6 +16,31 @@
 #import <Endian.h>
 #import "VoiceMemo.h"
 
+@interface UIImage (TPAdditions)
+- (UIImage*)imageScaledToSize:(CGSize)size;
+@end
+
+@implementation UIImage (TPAdditions)
+- (UIImage *)imageScaledToSize:(CGSize)size {
+    UIGraphicsBeginImageContext(size);
+    [self drawInRect:CGRectMake(0, 0, size.width, size.height)];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+@end
+
+// Both of these map to the value of "rotate".  The first array maps before the rotation, the second after 
+// (just has to do with the way the rotate ivar is incremented)
+
+static int rotatePositions [] = { UIImageOrientationLeft, UIImageOrientationDown,  UIImageOrientationRight, UIImageOrientationUp };
+static float rotAngles [] = { 0, 90, 180, 270};
+
+typedef enum _transitionEffects
+{
+    TransitionEffectFade, // represents fade image transition effect
+    TransitionEffectSlide // represents slide image transition effect
+} TransitionEffect;
 
 #define MYGRAY [UIColor colorWithRed: .8 green: .8 blue: .9 alpha: 1]
 #define MYWHITE [UIColor colorWithRed: .9 green: .9 blue: .9 alpha: 1]
@@ -32,18 +56,22 @@ static void *VideoTreeViewControllerStatusObservationContext = @"VideoTreeViewCo
 static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewControllerAirPlayObservationContext";
 
 @implementation VideoTreeViewController
+@synthesize stillView;
 @synthesize airPlayImageView;
 @synthesize playerToolbar;
 @synthesize playOutButton;
+@synthesize allStills;
 
 @synthesize showName, newNote, fullScreenMode, drawView, movieTimeControl, notes, newThumb, noteBar, drawingBar;
 @synthesize player, seekToZeroBeforePlay, movieURL, playerLayerView, theTime, maxLabel, minLabel, noteData, currentlyPlaying, isSaving, markers;
-@synthesize pausePlayButton, pauseImage, playImage, recImage, isRecordingImage, clip, clipPath, show, tape, filmDate, playerLayer, editButton, initials, episode, playerItem, theTimer;
+@synthesize pausePlayButton, pauseImage, playImage, recImage, isRecordingImage, clip, clipPath, show, tape, filmDate, playerLayer, 
+editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSelected;
+;
 @synthesize progressView, activityIndicator, notePaths, xmlPaths, txtPaths, noteProgressView, noteActivityIndicator, volLabel, curInitials, movieController;
 @synthesize  stampLabel, stampLabelFull, theAsset, startTimecode, download, clipLabel, runAllMode;
 @synthesize rewindToStartButton, frameBackButton, frameForwardButton, forwardToEndButton, fullScreenButton, rewindButton, fastForwardButton, airPlayMode, remote;
-@synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo;
-@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView;;
+@synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo, mediaPath;
+@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage;
 
 #pragma mark -
 #pragma mark view loading/unloading
@@ -62,6 +90,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     NSLog (@"view controller view did load");
     
     [super viewDidLoad];
+    
     CGPoint theOrigin = {0, 0};
     CGSize theSize;
     CGRect theFrame;
@@ -73,7 +102,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         theFrame.origin = theOrigin;
         drawView.frame = theFrame;
     }
-             
+            
+    drawViewFrame = drawView.frame;
+    
     // Add a volume control for Airplay; Add a Route Button if >= iOS5
  
     if (! iPHONE)  {
@@ -87,6 +118,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [self.view addSubview: myVolumeView];
     }
     
+#if 0
     // remove the playout button from the toolbar if iOS 5 or greater
     
     if (kRunningOS5OrGreater) {
@@ -94,6 +126,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [items removeObject: playOutButton];
         playerToolbar.items = items;
     }
+#endif
+    
+    playOutButton.image = [UIImage imageNamed: @"rotate.png"];
     
     // Make sure the upload indicator is off
     
@@ -175,13 +210,14 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     durationSet = NO;
     selectedNextClip = NO;
     airPlayMode = NO;
+    noteTableSelected = NO;
     
     fps = 0.0;
     pausePlayButton.enabled = NO;
     self.pauseImage = [UIImage imageNamed: @"pause2.png"];
     self.playImage = [UIImage imageNamed: @"play.png"];
 
-    seekToZeroBeforePlay = YES;         // Only when we start playing or reached the end
+    seekToZeroBeforePlay = YES;     // Only when we start playing or reached the end
     movieTimeControl.value = 0; 
     drawView.hidden = NO;              
     notePaper.hidden = NO;          
@@ -260,6 +296,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [uploadActivityIndicator stopAnimating];
     
     uploadCount = 0;
+    
+    // [self loadStill: @"http://noirfeathers.blog.com/files/2011/07/ansel_adams_mountains1.jpg"]; 
+    // @"http://db.tt/5PkAJLX"];
+    
+    [stampLabel removeFromSuperview];  // Don't like the way IB places this
 }
 
 - (void) viewDidAppear: (BOOL) animated {
@@ -272,6 +313,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 }
 
 // Only observe time changes when the view controller's view is visible.
+
 - (void)viewWillAppear:(BOOL)animated
 {    
 	[super viewWillAppear:animated];
@@ -294,8 +336,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-	[super viewDidDisappear:animated];
-	[self stopObservingTimeChanges];
+    [super viewDidDisappear:animated];
+    [self stopObservingTimeChanges];
     [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
     [self resignFirstResponder];
 }
@@ -328,10 +370,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 }
 
 - (void)viewDidUnload {
+    NSLog (@"Viewcontroller view did unload");
+    [self setStillView:nil];
     [self setAirPlayImageView:nil];
     [self setPlayerToolbar:nil];
     [self setPlayOutButton:nil];
-    NSLog (@"Viewcontroller view did unload");
     self.newNote = nil;
     self.theTime = nil;
     self.movieTimeControl = nil;
@@ -340,6 +383,273 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     self.maxLabel = nil;
 }
 
+#pragma mark -
+#pragma mark Still support
+  
+-(void) dumpRect: (CGRect) r title: (NSString *) title
+{
+    NSLog (@"%@: origin = (%g, %g), size = (%g, %g)", title, r.origin.x, r.origin.y,
+           r.size.width, r.size.height);
+}
+
+// called when the image transition animation finishes
+
+- (void)transitionFinished:(NSString *)animationId finished:(BOOL)finished
+                   context:(UIImageView *) context
+{
+    [context removeFromSuperview];   // remove the old image
+    stillView.userInteractionEnabled = YES;
+    [context release];
+} 
+
+//
+//  Load in a still image given its address
+//
+
+-(void) loadStill: (NSString *) link 
+{
+    self.movieURL = [self getTheURL: link];
+    self.mediaPath = link;
+    
+    NSData *imageData = [NSData dataWithContentsOfURL: movieURL];
+    
+    if (!imageData) {
+        [UIAlertView doAlert: @"Still Image" 
+                     withMsg: @"I couldn't read the image!"];
+        return;
+    }
+    
+    playOutButton.image = [UIImage imageNamed: @"rotate.png"];
+    playOutButton.enabled = YES;
+
+    // On the iPhone, hide the clip table
+    
+    if (iPHONE) {
+        UINavigationController  *nc = [(VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] nc];
+        nc.view.hidden = YES;
+    }
+    
+    // Invalidate any timer that might still be running
+    
+    if (slideshowTimer) {
+        [slideshowTimer invalidate];
+        self.slideshowTimer = nil;
+    }
+        
+    // Are we currently showing a still or a video player?
+    // If we selected the still from the notes table, we don't want to do any cleanup work here
+    // If we selected the still from the clip table (or it's being autoplayed) we do want to
+    // load the notes
+    
+    if (! noteTableSelected) {
+        if (player)
+            [self cleanup];
+        
+        [self erase];
+        [self clearAnyNotes];
+
+        // Load the notes table
+        
+        if (kFTPMode)
+            [self getAllFTPNotes];
+        else {
+            [self loadData: initials];
+        }
+    }
+    
+    drawView.frame = drawViewFrame;
+
+    // No current rotation
+    
+    rotate = 0;
+    self.clip = [link lastPathComponent];
+    
+    UIImageView *currentView = nil;
+    
+    if (stillShows)
+        currentView = [stillView retain];
+
+    // Load the image
+    
+    if (stillImage) 
+        [stillImage release];
+    
+    stillImage = [[UIImage alloc] initWithData: imageData];
+    stillView = [[[UIImageView alloc] initWithImage: stillImage] autorelease];
+    
+    if (fullScreenMode)
+        drawView.frame = stillView.frame = playerLayerView.frame;
+    
+    NSLog (@"Stillview.image size = (%g, %g)", stillView.image.size.width, stillView.image.size.height);
+    [self dumpRect: drawView.frame title: @"drawView.frame"];
+    
+    //set contentMode to scale aspect to fit
+    
+    stillView.contentMode = UIViewContentModeScaleAspectFit;
+    
+    // Compute a scale factor so we can adjust the size of the drawing frame
+    
+    CGFloat curWid = drawView.frame.size.width, curHt = drawView.frame.size.height;
+    CGFloat scale, scaleX, scaleY;
+    CGRect newFrame = drawView.frame;
+    
+    scaleX = drawView.frame.size.width / stillView.image.size.width;
+    scaleY = drawView.frame.size.height / stillView.image.size.height;
+    
+    NSLog (@"scaleX = %g, scaleY = %g", scaleX, scaleY);
+    
+    if (scaleX < scaleY)
+        scale = scaleX;
+    else
+        scale = scaleY;
+    
+    newFrame.size.width = stillView.image.size.width * scale;
+    newFrame.size.height = stillView.image.size.height * scale;
+    newFrame.origin.x += (curWid - newFrame.size.width) / 2;
+    newFrame.origin.y += (curHt - newFrame.size.height) / 2;
+    
+    stillView.frame = drawView.frame; 
+    drawView.frame = newFrame;
+        
+    [self dumpRect: drawView.layer.frame title: @"new drawView.layer.frame"];
+    [self dumpRect: drawView.layer.bounds title: @"new drawView.layer.bounds"];
+    
+    // Show the still now and add the drawing frame on top
+    
+    drawView.hidden = NO;
+    stillView.userInteractionEnabled = YES;
+    [playerLayerView addSubview: stillView];
+    [stillView addSubview: drawView];
+    
+    if (autoPlay) {
+        pausePlayButton.image = pauseImage;
+        pausePlayButton.enabled = YES;
+    }
+
+    if (stillShows) {
+        stillView.alpha = 0;
+
+        [UIView beginAnimations:nil context: currentView];
+        [UIView setAnimationDuration: (noteTableSelected) ? .25 : 2.0]; // set the animation length
+        [UIView setAnimationDelegate:self]; // set the animation delegate
+        
+        // call the given method when the animation ends
+        [UIView setAnimationDidStopSelector: @selector(transitionFinished:finished:context:)];
+        
+        // make the next image appear with the chosen effect
+        
+        TransitionEffect theEffect =  TransitionEffectFade;
+        
+        switch (theEffect)
+        {
+            case TransitionEffectFade: // the user chose the fade effect
+                [stillView setAlpha: 1.0]; // fade in the next image
+                [currentView setAlpha: 0.0]; // fade out the old image
+                break;
+                
+            case TransitionEffectSlide: // the user chose the slide effect
+                // frame.origin.x -= frame.size.width; // slide new image left
+                // nextImageView.frame = frame; // apply the repositioned frame
+                // CGRect currentImageFrame = currentImageView.frame;
+                
+                // slide the old image to the left
+                // currentImageFrame.origin.x -= currentImageFrame.size.width;
+                // currentImageView.frame = currentImageFrame; // apply frame
+                break;
+        } 
+        
+        [UIView commitAnimations]; // end animation block
+    }
+
+    // hide buttons that don't apply
+    
+    theTime.hidden = YES;
+    backgroundLabel.hidden = YES;
+    movieTimeControl.hidden = YES;
+    maxLabel.hidden = YES;
+    minLabel.hidden = YES;
+    rewindToStartButton.enabled = NO; 
+    frameBackButton.enabled = NO; 
+    frameForwardButton.enabled = NO; 
+    forwardToEndButton.enabled = NO; 
+    rewindButton.enabled = NO;
+    fastForwardButton.enabled = NO;
+    myVolumeView.hidden = YES;
+
+
+    if (autoPlay) {
+        pausePlayButton.enabled = YES;
+    }
+    else
+        pausePlayButton.enabled = NO;
+    
+    skipForwardButton.enabled = NO;
+    skipBackButton.enabled = NO;
+    skipForwardButton.title = @"";
+    skipBackButton.title = @"";
+    stillShows = YES;
+    
+    if (autoPlay && ! noteTableSelected)
+        self.slideshowTimer = [NSTimer scheduledTimerWithTimeInterval: slideshowTime target:self 
+               selector:@selector(stillDidTimeOut:) userInfo:nil repeats: NO]; 
+    
+    if (watermark) {
+        [stillView addSubview: stampLabel];
+        stampLabel.hidden = NO;
+    }
+}
+
+- (void) rotateStill {
+    // Yucch!  We'll need to rotate the markups as well? -- no, we'll just clear them--it's easier that way!
+    
+    if (!noteTableSelected)
+        [self erase];
+            
+    // Compute a scale factor so we can adjust the size of the drawing frame
+    // This is ugly due to the rotation--uggh
+    
+    CGRect newFrame = drawView.frame;
+    
+    CGFloat widDiff = newFrame.size.width - stillView.image.size.height;
+    CGFloat htDiff =  newFrame.size.height - stillView.image.size.width;
+    CGFloat scale;
+    
+    // Adjust the frame to keep the markups inside the still (or close to it)
+    
+    CGFloat curWid = drawView.frame.size.width, curHt = drawView.frame.size.height;
+    
+    NSLog (@"drawView wid, ht before rotation = (%g, %g)", curWid, curHt);
+    float scaleX, scaleY;
+    
+    scaleX = newFrame.size.height / stillView.image.size.width;
+    scaleY = newFrame.size.width / stillView.image.size.height;
+    
+    NSLog (@"scaleX = %g, scaleY = %g", scaleX, scaleY);
+    
+    if (scaleX * stillView.image.size.height > drawViewFrame.size.width)
+        scale = scaleY;
+    else
+        scale = scaleX;
+    
+    newFrame.size.width = stillView.image.size.height * scale;
+    newFrame.size.height = stillView.image.size.width * scale;
+    newFrame.origin.x += (curWid - newFrame.size.width) / 2;
+    newFrame.origin.y += (curHt - newFrame.size.height) / 2;
+
+    // Now rotate the image
+    
+    CGImageRef imageRef = [stillImage CGImage];
+    stillView.image =  [UIImage imageWithCGImage: imageRef scale: 1
+                                     orientation: rotatePositions [rotate % 4]];
+    
+    ++rotate;
+    
+    NSLog (@"image wid, ht after rotation = (%g, %g)", stillView.image.size.width, stillView.image.size.height);    
+    NSLog (@"widDiff = %g, htDiff = %g, scale = %g", widDiff, htDiff, scale);
+    
+    [self dumpRect: newFrame title: @"newFrame"];
+    drawView.frame = newFrame;
+}
 
 #pragma mark -
 #pragma mark remote control (e.g. headphones)
@@ -658,7 +968,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     // I had to invert this since DefaultValue doesn't seem to work
     
     timecodeFormat =  !(BOOL) [[defaults objectForKey: @"Timecode"] integerValue];
-        
+    
+    // Display time for slide show
+    
+    slideshowTime = [[defaults objectForKey: @"slideTime"] floatValue];
+    
+    if (slideshowTime == 0)
+        slideshowTime = 5;
+    
+    NSLog (@"Setting slide show time interval to %g", slideshowTime);   
+    
     // Skip value
     
     skipValue = [[defaults objectForKey: @"skipValue"] integerValue];
@@ -832,6 +1151,29 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
                     
 - (IBAction)playPauseButtonPressed:(id)sender
 {    
+    // If the slideshowTimer is running, we're in slide show playback mode
+    // Pause the playback (i.e., kill the timer)
+    
+    if (slideshowTimer) {
+        [slideshowTimer invalidate];
+        self.slideshowTimer = nil;
+        pausePlayButton.image = playImage;
+
+        return;
+    }
+    
+    //
+    //  If a still is showing and we're in autoPlay mode, resume playback
+    //
+    
+    if (stillShows && autoPlay) {
+        self.slideshowTimer = [NSTimer scheduledTimerWithTimeInterval: slideshowTime target:self 
+                        selector:@selector(stillDidTimeOut:) userInfo:nil repeats: NO]; 
+        pausePlayButton.image = pauseImage;
+        return;
+    }
+        
+    
     // If a timer's running we're in single frame playback
     // In that case, we'll pause playback below
     
@@ -839,19 +1181,19 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         player.rate = 1.0;
     
 	if (player.rate == 0.0) {
-		// if we are at the end of the movie we must seek to the beginning first before starting playback
+            // if we are at the end of the movie we must seek to the beginning first before starting playback
+            
+            if (YES == seekToZeroBeforePlay) {
+                seekToZeroBeforePlay = NO;
+                [player seekToTime: kCMTimeZero];
+            }
         
-		if (YES == seekToZeroBeforePlay) {
-			seekToZeroBeforePlay = NO;
-			[player seekToTime: kCMTimeZero];
-		}
-        
-        newNote.text = @"";       // Clear any note or markups
-        [self erase];
-		player.rate = 1.0;        // Start playback and set the play/pause button to pause icon
-        pausePlayButton.image = pauseImage;
+            newNote.text = @"";       // Clear any note or markups
+            [self erase];
+            player.rate = 1.0;        // Start playback and set the play/pause button to pause icon
+            pausePlayButton.image = pauseImage;
 	} else {
-		[self pauseIt];
+            [self pauseIt];
 	}
 }
 
@@ -1009,15 +1351,16 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 // #define APPSTORE
 
 #ifdef APPSTORE
+
 //
 // Once we grab the frame, we have to draw the markups (line segments) onto the frame
 // This is the purpose of this method.  On input it gets a reference to a bitmap
 // context to render into, along with the width and height of the captured frame
 //
 
--(void)drawMarkups: (CGContextRef) ctx width: (float) wid height: (float) ht { 
-    CGContextTranslateCTM (ctx, 0, ht);
-    CGContextScaleCTM (ctx, ((wid * 8) / drawView.bounds.size.width) / 8, - ((ht * 8) / drawView.bounds.size.height) / 8 ); 
+-(void) drawMarkups: (CGContextRef) ctx { 
+//    CGContextTranslateCTM (ctx, 0, ht);
+//    CGContextScaleCTM (ctx, (wid / drawView.bounds.size.width), -(ht / drawView.bounds.size.height)); 
     
     NSArray *myDrawing = drawView.myDrawing;
     NSArray *colors = drawView.colors;
@@ -1045,20 +1388,107 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
                 float thisX = [[thisArray objectAtIndex:0] floatValue];
                 float thisY = [[thisArray objectAtIndex:1] floatValue];
                 
-                CGContextBeginPath(ctx);
-                CGContextMoveToPoint(ctx, thisX, thisY);
+                CGContextBeginPath (ctx);
+                CGContextMoveToPoint (ctx, thisX, thisY);
                 
                 for (int j = 2; j < [thisArray count] ; j += 2) {
-                    thisX = [[thisArray objectAtIndex:j] floatValue];
-                    thisY = [[thisArray objectAtIndex:j + 1] floatValue];
+                    thisX = [[thisArray objectAtIndex: j] floatValue];
+                    thisY = [[thisArray objectAtIndex: j + 1] floatValue];
                     
-                    CGContextAddLineToPoint(ctx, thisX,thisY);
+                    CGContextAddLineToPoint (ctx, thisX, thisY);
                 }
                 CGContextStrokePath(ctx);
             }
         }
     }
 }
+
+//
+// Scale the captured still for the thumbnail
+//
+
+-(UIImage *) scaleImage: (CGImageRef) image  andRotate: (float) angle
+{
+    // We grabbed the frame, let's make it smaller
+
+    CGImageAlphaInfo	alphaInfo = CGImageGetAlphaInfo(image);
+
+    if (alphaInfo == kCGImageAlphaNone)
+    alphaInfo = kCGImageAlphaNoneSkipLast;
+    
+    int wid, ht;
+    
+    wid = CGImageGetWidth (image);
+    ht =  CGImageGetHeight (image);  
+    
+    NSLog (@"image width,height = (%i, %i)", wid, ht);
+
+    ht =  (200. / wid) * ht;
+    ht = ht + ht % 8;
+    wid = 200;
+    
+    NSLog (@"image width,height = (%i, %i)", wid, ht);
+
+    CGRect thumbRect = { 
+        {0.0f, 0.0f}, 
+        {(float) wid, (float) ht}
+    };
+
+    NSLog (@"bits per component = %i, color space = %i",  CGImageGetBitsPerComponent(image), CGImageGetColorSpace(image));
+    
+    CGFloat angleInRadians = angle * (M_PI / 180);
+
+    CGAffineTransform transform = CGAffineTransformMakeRotation(angleInRadians);
+    thumbRect = CGRectApplyAffineTransform(thumbRect, transform);
+
+    // Build a bitmap context that's the size of the thumbRect
+
+    CGContextRef bitmap = CGBitmapContextCreate(
+            NULL,
+            thumbRect.size.width,		// width
+            thumbRect.size.height,		// height
+            CGImageGetBitsPerComponent(image),	
+            4 * thumbRect.size.width,	// rowbytes
+            CGImageGetColorSpace(image),
+            alphaInfo
+            );
+    
+    CGContextTranslateCTM(bitmap, +(thumbRect.size.width/2), +(thumbRect.size.height/2));
+    CGContextRotateCTM(bitmap, angleInRadians);
+    
+    // Draw into the context, this scales the image
+
+    CGContextDrawImage(bitmap, CGRectMake(-wid/2, -ht/2, wid, ht), image);
+    CGContextRotateCTM(bitmap, -angleInRadians);
+    CGContextTranslateCTM(bitmap, -(thumbRect.size.width/2), -(thumbRect.size.height/2));
+    
+    if (angle == 90 || angle == 270) {
+        CGContextTranslateCTM (bitmap, 0, wid);
+        CGContextScaleCTM (bitmap, (ht / drawView.bounds.size.width), -(wid / drawView.bounds.size.height)); 
+    }
+    else {
+        CGContextTranslateCTM (bitmap, 0, ht);
+        CGContextScaleCTM (bitmap, (wid / drawView.bounds.size.width), -(ht / drawView.bounds.size.height)); 
+    }
+        
+    [self drawMarkups: bitmap];
+
+    // Get an image from the context and create a UIImage
+
+    CGImageRef	ref = CGBitmapContextCreateImage(bitmap);
+    
+    UIImage *resultImage = [UIImage imageWithCGImage:ref];
+    
+    NSLog (@"saved image size = %f x %f", resultImage.size.width, resultImage.size.height);
+
+    // Clean up
+
+    CGContextRelease (bitmap);	
+    CGImageRelease (ref);
+    
+    return resultImage;
+}
+
 
 //
 // This method will capture the paused video frame so we can save the 
@@ -1117,58 +1547,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             NSLog (@"Async Request for frame at %@, actual = %@ (fps = %f)", [self timeFormat: requestedTime], [self timeFormat: actualTime], fps);
         }];
 #endif
-
-    // We grabbed the frame, let's make it smaller
     
-    CGImageAlphaInfo	alphaInfo = CGImageGetAlphaInfo(image);
-        
-    if (alphaInfo == kCGImageAlphaNone)
-        alphaInfo = kCGImageAlphaNoneSkipLast;
-    
-    int  wid = CGImageGetWidth (image) + CGImageGetWidth (image) % 8;
-    int  ht =  CGImageGetHeight (image)  + CGImageGetHeight(image) % 8;  
-    
-    wid = 320;   // We've hardcoded the thumbnail size for now!
-    ht = 192;
-    
-    NSLog (@"image width,height = (%i, %i)", wid, ht);
-    
-    CGRect thumbRect = { 
-        {0.0f, 0.0f}, 
-        {(float) wid, (float) ht}
-    };
-    
-    NSLog (@"bits per component = %i, color space = %i",  CGImageGetBitsPerComponent(image), CGImageGetColorSpace(image));
-    
-    // Build a bitmap context that's the size of the thumbRect
-    
-    CGContextRef bitmap = CGBitmapContextCreate(
-                NULL,
-                thumbRect.size.width,		// width
-                thumbRect.size.height,		// height
-                CGImageGetBitsPerComponent(image),	
-                4 * thumbRect.size.width,	// rowbytes
-                CGImageGetColorSpace(image),
-                alphaInfo
-                );
-    
-    // Draw into the context, this scales the image
-    
-    CGContextDrawImage(bitmap, thumbRect, image);
-    
-    [self drawMarkups: bitmap width: wid height: ht];
-    
-    // Get an image from the context and create a UIImage
-    
-    CGImageRef	ref = CGBitmapContextCreateImage(bitmap);
-    self.newThumb = [UIImage imageWithCGImage:ref];
-    NSLog (@"saved image size = %f x %f", newThumb.size.width, newThumb.size.height);
-    
-    // Clean up
-    
-    CGContextRelease (bitmap);	
-    CGImageRelease (ref);
-    CGImageRelease (image);
+    self.newThumb = [self scaleImage: image andRotate: 0.0];
     [imageGen release];
 }
 
@@ -1176,11 +1556,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
 //
 // Code to rotate an image
-// We need this because we run in landscape mode and GetScreenImage will
+// We need this because we run in landscape mode and UIGetScreenImage will
 // give us an image that we'll need to rotate
 //
 
-- (CGImageRef)CGImageRotatedByAngle:(CGImageRef)imgRef angle:(CGFloat)angle
+- (CGImageRef) CGImageRotatedByAngle:(CGImageRef)imgRef angle:(CGFloat)angle
 {
 	CGFloat angleInRadians = angle * (M_PI / 180);
 	CGFloat width = CGImageGetWidth(imgRef);
@@ -1303,9 +1683,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         return;
     }
     
-    // If there's no video player, or we're playing--ignore this save
+    // If there's no video player, or we're playing and there's no still showing--ignore this save
     
-    if (!player || player.rate != 0.0)
+    if ((!player || player.rate != 0.0) && !stillShows)
         return;
 
     // We're here, so we really want to save a note
@@ -1314,21 +1694,44 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     Note *aNewNote = [[Note alloc] init];
     
     // Capture the frame and draw the markups on it
-
-    [self frameDraw];
     
-    CMTime curTime =  kCMTimeMakeWithSeconds (kCVTime ([player currentTime]) + startTimecode);
+    if ( !stillShows )
+        [self frameDraw];
+    else {
+        self.newThumb = [self scaleImage: [stillImage CGImage] andRotate: rotAngles [rotate % 4]];     // markups drawn on top by the method
+    }
     
     // Capture any text typed into the note pad area
-
+    
     aNewNote.text = newNote.text;
+    CMTime curTime;
     
-    // Always store the time in timecode format
+    if ( !stillShows ) {
+        curTime =  kCMTimeMakeWithSeconds (kCVTime ([player currentTime]) + startTimecode);
     
-    BOOL saveFormat = timecodeFormat;
-    timecodeFormat = YES;
-    aNewNote.timeStamp = [self timeFormat: curTime];
-    timecodeFormat = saveFormat;
+        // Always store the time in timecode format
+        
+        BOOL saveFormat = timecodeFormat;
+        timecodeFormat = YES;
+        aNewNote.timeStamp = [self timeFormat: curTime];
+        timecodeFormat = saveFormat;
+        
+        // We use this to scale the markups as needed so it
+        // works on both the iPhone and iPad
+        
+        aNewNote.frameWidth = playerLayerView.frame.size.width;
+        aNewNote.frameHeight = playerLayerView.frame.size.height;
+        aNewNote.imageName = nil;
+        aNewNote.rotation = 0;
+    }
+    else {
+        aNewNote.frameWidth = drawView.frame.size.width;
+        aNewNote.frameHeight = drawView.frame.size.height;
+        
+        aNewNote.timeStamp = @"";
+        aNewNote.imageName = clip;
+        aNewNote.rotation = rotate % 4;     // Save the current orientation of the still
+    }
     
     // Save the markups
     
@@ -1339,12 +1742,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     aNewNote.date = [self formatDate: NO];
     aNewNote.initials = initials;
-    
-    // We use this to scale the markups as needed so it
-    // works on both the iPhone and iPad
-    
-    aNewNote.frameWidth = playerLayerView.frame.size.width;
-    aNewNote.frameHeight = playerLayerView.frame.size.height;
 
     // If we made an audio note, save it as NSData
     
@@ -1356,23 +1753,28 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     // Let's compress the frame we grabbed and store it as NSData
     
     isSaving = YES;
-    aNewNote.thumb = UIImageJPEGRepresentation(newThumb, 0.25f);
+    aNewNote.thumb = UIImageJPEGRepresentation(newThumb, 0.9f);
+//  assert (aNewNote.thumb);
     
     // Love this part.  Animate the frame and note going into the notes table
 
     [self animateSave];
     
-    // Find where to put the note in the table (sorted in timecode order)
+    int     row = 0;
     
-    Float64 now = CMTimeGetSeconds(curTime);
-                                         
-    int row = 0;
-    for (Note *theNote in noteData) {
-        if ([self convertTimeToSecs: theNote.timeStamp] > now)
-            break;
-        ++row;
+    if ( !stillShows ) {
+        // Find where to put the note in the table (sorted in timecode order)
+        
+        Float64 now = CMTimeGetSeconds(curTime);
+                                             
+        row = 0;
+        for (Note *theNote in noteData) {
+            if ([self convertTimeToSecs: theNote.timeStamp] > now)
+                break;
+            ++row;
+        }
     }
-    
+        
     // Insert the note into the array and table
     
     NSIndexPath *indexP = [NSIndexPath indexPathForRow: row inSection:0];
@@ -1396,13 +1798,14 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         //do nothing
         NSLog (@"Race condition with notes table exception: %@", [e reason]);
     }
+    
+    [indexPaths release];
 
     // Clear the note
     
     newNote.text = @"";
     [self erase];
     madeRecording = NO;
-    [indexPaths release];
     [self storeData];
     
     pendingSave = NO;
@@ -1504,16 +1907,28 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 {
 	NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
 	NSString *docDir = [dirList objectAtIndex: 0];
+
+#if 0
+    NSMutableString *filePath = [clipPath mutableCopy];
     
-    NSString *fileName = [NSString stringWithFormat: @"%@.%@", clip, initials];
+    if ([filePath characterAtIndex: 0] == '/')
+        [filePath deleteCharactersInRange: NSMakeRange (0, 1)];
+#endif
+        
+    NSString *fileName = [NSString stringWithFormat: @"%@.%@", 
+            [clipPath stringByReplacingOccurrencesOfString: @"/" withString: kNoteDelimiter], initials];
+    
     NSLog (@"Archive file name = %@", fileName);
 	return [docDir stringByAppendingPathComponent: fileName];
 }
 
 // Archiving methods for our data
 
--(void) loadData: (NSString *) theInitials  {
+-(void) loadData: (NSString *) fileInfo  {
     download = kNotes;
+    NSString *downloadPath = [NSString stringWithFormat: @"Notes/%@", fileInfo];
+    
+    NSLog (@"*** Download path = %@", downloadPath);
     
     if (kFTPMode) {
         [FTPHelper sharedInstance].delegate = self;
@@ -1531,7 +1946,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         NSLog (@"Trying to download file from %@",  urlString);
         [FTPHelper sharedInstance].urlString = urlString;
         
-        [FTPHelper download: [NSString stringWithFormat: @"Notes/%@.%@", clip, theInitials] to: [self archiveFilePath]];
+        [FTPHelper download: downloadPath to: [self archiveFilePath]];
         NSLog (@"download returned...in process");
     }
     else 
@@ -1711,50 +2126,67 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 -(void) receivedListing: (NSArray *) listing
 {
     [self noteShowActivity];
-    NSString *f = [[clip stringByReplacingOccurrencesOfString: @"%20" withString: @" "]
-                   stringByDeletingPathExtension];
+    NSString *f = [clipPath stringByReplacingOccurrencesOfString: @"%20" withString: @" "];
 
-    NSLog (@"receivedListing, clip is %@", f);
-    [notePaths removeAllObjects];
+    NSLog (@"receivedListing, clip is %@, allStills is %i", f, allStills);
+    
+    if ([notePaths count])
+        [notePaths removeAllObjects];
+    
     [xmlPaths removeAllObjects];
     [txtPaths removeAllObjects];
     
-    // We will look at each file to see if it contains the clip name.  Then look at the extension:
+    // We will look at each file to see if it contains the clip name.  Then look at the extension.
     // 1. XML: FCP XML file for import
     // 2. txt: Avid Locator file for import
-    // 3. movie file: Skip it
+    // 3. movie or still file: Skip it
     // 4. Anything else: assume it's a note file (the extension is the initials)
+    
+    NSString *dirPath = [clipPath stringByDeletingLastPathComponent];
 
 	for (NSDictionary *dict in listing) {
         NSString *fileName = [FTPHelper textForDirectoryListing:(CFDictionaryRef) dict];
-		NSLog (@"Found ftp file: %@", fileName);
+        NSString *extension = [fileName pathExtension];
+        NSString *rootExtension = [[fileName stringByDeletingPathExtension] pathExtension];
+        NSString *translatedPath = [[fileName stringByReplacingOccurrencesOfString: kNoteDelimiter withString: @"/"] stringByDeletingPathExtension];   // Deletes the initials
         
-        if ( [fileName rangeOfString: f].location == NSNotFound ) {
+		NSLog (@"Found ftp file: %@ extension: %@\n\ttranslatedPath = %@", fileName, extension, translatedPath);
+        
+        if (allStills) {
+            NSLog (@"Testing %@ against %@ (%@)", dirPath, fileName, [translatedPath stringByDeletingLastPathComponent]);
+            
+            if ([dirPath isEqualToString: [translatedPath stringByDeletingLastPathComponent]] && kIsStill (rootExtension)) {
+                    NSLog (@"Found a still note: %@", fileName);
+                    [notePaths addObject: fileName];  // Make sure it's at the end of the path
+                }
+            
+            continue;
+        }
+        
+        if ( [translatedPath rangeOfString: f].location == NSNotFound ) {
             NSLog2 (@"Skipping file %@", fileName);
             continue;
         }
         
-        NSString *extension = [fileName pathExtension];
-        
-        if ( EQUALS (extension, @"mp4") || EQUALS (extension, @"m4v")  
-            || EQUALS (extension, @"mov") || EQUALS (extension, @"m3u8")) {
-            NSLog2 (@"Skipping FTP file %@", fileName);
+        if ( kIsMovie (extension) || kIsStill (extension))
             continue;
-        }
         
-        // Look for an XML or txt (Avid import) or note file
+        // Look for an XML or txt (Avid import) or note file for a video clip
         
-        if ( EQUALS (extension, @"xml") ) {
+        if ( !stillShows && EQUALS (extension, @"xml") ) {
             [xmlPaths addObject: fileName];
             NSLog (@"Found XML file %@", fileName );
         }
-        else if ( EQUALS (extension, @"txt") ) {
+        else if ( !stillShows && EQUALS (extension, @"txt") ) {
             [txtPaths addObject: fileName];
             NSLog (@"Found txt file (Avid import) %@", fileName );
         }
-        else
-            [notePaths addObject: extension];
+        else {
+            NSLog (@"Adding %@ to notePaths", fileName);
+            [notePaths addObject: fileName];
+        }
     }
+        
     
     // kick off the loading of the individual note files; the rest are loaded from the downloadFinished callback
     
@@ -1764,7 +2196,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         [self loadData: [notePaths objectAtIndex: 0]];
     else {
         [self noteStopActivity];
-        [self setStartTimecode];
+        
+        if (!stillShows)
+            [self setStartTimecode];
     }
 }
 
@@ -1798,7 +2232,11 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     NSMutableArray *myNotes = [[NSMutableArray alloc] init];
     
     for (Note *aNote in noteData) 
-        if ([aNote.initials isEqualToString: initials]) 
+        if (allStills) {
+            if ([aNote.imageName isEqualToString: clip] && [aNote.initials isEqualToString: initials])
+                [myNotes addObject: aNote];
+        }
+        else if ([aNote.initials isEqualToString: initials]) 
             [myNotes addObject: aNote];
     
     return myNotes;
@@ -1809,7 +2247,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 -(void) storeData  {
     NSMutableArray *myNotes = [self getMyNotes];
     NSString *archivePath = [self archiveFilePath];
-    
+        
     // Write the notes to a local archive file first 
     
     if ([NSKeyedArchiver archiveRootObject: myNotes toFile: archivePath] == NO) {
@@ -1874,6 +2312,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         if (data) {
             startTimecode = [self convertTimeToSecs: data];
             NSLog (@"Read starting timecode from file: %@ (%lg)", data, startTimecode);
+            if (startTimecode == NAN)
+                startTimecode = 0;
 
             durationSet = NO;
             maxLabelSet = NO;
@@ -1950,7 +2390,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 Next:
     ++noteFileProcessed;
     if (noteFileProcessed >= [notePaths count]) {
-        [self setStartTimecode];        
+        if (!stillShows)
+            [self setStartTimecode]; 
+        
         [self noteStopActivity];
 
         return;
@@ -2067,20 +2509,6 @@ Next:
     }
     else
         return fileName;
-                                   
-#if 0  
-    [FTPHelper sharedInstance].delegate = self;
-    [FTPHelper sharedInstance].uname = [kAppDel FTPusername];
-    [FTPHelper sharedInstance].pword = [kAppDel FTPpassword];
-    
-    NSString *urlString = [NSString stringWithFormat: @"ftp://%@", [kAppDel FTPserver]];
-    
-    NSLog2 (@"Saving file %@ to %@", fileName, urlString);
-    [FTPHelper sharedInstance].urlString = urlString;
-    
-    [FTPHelper upload: fileName];
-    NSLog2 (@"upload returned...in process");
-#endif
 }
 
 
@@ -2246,7 +2674,7 @@ Next:
 
 - (void) credentialsMissing
 {
-	NSLog (@"Please supply both user name and password before using FTP Helper");
+	NSLog (@"Please supply both user name and password for ftp");
 }
 
 - (void) progressAtPercent: (NSNumber *) aPercent;
@@ -2308,7 +2736,7 @@ Next:
             //self.content = nil;
             if (!completed && error) {
                 [UIAlertView doAlert: @"Printing" 
-                             withMsg: @"An error occurred trying to print"];
+                             withMsg: @"An error occurred while trying to print"];
                 NSLog(@"Failed due to error in domain %@ with error code %u", error.domain, error.code);
             } 
         };
@@ -2346,9 +2774,15 @@ Next:
     
     // set the subject line for the email
 	
-	[picker setSubject: [NSString stringWithFormat: @"Notes for %@",
-                [[clip stringByReplacingOccurrencesOfString: @"%20" withString:@" "]
-                 stringByDeletingPathExtension], (FCPXML) ? @"(FCP XML attached)" : @"", 
+    NSString *noteName;
+    
+    if (! allStills) 
+        noteName = [[clip stringByReplacingOccurrencesOfString: @"%20" withString:@" "]
+                    stringByDeletingPathExtension];
+    else
+        noteName = [NSString stringWithFormat: @"Album %@", [[[clipPath stringByReplacingOccurrencesOfString: @"%20" withString:@" "] stringByDeletingLastPathComponent] lastPathComponent]];
+                    
+	[picker setSubject: [NSString stringWithFormat: @"Notes for %@ %@", noteName,  (FCPXML) ? @"(FCP XML attached)" : @"", 
                          (AvidExport) ? @"(Avid Locator file attached)" : @""]];
     
 	// Set up recipients
@@ -2408,7 +2842,7 @@ Next:
                     [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],  [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
         
         [picker setMessageBody:emailBody isHTML:NO];
-   }
+    }
     else  {
         NSString *theTitle = @"";
         
@@ -2514,7 +2948,7 @@ Next:
 // Save a thumbnail image as a base64-encoded string to insert in the HTML stream
 
 -(NSString *) outputImage: (Note *) theNote {
-   NSString *result = [NSString stringWithFormat: @"<img width=400  src=\"data:image/jpeg;base64,%@\">", 
+   NSString *result = [NSString stringWithFormat: @"<center><img height=175 src=\"data:image/jpeg;base64,%@\"></center>", 
                        [self base64EncodedString: theNote.thumb ]];
     return result;
 }   
@@ -2527,6 +2961,7 @@ Next:
         [emailBody appendString: @"<table border=2 cellpadding=10 cellspacing=10>"];
         
         noteNumber = 1;
+        NSLog (@"emailing %lu notes", [noteData count]);
 
         for (Note *theNote in noteData) {
             [emailBody appendString: [self noteToHTML: theNote]];
@@ -2559,11 +2994,20 @@ Next:
     
     // output the note
     
-    NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
-    [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
-    
-    [emailBody appendString: [NSString stringWithFormat: @"<td valign=top><font color=red>%@</font>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;%@<p></p>%@", 
-                timeFormat, theNote.date, theNote.initials, comment]];
+    if (! theNote.imageName ) {
+        NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
+        [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
+        
+        [emailBody appendString: [NSString stringWithFormat: @"<td valign=top>%@&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;&nbsp;<p></p>%@", 
+                    timeFormat, theNote.date, theNote.initials, comment]];
+    }
+    else {
+        NSString *image = [[theNote.imageName lastPathComponent] stringByDeletingPathExtension];
+        
+        [emailBody appendString: [NSString stringWithFormat: @"<td valign=top><b>%@</b><br>%@&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;&nbsp;&nbsp;<p></p>%@", 
+                                 image, theNote.initials, theNote.date, comment]];
+    }
+        
  
     // audio -- upload to server and embed in HTML
     
@@ -2797,19 +3241,34 @@ Next:
     
     // We'll use the thumbnail for the note image....the quality is acceptable
     
-    CGContextDrawImage (pdfContext, CGRectMake (40, currentY - 155, 250, 150), [UIImage imageWithData: aNote.thumb].CGImage);
+    UIImage *theImage = [UIImage imageWithData: aNote.thumb];
+    float wid = theImage.size.width;
+    float ht = theImage.size.height;
+    
+    wid =  (150 / ht) * wid;
+    ht = 150;
+    
+    CGContextDrawImage (pdfContext, CGRectMake (40, currentY - 155, wid, ht), theImage.CGImage);
 
     // Fill in the usual suspects for the note info: date/time stamp, initials, note text
     
-    CGContextSelectFont (pdfContext, "Helvetica-Bold", 12, kCGEncodingMacRoman);
-    CGContextSetRGBFillColor (pdfContext, 1, 0, 0, 1);
-    CGContextShowTextAtPoint (pdfContext, 330, currentY - 20, noteTime, strlen(noteTime));
+    if (! aNote.imageName) {
+        CGContextSelectFont (pdfContext, "Helvetica-Bold", 12, kCGEncodingMacRoman);
+        CGContextSetRGBFillColor (pdfContext, 1, 0, 0, 1);
+        CGContextShowTextAtPoint (pdfContext, 330, currentY - 20, noteTime, strlen(noteTime));
+    }
+    else {
+        const char *image = [[[aNote.imageName lastPathComponent] stringByDeletingPathExtension] UTF8String];
+        CGContextSelectFont (pdfContext, "Helvetica-Bold", 12, kCGEncodingMacRoman);
+        CGContextSetRGBFillColor (pdfContext, 1, 0, 0, 1);
+        CGContextShowTextAtPoint (pdfContext, 330, currentY - 20, image, strlen(image));
+    }
     
     CGContextSelectFont (pdfContext, "Helvetica", 12, kCGEncodingMacRoman);
     CGContextSetRGBFillColor (pdfContext, 0, 0, 1, 1);
  
     char *dateInitials = strcat (strcat (date, "   "), who);
-	CGContextShowTextAtPoint (pdfContext, 490, currentY - 20, dateInitials, strlen(dateInitials));
+    CGContextShowTextAtPoint (pdfContext, 490, currentY - 20, dateInitials, strlen(dateInitials));
     CGContextSetRGBFillColor (pdfContext, 0, 0, 0, 1);
     
     // I think there's an easier way to do the line wrapping for the note.... I chose the hard way!
@@ -3093,7 +3552,7 @@ static int saveRate;
 
     // Set the clips duration
     
-    double duration;
+    double duration = 0.0;
         
     if (! durationSet) {
         endOfVid = player.currentItem.asset.duration; // [asset duration];
@@ -3130,8 +3589,11 @@ static int saveRate;
     Float64 time = kCVTime([player currentTime]);
     
     // Set the scrubber to the current time as a percentage of the duration
-     
-    movieTimeControl.value = (float) (time / duration);
+    
+    if (! isfinite (duration))
+        duration = 0;
+    else
+        movieTimeControl.value = (float) (time / duration);
 
     // [self timeStats];
     // Scroll the notes table in time with the video clip
@@ -3280,72 +3742,154 @@ static int saveRate;
 
 // 
 // This method is used to put the app back to a "sane" state
-// We don't do anything unless we have an active video clip
-// We'll pause it, remove the clip from playback, remove any observers, stop any activity indicators
+// We don't do anything unless we have an active video clip or a still showing
+// For a still, we'll remove its display, and clear any markups and notes
+// If the sideshow timer is running, we'll stop it
+// For a video, we'll pause it, remove the clip from playback, remove any observers, stop any activity indicators
 // We'll also leave fullScreen or airPlay modes if active
 //
 
 -(void) cleanup
 {
-        if (!player)
-            return;
+    NSLog (@"cleaning up");
 
-        NSLog (@"cleaning up");
-
-        [player removeObserver: self forKeyPath:@"rate"];
-        [player removeObserver: self forKeyPath:@"currentItem.status"];
-        [player removeObserver: self forKeyPath:@"currentItem.asset.duration"];
-        [player removeObserver: self forKeyPath:@"currentItem.asset.commonMetadata"];
-        [self stopObservingTimeChanges];
-
-        player.rate = 0;
+    noteTableSelected = NO;
     
-        [self pauseIt];
-        [self stopActivity];
-        [self noteStopActivity];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                        name:AVPlayerItemDidPlayToEndTimeNotification  object:nil];
+    
+    if (watermark)
+        [stampLabel removeFromSuperview];
 
-        if (!autoPlay && fullScreenMode)
-            [self leaveFullScreen: nil];
+    if (stillShows) {
+        if (slideshowTimer) {
+            [slideshowTimer invalidate];
+            self.slideshowTimer = nil;
+        }
         
-       if (airPlayMode && !runAllMode && !autoPlay)
-           [self airPlay];
-        else    
-            [self movieControllerDetach];
-
-        // Clear any current note or markup
-    
-        [self clearAnyNotes];
+        [stillView removeFromSuperview];
+        stillShows = NO;
+        drawView.frame = drawViewFrame;
         [self erase];
-        [drawView setNeedsDisplay];
-    
-        // Get rid of our player
-    
-        self.playerLayer.player = nil; // this is the trick !
-        [self.playerLayer removeFromSuperlayer];
-        self.playerLayer = nil;
-        self.currentlyPlaying = nil;
-        player = nil;
-    
-        // We shouldn't be recording
-
-        if ([voiceMemo audioRecorder].isRecording)            
-            [voiceMemo stopRecording];
-    
-        recording.hidden = YES;
-    
-        // Reset various vars to sane values
-    
-        fps = 0;
-        isPrinting = NO;
-        movieTimeControl.value = 0;
-        durationSet = NO;
-        theTime.text = [self timeFormat: kCMTimeZero];
+        [self clearAnyNotes];
         newNote.text = @"";
-        maxLabelSet = NO;  
-        startTimecode = 0.0;
-        reTryCount = 0;
-        maxLabel.text = [self timeFormat: kCMTimeZero];
-        minLabel.text = [self timeFormat: kCMTimeZero];
+        
+        // hide buttons that don't apply
+        
+        theTime.hidden = NO;
+        backgroundLabel.hidden = NO;
+        movieTimeControl.hidden = NO;
+        maxLabel.hidden = NO;
+        minLabel.hidden = NO;
+        rewindToStartButton.enabled = YES; 
+        frameBackButton.enabled = YES; 
+        frameForwardButton.enabled = YES; 
+        forwardToEndButton.enabled = YES; 
+        rewindButton.enabled = YES;
+        fastForwardButton.enabled = YES;
+        //  pausePlayButton.enabled = NO;
+        
+        skipForwardButton.enabled = YES;
+        skipBackButton.enabled = YES;
+        skipForwardButton.title = [NSString stringWithFormat: @"+%i", skipValue];
+        skipBackButton.title = [NSString stringWithFormat: @"-%i", skipValue];;
+        
+        return;
+    }
+    
+    if (!player)
+        return;
+    
+    newNote.text = @"";
+    [self stopObservingTimeChanges];
+
+    [player removeObserver: self forKeyPath:@"rate"];
+    [player removeObserver: self forKeyPath:@"currentItem.status"];
+    [player removeObserver: self forKeyPath:@"currentItem.asset.duration"];
+    [player removeObserver: self forKeyPath:@"currentItem.asset.commonMetadata"];
+    
+    if (kRunningOS5OrGreater) 
+        [player removeObserver: self forKeyPath:@"airPlayVideoActive"];
+
+    player.rate = 0;
+
+    [self pauseIt];
+    [self stopActivity];
+    [self noteStopActivity];
+
+    if (!autoPlay && fullScreenMode)
+        [self leaveFullScreen: nil];
+    
+   if (airPlayMode && !runAllMode && !autoPlay)
+       [self airPlay];
+    else    
+        [self movieControllerDetach];
+
+    // Clear any current note or markup
+
+    [self clearAnyNotes];
+    [self erase];
+    [drawView setNeedsDisplay];
+
+    // Get rid of our player
+
+    self.playerLayer.player = nil; // this is the trick !
+    [self.playerLayer removeFromSuperlayer];
+    self.playerLayer = nil;
+    self.currentlyPlaying = nil;
+    player = nil;
+
+    // We shouldn't be recording
+
+    if ([voiceMemo audioRecorder].isRecording)            
+        [voiceMemo stopRecording];
+
+    recording.hidden = YES;
+
+    // Reset various vars to sane values
+
+    fps = 0;
+    isPrinting = NO;
+    movieTimeControl.value = 0;
+    durationSet = NO;
+    theTime.text = [self timeFormat: kCMTimeZero];
+    maxLabelSet = NO;  
+    startTimecode = 0.0;
+    reTryCount = 0;
+    maxLabel.text = [self timeFormat: kCMTimeZero];
+    minLabel.text = [self timeFormat: kCMTimeZero];
+}
+
+-(NSURL *) getTheURL: (NSString *) thePath
+{
+    NSURL  *theURL = (NSURL *) thePath;
+    
+    // Generate an NSURL object from the argument if it's a string 
+    // (Otherwise assume it's already an NSURL)
+
+    if ([thePath isKindOfClass: [NSString class]]) {
+        NSRange network = [thePath rangeOfString: @"http:"];
+        
+        if (network.location == NSNotFound)
+            network = [thePath rangeOfString: @"https:"];
+        if (network.location == NSNotFound)
+            network = [thePath rangeOfString: @"file:"];
+        
+        if (network.location == NSNotFound) {
+            NSLog (@"Loading movie/still %@", thePath);
+            
+            if ([thePath rangeOfString: @"Simulator"].location != NSNotFound)
+                theURL = [[NSURL alloc] initFileURLWithPath: [[NSBundle mainBundle] pathForResource: @"31-1A" ofType:@"m4v"]];
+            else
+                theURL = [[NSURL alloc] initFileURLWithPath: thePath];
+        }
+        else {
+            NSLog (@"Loading movie/still %@ from Internet or camera roll", thePath);
+            theURL = [NSURL URLWithString: thePath];
+        }
+    }
+
+    return theURL;
 }
 
 //
@@ -3357,7 +3901,7 @@ static int saveRate;
 {
     editButton.title = @"Edit";
 
-    if (player) 
+    if (player || stillShows) 
         [self cleanup];
     else
         [self erase];
@@ -3367,37 +3911,21 @@ static int saveRate;
         nc.view.hidden = YES;
     }
     
+    if (kRunningOS5OrGreater) {
+        playOutButton.enabled = NO;
+    }
+    else {
+        playOutButton.image = [UIImage imageNamed: @"playout.png"];
+        playOutButton.enabled = YES;
+    }
+
     self.currentlyPlaying = [theMovie retain];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self
                 name:AVPlayerItemDidPlayToEndTimeNotification  object:nil];
 
-    // Generate an NSURL object from the argument if it's a string 
-    // (Otherwise assume it's already an NSURL
-    
-    if ([theMovie isKindOfClass: [NSString class]]) {
-        NSRange network = [theMovie rangeOfString: @"http:"];
-        if (network.location == NSNotFound)
-            network = [theMovie rangeOfString: @"https:"];
-        if (network.location == NSNotFound)
-            network = [theMovie rangeOfString: @"file:"];
-        
-        if (network.location == NSNotFound) {
-            NSLog (@"Loading movie %@", theMovie);
-            
-            if ([theMovie rangeOfString: @"Simulator"].location != NSNotFound)
-                movieURL = [[NSURL alloc] initFileURLWithPath: [[NSBundle mainBundle] pathForResource: @"31-1A" ofType:@"m4v"]];
-            else
-                movieURL = [[NSURL alloc] initFileURLWithPath: theMovie];
-            
-        }
-        else {
-            NSLog (@"Loading movie %@ from Internet or camera roll", theMovie);
-            self.movieURL = [NSURL URLWithString: theMovie];
-        }
-    }
-    else
-         self.movieURL = theMovie;
+    self.movieURL = [self getTheURL: theMovie];
+    self.mediaPath = theMovie;
     
 #if 0
     // This never worked!
@@ -3419,7 +3947,11 @@ static int saveRate;
     if (kFTPMode)
         [self getAllFTPNotes];
     else {
-        [self loadData: initials];
+        if (!allStills)
+            [self loadData: [NSString stringWithFormat: @"%@.%@", 
+                    [clipPath stringByReplacingOccurrencesOfString: @"/" withString: kNoteDelimiter], initials]];   
+        else
+            ;  //  Need to get the local notes for all images in the album here
     }
     
     // Create the movie asset and get the tracks keys
@@ -3477,8 +4009,6 @@ static int saveRate;
             [player addObserver:self forKeyPath:@"currentItem.status" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerStatusObservationContext];
             [player addObserver:self forKeyPath:@"currentItem.asset.duration" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerDurationObservationContext];
             [player addObserver:self forKeyPath:@"currentItem.asset.commonMetadata" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context: VideoTreeViewControllerCommonMetadataObserverContext];           
-//          [player addObserver:self forKeyPath:@"currentItem.timedMetadata" options: NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:VideoTreeViewControllerTimedMetadataObserverContext];
-//			[playerItem addObserver:self forKeyPath:@"currentItem.seekableTimeRanges" options:NSKeyValueObservingOptionInitial context:VideoTreeViewControllerSeekableTimeRangesObserverContext];
 
             // Set up the playerLayer for playback
             
@@ -3489,15 +4019,6 @@ static int saveRate;
             playerLayer.frame = playerLayerView.layer.bounds;
             [playerLayerView.layer addSublayer:playerLayer];
             playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;  // maintain aspect ratio
-  
-            // If we're watermarking, make our view visible
-            
-            if (watermark) {
-  //            [playerLayerView bringSubviewToFront: stampLabel];
-                self.stampLabel.hidden = NO;
-            }
-            else
-                self.stampLabel.hidden = YES;
             
             // Let's add the drawView and make sure it's on top
 
@@ -3512,6 +4033,16 @@ static int saveRate;
                 else
                     airPlayImageView.hidden = YES;
             }
+            
+            // If we're watermarking, make our view visible
+            
+            if (watermark) {
+                [playerLayerView addSubview: stampLabel];
+                [playerLayerView bringSubviewToFront: stampLabel];
+                self.stampLabel.hidden = NO;
+            }
+            else
+                self.stampLabel.hidden = YES;
         }
         else
             NSLog (@"Failed to initiliaze the movie player!");
@@ -3545,9 +4076,6 @@ static int saveRate;
 #endif
 
          NSLog (@"playbackLikelyToKeepUp = %i", player.currentItem.isPlaybackLikelyToKeepUp);
-//       NSLog (@"%@, %@", playerItem.asset.commonMetadata, playerItem.timedMetadata);
-         
-//         NSLog (@"%@, %@, %lu, %lu", player, player.currentItem, player.currentItem.asset.duration.value, player.currentItem.asset.duration.timescale);
 
          [self updateTimeControl];
          
@@ -3588,9 +4116,17 @@ static int saveRate;
 // This button is only needed pre-iOS 5.0
 // because AVPlayer class did not support airPlay
 //
+// Note that this button changes to the rotate button
+// when showing stills
+//
 
 -(IBAction) airPlay
 {
+    if (stillShows) { 
+        [self rotateStill];
+        return;
+    }
+    
     // Remove the "DVD Remote" if it shows
     
     [UIView animateWithDuration: .3 animations: ^{ 
@@ -3761,7 +4297,7 @@ static int saveRate;
 
 -(BOOL) nextClip
 {
-    DetailViewController *dc =  [ kAppDel tvc];
+    DetailViewController *dc =  [kAppDel tvc];
     
     NSLog (@"autoplay next clip");
     return [dc nextClip];
@@ -3834,24 +4370,31 @@ static int saveRate;
 // FullScreen support using AVPlayer
 
 -(IBAction) fullScreen
-{    
-    if (!player)
+{ 
+    if (!player && !stillShows)
         return;
-    
-    [self pauseIt];
-    [self erase];
     
     if (! iPHONE) {
         [[UIApplication sharedApplication] setStatusBarHidden: YES 
-            withAnimation: UIStatusBarAnimationFade];
+                                                withAnimation: UIStatusBarAnimationFade];
         
         UINavigationController  *nc = [(VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] nc];
         nc.view.hidden = YES;
     }
     
+    if (player) {
+        [self pauseIt];
+        [self erase];
+    }
+
     [UIView animateWithDuration: .3 animations: ^{ 
         playerLayerView.frame = CGRectMake (0.0, 0.0, [UIScreen mainScreen].applicationFrame.size.height, [UIScreen mainScreen].applicationFrame.size.width);
         playerLayer.frame = playerLayerView.frame;
+        
+        if (stillShows) {
+            saveFrame2 = stillView.frame;
+            stillView.frame = playerLayerView.frame;
+        }
     }];
         
     // We have to hide everything so full screen playback looks nice
@@ -3881,8 +4424,11 @@ static int saveRate;
         stampLabelFull.textColor = [UIColor whiteColor];
     }
     
-    [playerLayerView addSubview: stampLabelFull];
-    [player play];
+    if (watermark)
+        [playerLayerView addSubview: stampLabelFull];
+    
+    if (player)
+        [player play];
 }
 
 // Leave full screen playback 
@@ -3894,6 +4440,9 @@ static int saveRate;
     [UIView animateWithDuration: .3 animations: ^{
         playerLayerView.frame = saveFrame;
         playerLayer.frame = playerLayerView.layer.bounds;
+        
+        if (stillShows)
+            stillView.frame = saveFrame2;
     }];
     
     // We hid the navgation controlller on the iPad (on the iPhone, it's a drop down)
@@ -3908,7 +4457,10 @@ static int saveRate;
     // reshow everything we hid before
     
     newNote.hidden = NO;
-    theTime.hidden = NO;
+    
+    if (! stillShows)
+        theTime.hidden = NO;
+    
     backgroundLabel.hidden = NO;
     noteBar.hidden = NO;
     myVolumeView.hidden = NO;
@@ -3926,6 +4478,14 @@ static int saveRate;
         pausePlayButton.image = pauseImage;
 }
 
+// 
+// Leave full screen for still autoplay
+//
+
+-(void) leaveFullScreenStill
+{
+}
+
 //
 // Notification when player reaches the end of playback
 //
@@ -3934,12 +4494,29 @@ static int saveRate;
 {
     NSLog (@"Item did play to end");
     
-	seekToZeroBeforePlay = YES;
+    seekToZeroBeforePlay = YES;
     
     if (autoPlay) {
         if (! [self nextClip] && fullScreenMode)
             [self leaveFullScreen: nil];
     }
+}
+
+//
+// Notification when still has been displayed for slideTime secs
+//
+
+-(void) stillDidTimeOut: (NSTimer *) theTimer
+{
+    NSLog (@"Still did time out autoplay");
+    
+    [slideshowTimer invalidate];
+    self.slideshowTimer = nil;
+    
+    BOOL next = [self nextClip];   // This will actually select the next clip/still from the table
+    
+    if (!next)
+        pausePlayButton.enabled = NO;
 }
 
 //
@@ -4082,17 +4659,14 @@ static int saveRate;
         cell.editingAccessoryType = UITableViewCellEditingStyleDelete;
         cell.textLabel.numberOfLines = 1;
         cell.detailTextLabel.numberOfLines = 3;
-        cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        cell.imageView.frame = CGRectMake (0, 0, 32, 32);
         cell.imageView.backgroundColor = MYGRAY;
         tableView.backgroundColor = [UIColor colorWithRed: .8 green: .8 blue: .9 alpha: 1];
         
- 
         CGRect theFrame = cell.selectedBackgroundView.frame;
         UIView *theBG = [[UIView alloc] initWithFrame: theFrame];
         theBG.backgroundColor =  [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: .7];;
         cell.selectedBackgroundView = theBG;
-
+        cell.imageView.layer.masksToBounds = YES;
     }
 
     // Fill in the cell with data from the note stored in noteData
@@ -4100,23 +4674,41 @@ static int saveRate;
     Note *theNote = [noteData objectAtIndex: indexPath.row];
     
     // The marked up frame thumbnail
+ 
+#if 0
+    UIImage *thumbnail = [UIImage imageWithData: theNote.thumb];
+    float width = 200;
+    float ht = (width / thumbnail.size.width) * thumbnail.size.height;
     
-    cell.imageView.image = [UIImage imageWithData: theNote.thumb]; 
+    cell.imageView.image = [[UIImage imageWithData: theNote.thumb] imageScaledToSize: CGSizeMake(width, ht)];
+#endif
     
+    UIImage *thumbnail = [UIImage imageWithData: theNote.thumb];
+    cell.imageView.image = thumbnail;
+    
+//  [self dumpRect: cell.imageView.frame title: @"cell.imageView.frame"];
+//  [self dumpRect: cell.imageView.bounds title: @"cell.imageView.bounds"];
+//   NSLog (@"cell imageView image size = (%g, %g)", cell.imageView.image.size.width, 
+//                    cell.imageView.image.size.height);
+ 
     // The typed note 
    
     cell.detailTextLabel.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
     
-    // The time in either timecode or frame number format
-    
-    NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
-            [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
-    
-    // The time, the date of the note, and the initials of the user that made the note
-    
-    cell.textLabel.text = [NSString stringWithFormat: @"%@ %@ %@", timeFormat, 
-            [theNote.date length] > 3 ? 
-            [theNote.date substringToIndex: [theNote.date length] - 3] : @"", theNote.initials];
+    if (! theNote.imageName)  { // means it's a video 
+        // The time in either timecode or frame number format
+        
+        NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
+                [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
+        
+        // The time, the date of the note, and the initials of the user that made the note
+        
+        cell.textLabel.text = [NSString stringWithFormat: @"%@ %@ %@", timeFormat, 
+                [theNote.date length] > 3 ? 
+                [theNote.date substringToIndex: [theNote.date length] - 3] : @"", theNote.initials];
+    }
+    else
+        cell.textLabel.text = [NSString stringWithFormat: @"%@ %@", [[theNote.imageName lastPathComponent] stringByDeletingPathExtension], theNote.initials];
     
     // My notes look different in the table than everyone else's
     
@@ -4182,19 +4774,40 @@ static int saveRate;
         
         [audioPlayer play];
     }
-        
-    // We want to draw the markups onto the frame
-    // Set up the data in the drawView object and then have the markups drawn
-
+    
     drawView.colors = theNote.colors;
     drawView.myDrawing = theNote.drawing;
-    drawView.scaleWidth =  playerLayerView.frame.size.width  / theNote.frameWidth;
-    drawView.scaleHeight =  playerLayerView.frame.size.height / theNote.frameHeight;
     
-    if ( drawView.scaleWidth == 0.0 || drawView.scaleWidth == NAN)
+    if (theNote.imageName)  {  // Load in the still
+        noteTableSelected = YES;
+        
+        [self loadStill:  [[mediaPath stringByDeletingLastPathComponent] stringByAppendingPathComponent: theNote.imageName]];
+        
+        for (int i = 0; i < theNote.rotation; ++i)   // get the still in the right orientation---maybe not the most elegant solution here
+            [self rotateStill];
+        
         drawView.scaleWidth = drawView.scaleHeight = 1.0;
+        
+        drawView.scaleWidth =  drawView.frame.size.width  / theNote.frameWidth;
+        drawView.scaleHeight =  drawView.frame.size.height / theNote.frameHeight;
+        
+        NSLog (@"framewidth = %g, frameheight = %g", theNote.frameWidth, theNote.frameHeight);
+        [self dumpRect: drawView.frame title: @"drawView.frame"];
+        noteTableSelected = NO;
+    }
+    else {
+        // We want to draw the markups onto the frame
+        // Set up the data in the drawView object and then have the markups drawn
+
+        drawView.scaleWidth =  drawView.frame.size.width  / theNote.frameWidth;
+        drawView.scaleHeight =  drawView.frame.size.height / theNote.frameHeight;
+    
+        if ( drawView.scaleWidth == 0.0 || drawView.scaleWidth == NAN )
+            drawView.scaleWidth = drawView.scaleHeight = 1.0;
+    }
 
     [drawView setNeedsDisplay];   // Draw the markups
+    
     [self updateTimeLabel];
     [self updateTimeControl];
 }
@@ -4242,10 +4855,15 @@ static int saveRate;
     [player removeObserver: self forKeyPath:@"currentItem.status"];
     [player removeObserver: self forKeyPath:@"currentItem.asset.duration"];
     [player removeObserver: self forKeyPath:@"currentItem.asset.commonMetadata"];
-    [player removeObserver: self forKeyPath:@"airPlayVideoActive"];
+    if (kRunningOS5OrGreater) 
+        [player removeObserver: self forKeyPath:@"airPlayVideoActive"];
     
     [theTimer invalidate];
     self.theTimer = nil;
+    
+    [slideshowTimer invalidate];
+    self.slideshowTimer = nil;
+    [stillImage release];
     
     [theAsset release];
     [noteData release];

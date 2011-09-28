@@ -201,6 +201,8 @@ static int retryCount;      // We don't give up on FTP failures that easily
 {
     NSLog (@"receivedListing");
     
+    allStills = YES;
+    
 	for (NSDictionary *dict in listing) {
         NSString *fileName = [FTPHelper textForDirectoryListing:(CFDictionaryRef) dict];
         
@@ -210,10 +212,12 @@ static int retryCount;      // We don't give up on FTP failures that easily
         
         NSString *extension = [fileName pathExtension];
         
-        if ( cfType != kDirectory && !(EQUALS (extension, @"mov")|| EQUALS (extension, @"m4v")
-                        ||EQUALS (extension,  @"mp4") || EQUALS (extension,  @"m3u8")) ) {
+        
+        if (cfType != kDirectory && kIsMovie (extension))
+            allStills = NO;
+        
+        if ( cfType != kDirectory && !(kIsMovie (extension) || kIsStill (extension)) )
             continue;
-        }
         
         if ( cfType == kDirectory && ([fileName isEqualToString: @"Notes"]
                         || [fileName isEqualToString: @"Library"]))
@@ -274,8 +278,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
     for (NSString *path in clips) {
         NSString *extension = [path pathExtension];
         
-        if ( ! (EQUALS (extension,  @"mov") || EQUALS (extension,  @"m4v")
-                || EQUALS (extension,  @"mp4") || EQUALS (extension,   @"m3u8")) )
+        if ( ! (kIsMovie (extension) || kIsStill (extension)) )
             continue;
          
         [files addObject: path];
@@ -311,7 +314,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.allowsEditing = NO;
     picker.delegate = self;
-    picker.mediaTypes = [NSArray arrayWithObjects:  S kUTTypeAudiovisualContent, S kUTTypeMovie, S kUTTypeQuickTimeMovie, S kUTTypeMPEG,  S kUTTypeMPEG4, S kUTTypeVideo, nil]; 
+    picker.mediaTypes = [NSArray arrayWithObjects:  S kUTTypeImage, S kUTTypeAudiovisualContent, S kUTTypeMovie, S kUTTypeQuickTimeMovie, S kUTTypeMPEG,  S kUTTypeMPEG4, S kUTTypeVideo, nil]; 
     picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary; /* UIImagePickerControllerSourceTypeSavedPhotosAlbum; */
     picker.modalPresentationStyle = UIModalPresentationFormSheet;
     picker.videoQuality =   UIImagePickerControllerQualityTypeHigh;
@@ -342,7 +345,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
 }
 
 //
-// This method gets called after a choice is made from the image picker (e.g., a video clip is selected)
+// This method gets called after a choice is made from the image picker (e.g., a video clip or still is selected)
 //
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
@@ -353,10 +356,16 @@ static int retryCount;      // We don't give up on FTP failures that easily
     else
         [popoverController dismissPopoverAnimated: YES];
     
-    NSURL *moviePicked = [info objectForKey: UIImagePickerControllerMediaURL];
+    UIImage *thePhoto = [info objectForKey: UIImagePickerControllerOriginalImage];
     
-    VideoTreeAppDelegate *appDel = kAppDel;
-    [appDel copyURLIntoApp: moviePicked];   // Works like an "Open In..."
+    if (thePhoto)  {  // picked an image
+        NSLog (@"UIImagePickerControllerOriginalImage has data (%@)!", thePhoto);
+        [kAppDel copyVideoOrImageIntoApp: [thePhoto retain]];       // Works like an "Open In..."
+    }
+    else  {
+        NSURL *moviePicked = [info objectForKey: UIImagePickerControllerMediaURL];
+        [kAppDel copyVideoOrImageIntoApp: moviePicked]; 
+    }
 }
 
 //
@@ -481,9 +490,18 @@ static int retryCount;      // We don't give up on FTP failures that easily
         cell.imageView.image = [UIImage imageNamed: @"folder.png"];
     }
     else {
+        NSString *path = [files objectAtIndex: indexPath.row];
+        
+        NSString *extension = [path pathExtension];
         cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.textLabel.text = [[files objectAtIndex: indexPath.row] stringByDeletingPathExtension];
-        cell.imageView.image = nil;
+        cell.textLabel.text = [path stringByDeletingPathExtension];
+        
+        if ( kIsMovie (extension))
+            cell.imageView.image = [UIImage imageNamed: @"movies.png"];
+        else if ( kIsStill (extension) )
+            cell.imageView.image = [UIImage imageNamed: @"camera.png"];
+        else
+            cell.imageView.image = nil;
     }
     
     return cell;
@@ -534,7 +552,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
             }
             @catch (NSException *exception) {
                 NSLog (@"Couldn't select next clip!");
-                return NO;
+                break;
             }
 
             return YES;
@@ -563,6 +581,11 @@ static int retryCount;      // We don't give up on FTP failures that easily
         NSString *docDir = [dirList objectAtIndex: 0];
         self.moviePath = [docDir stringByAppendingPathComponent: theMovie];
     }
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return (kFTPMode) ? NO : YES;
 }
 
 // 
@@ -598,25 +621,34 @@ static int retryCount;      // We don't give up on FTP failures that easily
         [detailViewController release];
     }
     else {   
-        // Play the selected movie
+        // Play the selected movie or display the selected still
         
         if (vc.runAllMode) {
             [vc airPlay];
             vc.runAllMode = NO;
         }
         
-         NSString *theMovie;
+         NSString *theMedia;
          
-         theMovie = [NSString stringWithFormat: @"%@/%@", currentPath, 
+         theMedia = [NSString stringWithFormat: @"%@/%@", currentPath, 
                      [files objectAtIndex: indexPath.row]];
          
-        NSLog (@"The movie = %@", theMovie);
+        NSLog (@"The movie/still = %@", theMedia);
          
-        [self setTheMoviePath: theMovie];  // Get the correct path to the selected movie
+        [self setTheMoviePath: theMedia];  // Get the correct path to the selected movie
         
-        vc.clip =  theMovie;
-        vc.clipPath = theMovie;
-        [vc loadMovie: moviePath];
+        vc.clip =  theMedia;
+        vc.clipPath = theMedia;
+        vc.allStills = allStills;
+        
+        NSString *extension = [[files objectAtIndex: indexPath.row] pathExtension];
+        
+        vc.noteTableSelected = NO;
+        
+        if ( kIsMovie (extension) )
+            [vc loadMovie: moviePath];
+        else
+            [vc loadStill: moviePath];
     }
 }
 

@@ -15,6 +15,47 @@
 #endif
 
 
+@implementation UIImageView (Scaling) // extensions to UIImageView
+
+// scale the view to fill the given bounds without distorting
+- (void)expandToFill:(CGRect)bounds
+{
+    UIImage *image = self.image; // get the image of this view
+    CGRect frame = self.frame; // get the frame of this view
+    
+    // check if the image is bound by its height
+    if (image.size.height / image.size.width >
+        bounds.size.height / bounds.size.width)
+    {
+        // expand the new height to fill the entire view
+        frame.size.height = bounds.size.height;
+        
+        // calculate the new width so the image isn't distorted
+        frame.size.width = image.size.width * bounds.size.height /
+        image.size.height;
+        
+        // add to the x and y coordinates so the view remains centered
+        frame.origin.y += (self.frame.size.height - frame.size.height) / 2;
+        frame.origin.x += (self.frame.size.width - frame.size.width) / 2;
+    } // end if
+    else // the image is bound by its width
+    {
+        // expand the new width to fill the entire view
+        frame.size.width = bounds.size.width;
+        
+        // calculate the new height so the image isn't distorted
+        frame.size.height = image.size.height * bounds.size.width /
+        image.size.width;
+        
+        // add to the x and y coordinates so the view remains centered
+        frame.origin.y += (self.frame.size.height - frame.size.height) / 2;
+        frame.origin.x += (self.frame.size.width - frame.size.width) / 2;
+    } // end else
+    
+    self.frame = frame; // assign the new frame
+} 
+@end 
+
 // This creates a "picker" style gradient appearance
 // Prepare colors
 
@@ -795,5 +836,56 @@ dc.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithImage:
     CGImageRelease (ref);
     CGContextRelease (bitmap);	// ok if NULL
     [imageGen release];
+}
+
+-(void) loadStill2: (NSString *) link 
+{
+    if (! stillWebView)  {
+        CGRect theFrame = drawView.frame;
+        CGSize theSize = { 500, 200 };
+        theFrame.size = theSize;
+        
+        stillWebView = [[UIWebView alloc] initWithFrame: drawView.frame];
+        stillWebView.scalesPageToFit = YES;
+        stillWebView.delegate = self;
+        
+        stillView = [[UIImageView alloc] initWithFrame: drawView.frame];
+    }
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL: [NSURL URLWithString: link]];
+    
+    stillView.contentMode = UIViewContentModeScaleAspectFit;
+    [stillWebView loadRequest: request];
+}
+
+- (void) webViewDidFinishLoad:(UIWebView *)webView
+{    
+    NSLog (@"image loaded!"); 
+    NSLog (@"webView size is (%g, %g)", webView.bounds.size.width, webView.bounds.size.height);
+    
+    [webView sizeToFit];
+    
+    NSLog (@"stillView origin = (%g, %g), size = (%g, %g)", stillView.frame.origin.x, stillView.frame.origin.y,
+           stillView.frame.size.width, stillView.frame.size.height);
+    NSLog (@"webView size is (%g, %g)", webView.bounds.size.width, webView.bounds.size.height);
+    
+    //  UIGraphicsBeginImageContext(stillView.frame.size);
+    UIGraphicsBeginImageContextWithOptions(webView.frame.size, YES, 1);
+    
+    [webView.layer renderInContext: UIGraphicsGetCurrentContext()];
+    
+    stillView.image = UIGraphicsGetImageFromCurrentImageContext();
+    stillView.autoresizesSubviews = NO; 
+    playerLayerView.autoresizesSubviews = NO;
+    
+    UIGraphicsEndImageContext();
+    
+    stillView.userInteractionEnabled = YES;
+    
+    [playerLayerView addSubview: stillView];
+    [stillView addSubview: drawView];
+    
+    stillShows = YES;
+}
 
 #endif
