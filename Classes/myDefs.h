@@ -8,7 +8,7 @@
 
 #import "VideoTreeAlert.h"
 
-//#define APPSTORE
+#define APPSTORE
 
 extern int gIOSMajorVersion;
 
@@ -74,7 +74,7 @@ extern void removeLogFile (void);
 extern void newLogFile (void);
 extern void uploadLogFile (void);
 #else
-#define NSLog(x,...)
+#define NSLog(x,...) // Disables NSLog
 #define NSLog2(x,...)
 #endif
 
