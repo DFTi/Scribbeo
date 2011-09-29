@@ -3387,13 +3387,13 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
         time1 = [NSString stringWithFormat: @"%.2i:%.2i:%.2i:%.2i", hours, mins, theSecs, frames];
     }
     else {
-        long frames  =  secs * theFPS;
+        long frames  =  secs * theFPS + .4999;   // round up?
                         
         if (frames <= 0)
             time1 = @"0";
         else {
             time1 = [NSString stringWithFormat: @"%li", frames];
-            // NSLog (@"time = %g, frame = %@, fps = %i", secs, time1, theFPS);
+            // 1NSLog (@"time = %g, frame = %@, fps = %i", secs, time1, theFPS);
         }
     }
     
