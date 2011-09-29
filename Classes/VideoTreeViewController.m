@@ -1210,7 +1210,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     if (player.rate <= 1.0)
         player.rate = 1.75;
     else if (player.rate > 13)
-        player.rate = 1.0;
+        player.rate = 1;
     else
         player.rate *= 3;
 }
@@ -3387,13 +3387,13 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
         time1 = [NSString stringWithFormat: @"%.2i:%.2i:%.2i:%.2i", hours, mins, theSecs, frames];
     }
     else {
-        long frames  =  secs * theFPS + (secs - (long) secs) * theFPS;
+        long frames  =  secs * theFPS + .4999;   // round up?
                         
         if (frames <= 0)
             time1 = @"0";
         else {
             time1 = [NSString stringWithFormat: @"%li", frames];
-            // NSLog (@"time = %g, frame = %@, fps = %i", secs, time1, theFPS);
+            // 1NSLog (@"time = %g, frame = %@, fps = %i", secs, time1, theFPS);
         }
     }
     
@@ -3518,7 +3518,7 @@ static int saveRate;
                 fps = [[tracks objectAtIndex: 0] nominalFrameRate];
 
                 if (fps > 0.0) 
-                    NSLog (@"fps = %f", fps);
+                    NSLog (@"nominal frame rate fps = %f", fps);
             }
          }
         

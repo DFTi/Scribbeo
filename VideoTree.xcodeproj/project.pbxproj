@@ -41,8 +41,6 @@
 		02A3067413C686D300E7340D /* VideoTreeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 02A3061413C686D300E7340D /* VideoTreeViewController.xib */; };
 		02A3067513C686D300E7340D /* VoiceMemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A3061613C686D300E7340D /* VoiceMemo.m */; };
 		02A3067613C686D300E7340D /* XMLURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A3061813C686D300E7340D /* XMLURL.m */; };
-		02A3067813C686D300E7340D /* helpScreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3061A13C686D300E7340D /* helpScreen.png */; };
-		02A3067913C686D300E7340D /* helpScreeniPhone.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3061B13C686D300E7340D /* helpScreeniPhone.png */; };
 		02A3067A13C686D300E7340D /* iPhoneVideoTreeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 02A3061C13C686D300E7340D /* iPhoneVideoTreeViewController.xib */; };
 		02A3067B13C686D300E7340D /* Refresh.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3061D13C686D300E7340D /* Refresh.png */; };
 		02A3067D13C686D300E7340D /* help.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3061F13C686D300E7340D /* help.png */; };
@@ -94,6 +92,8 @@
 		02A306B413C686D300E7340D /* play.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3065F13C686D300E7340D /* play.png */; };
 		02A306B513C686D300E7340D /* fstforward.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3066013C686D300E7340D /* fstforward.png */; };
 		02A306B613C686D300E7340D /* quartzregulardb.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 02A3066113C686D300E7340D /* quartzregulardb.ttf */; };
+		02E6571D1433DE52004334C9 /* helpScreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E6571B1433DE52004334C9 /* helpScreen.png */; };
+		02E6571E1433DE52004334C9 /* helpScreeniPhone.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E6571C1433DE52004334C9 /* helpScreeniPhone.png */; };
 		02E83886141AA38B001B6CA5 /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E83885141AA38B001B6CA5 /* camera.png */; };
 		02E83888141AA95D001B6CA5 /* movies.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E83887141AA95D001B6CA5 /* movies.png */; };
 		02E8388C141AABF3001B6CA5 /* rotate.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E8388B141AABF3001B6CA5 /* rotate.png */; };
@@ -158,8 +158,6 @@
 		02A3061713C686D300E7340D /* XMLURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLURL.h; sourceTree = "<group>"; };
 		02A3061813C686D300E7340D /* XMLURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMLURL.m; sourceTree = "<group>"; };
 		02A3061913C686D300E7340D /* VideoTree-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "VideoTree-Info.plist"; sourceTree = "<group>"; };
-		02A3061A13C686D300E7340D /* helpScreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = helpScreen.png; sourceTree = "<group>"; };
-		02A3061B13C686D300E7340D /* helpScreeniPhone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = helpScreeniPhone.png; sourceTree = "<group>"; };
 		02A3061C13C686D300E7340D /* iPhoneVideoTreeViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = iPhoneVideoTreeViewController.xib; sourceTree = "<group>"; };
 		02A3061D13C686D300E7340D /* Refresh.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Refresh.png; sourceTree = "<group>"; };
 		02A3061F13C686D300E7340D /* help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = help.png; sourceTree = "<group>"; };
@@ -212,6 +210,8 @@
 		02A3065F13C686D300E7340D /* play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play.png; sourceTree = "<group>"; };
 		02A3066013C686D300E7340D /* fstforward.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fstforward.png; sourceTree = "<group>"; };
 		02A3066113C686D300E7340D /* quartzregulardb.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = quartzregulardb.ttf; sourceTree = "<group>"; };
+		02E6571B1433DE52004334C9 /* helpScreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = helpScreen.png; sourceTree = "<group>"; };
+		02E6571C1433DE52004334C9 /* helpScreeniPhone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = helpScreeniPhone.png; sourceTree = "<group>"; };
 		02E83885141AA38B001B6CA5 /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
 		02E83887141AA95D001B6CA5 /* movies.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = movies.png; sourceTree = "<group>"; };
 		02E8388B141AABF3001B6CA5 /* rotate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rotate.png; sourceTree = "<group>"; };
@@ -354,11 +354,11 @@
 		02A306CC13C6886100E7340D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				02E6571B1433DE52004334C9 /* helpScreen.png */,
+				02E6571C1433DE52004334C9 /* helpScreeniPhone.png */,
 				02BEFC3413FD997200BC061F /* buttons */,
 				02A3061913C686D300E7340D /* VideoTree-Info.plist */,
-				02A3061A13C686D300E7340D /* helpScreen.png */,
 				02E83885141AA38B001B6CA5 /* camera.png */,
-				02A3061B13C686D300E7340D /* helpScreeniPhone.png */,
 				02A3061D13C686D300E7340D /* Refresh.png */,
 				02A3062313C686D300E7340D /* spot.png */,
 				02E83887141AA95D001B6CA5 /* movies.png */,
@@ -487,8 +487,6 @@
 				02A3066A13C686D300E7340D /* HelpScreenController.xib in Resources */,
 				02A3066B13C686D300E7340D /* HelpScreenControlleriPhone.xib in Resources */,
 				02A3067413C686D300E7340D /* VideoTreeViewController.xib in Resources */,
-				02A3067813C686D300E7340D /* helpScreen.png in Resources */,
-				02A3067913C686D300E7340D /* helpScreeniPhone.png in Resources */,
 				02A3067A13C686D300E7340D /* iPhoneVideoTreeViewController.xib in Resources */,
 				02A3067B13C686D300E7340D /* Refresh.png in Resources */,
 				02A3067D13C686D300E7340D /* help.png in Resources */,
@@ -544,6 +542,8 @@
 				02E83886141AA38B001B6CA5 /* camera.png in Resources */,
 				02E83888141AA95D001B6CA5 /* movies.png in Resources */,
 				02E8388C141AABF3001B6CA5 /* rotate.png in Resources */,
+				02E6571D1433DE52004334C9 /* helpScreen.png in Resources */,
+				02E6571E1433DE52004334C9 /* helpScreeniPhone.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
