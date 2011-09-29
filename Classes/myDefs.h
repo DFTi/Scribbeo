@@ -8,7 +8,7 @@
 
 #import "VideoTreeAlert.h"
 
-#define APPSTORE
+// #define APPSTORE
 
 extern int gIOSMajorVersion;
 
