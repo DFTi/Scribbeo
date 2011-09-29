@@ -3387,7 +3387,7 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
         time1 = [NSString stringWithFormat: @"%.2i:%.2i:%.2i:%.2i", hours, mins, theSecs, frames];
     }
     else {
-        long frames  =  secs * theFPS + (secs - (long) secs) * theFPS;
+        long frames  =  secs * theFPS;
                         
         if (frames <= 0)
             time1 = @"0";
@@ -3518,7 +3518,7 @@ static int saveRate;
                 fps = [[tracks objectAtIndex: 0] nominalFrameRate];
 
                 if (fps > 0.0) 
-                    NSLog (@"fps = %f", fps);
+                    NSLog (@"nominal frame rate fps = %f", fps);
             }
          }
         
