@@ -1210,7 +1210,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     if (player.rate <= 1.0)
         player.rate = 1.75;
     else if (player.rate > 13)
-        player.rate = 1.0;
+        player.rate = 1;
     else
         player.rate *= 3;
 }
