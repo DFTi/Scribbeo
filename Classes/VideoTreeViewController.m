@@ -1510,10 +1510,13 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     // Prior to iOS 5.0 we're only going to get the nearest key frame
     // Still waiting for support for any of this from streaming media....
     
-    if (kRunningOS5OrGreater){
+    // Late breaking news:  This seems to work for iOS 4.3 as well (documentation 
+    // just says iOS 5.0 or later??)
+    
+    if ([imageGen respondsToSelector: @selector (setRequestedTimeToleranceAfter:)]) {
         [imageGen setRequestedTimeToleranceAfter: kCMTimeZero];
         [imageGen setRequestedTimeToleranceBefore: kCMTimeZero];
-    }
+   }
 
     // Create the request to get the frame using the copyCGImageAtTime:actualTime:error: method
     

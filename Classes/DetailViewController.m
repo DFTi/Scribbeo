@@ -103,7 +103,13 @@ static int retryCount;      // We don't give up on FTP failures that easily
 
 -(void) makeList
 {
-#ifdef CAMERAROLL
+    if (! iPHONE) {
+        UIBarButtonItem *refresh =  [[[UIBarButtonItem alloc] initWithImage: 
+                                      [UIImage imageNamed: @"Refresh.png"]
+              style: UIBarButtonItemStylePlain target: self action: @selector(makeList)] autorelease];  
+        self.navigationItem.rightBarButtonItem = refresh;
+    }
+    
     if (! kFTPMode) {
         UIBarButtonItem *cRollButton = 
         [[[UIBarButtonItem alloc] initWithImage: 
@@ -112,9 +118,9 @@ static int retryCount;      // We don't give up on FTP failures that easily
                         action: @selector(pickClip)] autorelease]; 
         self.navigationItem.leftBarButtonItem = cRollButton;
     }
-    else
-        self.navigationItem.leftBarButtonItem = nil;
-#endif
+    else {
+        self.navigationItem.rightBarButtonItem = nil;
+    }
     
     // Create our clip list arrays, or clear if already created
     
@@ -174,13 +180,6 @@ static int retryCount;      // We don't give up on FTP failures that easily
     if (activityIndicator.isAnimating)
         [self stopActivity];
     
-    if (! iPHONE) {
-        self.navigationItem.rightBarButtonItem = 
-        [[[UIBarButtonItem alloc] initWithImage: 
-          [UIImage imageNamed: @"refresh.png"]
-                    style: UIBarButtonItemStyleBordered target: self action: @selector(makeList)] autorelease];  
-    }
-    
 #if 0
     if ([files count] == 0)         
         [UIAlertView doAlert:  @"" withMsg: @"No video clips found"];
@@ -189,6 +188,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
     NSLog (@"Found %i files", [files count]);
 
     [self.tableView reloadData];
+
 }
 
 //

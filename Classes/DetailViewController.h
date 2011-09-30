@@ -22,7 +22,6 @@
     
     int                 currentClip;                // current index into the files table 
     NSString            *clip;
-    UIBarButtonItem     *cameraRollButton;          // We show this button when running in local mode
     UIPopoverController *popoverController;         // The controller for showing the popover when selecting a local clip
     NSString            *moviePath;                 // Is this an album (all stills?)
     BOOL                allStills;
