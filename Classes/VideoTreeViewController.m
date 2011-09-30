@@ -4625,7 +4625,7 @@ static int saveRate;
 - (CGFloat) tableView: (UITableView *) tableView heightForRowAtIndexPath: (NSIndexPath *) indexPath
 {
     if ( !iPHONE)
-        return 60.0;
+        return 65.0;
     else
         return 80.0;
 }
@@ -4651,11 +4651,11 @@ static int saveRate;
     
     if (cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
-        [cell.textLabel setFont:[UIFont systemFontOfSize: 8.0]]; 
-        [cell.detailTextLabel setFont:[UIFont systemFontOfSize: 10.0]];
+        [cell.textLabel setFont:[UIFont systemFontOfSize: 14.0]]; 
+        [cell.detailTextLabel setFont:[UIFont systemFontOfSize: 12.0]];
         cell.editingAccessoryType = UITableViewCellEditingStyleDelete;
-        cell.textLabel.numberOfLines = 1;
-        cell.detailTextLabel.numberOfLines = 3;
+        cell.textLabel.numberOfLines = 2;
+        cell.detailTextLabel.numberOfLines = 1;
         cell.imageView.backgroundColor = MYGRAY;
         tableView.backgroundColor = [UIColor colorWithRed: .8 green: .8 blue: .9 alpha: 1];
         
@@ -4700,7 +4700,7 @@ static int saveRate;
         
         // The time, the date of the note, and the initials of the user that made the note
         
-        cell.textLabel.text = [NSString stringWithFormat: @"%@ %@ %@", timeFormat, 
+        cell.textLabel.text = [NSString stringWithFormat: @"%@\n%@ %@", timeFormat, 
                 [theNote.date length] > 3 ? 
                 [theNote.date substringToIndex: [theNote.date length] - 3] : @"", theNote.initials];
     }
