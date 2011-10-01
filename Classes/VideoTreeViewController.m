@@ -2007,7 +2007,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         fileName = [docDir stringByAppendingPathComponent: fileName];
         NSLog (@"Trying to download ftp timecode file %@ to %@", [clipPath stringByDeletingPathExtension], fileName);
       
-        [FTPHelper download: [NSString stringWithFormat: @"Storage/User01/%@.tc", [clipPath stringByDeletingPathExtension]] to: fileName];
+        [FTPHelper download: [NSString stringWithFormat: @"Storage/%@/%@.tc", kFTPusername, [clipPath stringByDeletingPathExtension]] to: fileName];
     }
 }
 
