@@ -34,12 +34,13 @@
 
 // initialize the instance variables for this class
 
--(id)initWithCoder: (NSCoder *) decoder
+-(id) initWithFrame: (CGRect) theFrame
 {
-    [super initWithCoder: decoder];
-    color = RED;
-    myDrawing = [[NSMutableArray alloc] initWithCapacity:0];
-    colors = [[NSMutableArray alloc] initWithCapacity:0];
+    if (self = [super initWithFrame: theFrame]) {
+        color = RED;
+        myDrawing = [[NSMutableArray alloc] initWithCapacity:0];
+        colors = [[NSMutableArray alloc] initWithCapacity:0];
+    }
 
     return self;
 }
@@ -62,7 +63,7 @@
 // Draws the current line segments in myDrawing according to the colors in the
 // colors array into the view
 
-- (void)drawRect:(CGRect)rect {   
+- (void)drawRect:(CGRect)rect {      
     if (![myDrawing count])
         return;
         
@@ -160,6 +161,8 @@
     
 	CGPoint curPoint = [[touches anyObject] locationInView:self];
     
+    NSLog (@"Touch began at (%g, %g)", curPoint.x, curPoint.y);
+    
     // Add the new touch point to the end of the myDrawing array
     
     straightX = curPoint.x;
@@ -188,7 +191,7 @@
 - (void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     AVPlayer *player = [[kAppDel viewController] player];
     BOOL still = [[kAppDel viewController] stillShows];
-
+    
     if ((!player || [player rate]) && !still) 
         return;
         
