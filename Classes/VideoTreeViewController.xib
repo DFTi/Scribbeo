@@ -987,66 +987,50 @@
 						<int key="NSvFlags">292</int>
 						<object class="NSMutableArray" key="NSSubviews">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBUIView" id="495471908">
+							<object class="IBUIImageView" id="975396087">
 								<reference key="NSNextResponder" ref="371440629"/>
 								<int key="NSvFlags">274</int>
-								<object class="NSMutableArray" key="NSSubviews">
-									<bool key="EncodedWithXMLCoder">YES</bool>
-									<object class="IBUIImageView" id="975396087">
-										<reference key="NSNextResponder" ref="495471908"/>
-										<int key="NSvFlags">274</int>
-										<string key="NSFrame">{{46, -103}, {809, 500}}</string>
-										<reference key="NSSuperview" ref="495471908"/>
-										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView" ref="284580594"/>
-										<string key="NSReuseIdentifierKey">_NS:544</string>
-										<reference key="IBUIBackgroundColor" ref="781911557"/>
-										<float key="IBUIAlpha">0.0</float>
-										<bool key="IBUIUserInteractionEnabled">NO</bool>
-										<string key="targetRuntimeIdentifier">IBIPadFramework</string>
-										<object class="NSCustomResource" key="IBUIImage">
-											<string key="NSClassName">NSImage</string>
-											<string key="NSResourceName">airplay.png</string>
-										</object>
-									</object>
-									<object class="IBUILabel" id="284580594">
-										<reference key="NSNextResponder" ref="495471908"/>
-										<int key="NSvFlags">292</int>
-										<string key="NSFrame">{{659, 413}, {80, 21}}</string>
-										<reference key="NSSuperview" ref="495471908"/>
-										<reference key="NSWindow"/>
-										<reference key="NSNextKeyView"/>
-										<string key="NSReuseIdentifierKey">_NS:327</string>
-										<bool key="IBUIOpaque">NO</bool>
-										<bool key="IBUIClipsSubviews">YES</bool>
-										<int key="IBUIContentMode">7</int>
-										<bool key="IBUIUserInteractionEnabled">NO</bool>
-										<string key="targetRuntimeIdentifier">IBIPadFramework</string>
-										<string key="IBUIText">Label</string>
-										<object class="NSColor" key="IBUITextColor">
-											<int key="NSColorSpace">1</int>
-											<bytes key="NSRGB">MSAxIDEAA</bytes>
-											<reference key="NSCustomColorSpace" ref="927523912"/>
-										</object>
-										<nil key="IBUIHighlightedColor"/>
-										<int key="IBUIBaselineAdjustment">1</int>
-										<float key="IBUIMinimumFontSize">10</float>
-									</object>
-								</object>
-								<string key="NSFrame">{{0, 4}, {802, 500}}</string>
+								<string key="NSFrame">{{46, -99}, {809, 500}}</string>
 								<reference key="NSSuperview" ref="371440629"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="975396087"/>
-								<string key="NSReuseIdentifierKey">_NS:195</string>
+								<reference key="NSNextKeyView" ref="284580594"/>
+								<string key="NSReuseIdentifierKey">_NS:544</string>
 								<reference key="IBUIBackgroundColor" ref="781911557"/>
-								<bool key="IBUIOpaque">NO</bool>
+								<float key="IBUIAlpha">0.0</float>
+								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
+								<object class="NSCustomResource" key="IBUIImage">
+									<string key="NSClassName">NSImage</string>
+									<string key="NSResourceName">airplay.png</string>
+								</object>
+							</object>
+							<object class="IBUILabel" id="284580594">
+								<reference key="NSNextResponder" ref="371440629"/>
+								<int key="NSvFlags">292</int>
+								<string key="NSFrame">{{659, 417}, {80, 21}}</string>
+								<reference key="NSSuperview" ref="371440629"/>
+								<reference key="NSWindow"/>
+								<string key="NSReuseIdentifierKey">_NS:327</string>
+								<bool key="IBUIOpaque">NO</bool>
+								<bool key="IBUIClipsSubviews">YES</bool>
+								<int key="IBUIContentMode">7</int>
+								<bool key="IBUIUserInteractionEnabled">NO</bool>
+								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
+								<string key="IBUIText">Label</string>
+								<object class="NSColor" key="IBUITextColor">
+									<int key="NSColorSpace">1</int>
+									<bytes key="NSRGB">MSAxIDEAA</bytes>
+									<reference key="NSCustomColorSpace" ref="927523912"/>
+								</object>
+								<nil key="IBUIHighlightedColor"/>
+								<int key="IBUIBaselineAdjustment">1</int>
+								<float key="IBUIMinimumFontSize">10</float>
 							</object>
 						</object>
 						<string key="NSFrame">{{222, 250}, {802, 500}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="495471908"/>
+						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:195</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">3</int>
@@ -1083,7 +1067,6 @@
 						<string key="NSFrame">{{46, 78}, {366, 31}}</string>
 						<reference key="NSSuperview" ref="147838554"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<reference key="IBUIBackgroundColor" ref="994980202"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -1628,14 +1611,6 @@
 						<reference key="destination" ref="371440629"/>
 					</object>
 					<int key="connectionID">336</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">drawView</string>
-						<reference key="source" ref="841351856"/>
-						<reference key="destination" ref="495471908"/>
-					</object>
-					<int key="connectionID">338</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
@@ -2192,24 +2167,10 @@
 						<reference key="object" ref="371440629"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="495471908"/>
-						</object>
-						<reference key="parent" ref="766721923"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">337</int>
-						<reference key="object" ref="495471908"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="975396087"/>
 							<reference ref="284580594"/>
 						</object>
-						<reference key="parent" ref="371440629"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">339</int>
-						<reference key="object" ref="975396087"/>
-						<reference key="parent" ref="495471908"/>
+						<reference key="parent" ref="766721923"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">340</int>
@@ -2217,9 +2178,14 @@
 						<reference key="parent" ref="909807589"/>
 					</object>
 					<object class="IBObjectRecord">
+						<int key="objectID">339</int>
+						<reference key="object" ref="975396087"/>
+						<reference key="parent" ref="371440629"/>
+					</object>
+					<object class="IBObjectRecord">
 						<int key="objectID">341</int>
 						<reference key="object" ref="284580594"/>
-						<reference key="parent" ref="495471908"/>
+						<reference key="parent" ref="371440629"/>
 					</object>
 				</object>
 			</object>
@@ -2298,8 +2264,6 @@
 					<string>333.IBPluginDependency</string>
 					<string>335.CustomClassName</string>
 					<string>335.IBPluginDependency</string>
-					<string>337.CustomClassName</string>
-					<string>337.IBPluginDependency</string>
 					<string>339.IBPluginDependency</string>
 					<string>340.IBPluginDependency</string>
 					<string>341.IBPluginDependency</string>
@@ -2390,8 +2354,6 @@
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>MyPlayerLayerView</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-					<string>DrawView</string>
-					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -2427,25 +2389,6 @@
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<object class="IBPartialClassDescription">
-					<string key="className">DrawView</string>
-					<string key="superclassName">UIView</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">twoBars</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">twoBars</string>
-						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">twoBars</string>
-							<string key="candidateClassName">id</string>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/DrawView.h</string>
-					</object>
-				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">MPMoviePlayerController</string>
 					<string key="superclassName">NSObject</string>
@@ -2637,7 +2580,6 @@
 							<string>airPlayImageView</string>
 							<string>clipLabel</string>
 							<string>dateLabel</string>
-							<string>drawView</string>
 							<string>drawingBar</string>
 							<string>editButton</string>
 							<string>episodeLabel</string>
@@ -2677,7 +2619,6 @@
 							<string>UIImageView</string>
 							<string>UILabel</string>
 							<string>UILabel</string>
-							<string>DrawView</string>
 							<string>UIToolbar</string>
 							<string>UIBarButtonItem</string>
 							<string>UILabel</string>
@@ -2720,7 +2661,6 @@
 							<string>airPlayImageView</string>
 							<string>clipLabel</string>
 							<string>dateLabel</string>
-							<string>drawView</string>
 							<string>drawingBar</string>
 							<string>editButton</string>
 							<string>episodeLabel</string>
@@ -2768,10 +2708,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">dateLabel</string>
 								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">drawView</string>
-								<string key="candidateClassName">DrawView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">drawingBar</string>

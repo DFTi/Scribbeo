@@ -98,10 +98,15 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     if (iPHONE) {
         newNote.font = [UIFont fontWithName: @"Helvetica" size: 10];
         self.editButton = nil;
-        theFrame = drawView.frame;
-        theFrame.origin = theOrigin;
-        drawView.frame = theFrame;
     }
+    
+    NSLog (@"Allocating drawView frame");
+    self.drawView = [[[DrawView alloc] initWithFrame: 
+                      playerLayerView.layer.bounds] autorelease];
+    drawView.userInteractionEnabled = YES;
+    drawView.backgroundColor = [UIColor clearColor];
+    drawView.scaleWidth = drawView.scaleHeight = 1;
+    drawView.color = RED;
             
     drawViewFrame = drawView.frame;
     
@@ -4022,8 +4027,9 @@ static int saveRate;
             
             // Let's add the drawView and make sure it's on top
 
-            [playerLayerView addSubview:drawView];
-            [playerLayerView bringSubviewToFront: drawView];
+            drawView.frame = playerLayer.frame;
+            [playerLayerView addSubview: drawView];
+            [self.view bringSubviewToFront: drawView];
             
             if (kRunningOS5OrGreater) {
                 NSLog (@"setting up player, airPlayVideoActive = %i", [player isAirPlayVideoActive]);
@@ -4382,10 +4388,10 @@ static int saveRate;
         nc.view.hidden = YES;
     }
     
-    if (player) {
+    if (player) 
         [self pauseIt];
-        [self erase];
-    }
+     
+    [self erase];
 
     [UIView animateWithDuration: .3 animations: ^{ 
         playerLayerView.frame = CGRectMake (0.0, 0.0, [UIScreen mainScreen].applicationFrame.size.height, [UIScreen mainScreen].applicationFrame.size.width);
@@ -4785,9 +4791,7 @@ static int saveRate;
         
         for (int i = 0; i < theNote.rotation; ++i)   // get the still in the right orientation---maybe not the most elegant solution here
             [self rotateStill];
-        
-        drawView.scaleWidth = drawView.scaleHeight = 1.0;
-        
+                
         drawView.scaleWidth =  drawView.frame.size.width  / theNote.frameWidth;
         drawView.scaleHeight =  drawView.frame.size.height / theNote.frameHeight;
         

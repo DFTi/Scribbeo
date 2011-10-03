@@ -234,7 +234,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property (nonatomic, retain) IBOutlet UIToolbar *playerToolbar;
 @property (nonatomic, retain) IBOutlet UILabel    *theTime;
 @property (nonatomic, retain) IBOutlet UISlider *movieTimeControl;
-@property (nonatomic, retain) IBOutlet DrawView *drawView;
+@property (nonatomic, retain) DrawView *drawView;
 @property (nonatomic, retain) IBOutlet UIView   *playerLayerView;
 @property (nonatomic, retain) IBOutlet UIView   *remote;
 @property (nonatomic, retain) IBOutlet UILabel   *minLabel;

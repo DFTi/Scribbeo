@@ -103,13 +103,6 @@ static int retryCount;      // We don't give up on FTP failures that easily
 
 -(void) makeList
 {
-    if (! iPHONE) {
-        UIBarButtonItem *refresh =  [[[UIBarButtonItem alloc] initWithImage: 
-                                      [UIImage imageNamed: @"Refresh.png"]
-              style: UIBarButtonItemStylePlain target: self action: @selector(makeList)] autorelease];  
-        self.navigationItem.rightBarButtonItem = refresh;
-    }
-    
     if (! kFTPMode) {
         UIBarButtonItem *cRollButton = 
         [[[UIBarButtonItem alloc] initWithImage: 
@@ -120,6 +113,13 @@ static int retryCount;      // We don't give up on FTP failures that easily
     }
     else {
         self.navigationItem.rightBarButtonItem = nil;
+        
+        if (! iPHONE) {
+            UIBarButtonItem *refresh =  [[[UIBarButtonItem alloc] initWithImage: 
+          [UIImage imageNamed: @"Refresh.png"]
+                  style: UIBarButtonItemStylePlain target: self action: @selector(makeList)] autorelease];  
+            self.navigationItem.rightBarButtonItem = refresh;
+        }
     }
     
     // Create our clip list arrays, or clear if already created
@@ -298,8 +298,6 @@ static int retryCount;      // We don't give up on FTP failures that easily
 #pragma mark -
 #pragma mark Select video from camera roll
 
-
-#ifdef CAMERAROLL
 #define S (NSString *)
 
 //
@@ -390,9 +388,8 @@ static int retryCount;      // We don't give up on FTP failures that easily
 {
     [popoverController release];
 }
-#endif  // CAMERAROLL
 
-// Cougar Town/0201/Daiies/31G-1.m4v3
+
 
 #if 0
 -(NSMutableArray *) uniqueValuesForComponent: (int) component
