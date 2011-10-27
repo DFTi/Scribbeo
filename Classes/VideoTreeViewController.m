@@ -78,7 +78,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 static int reTryCount = 0;   // number of retries for an ftp list: request???
 
-
 - (BOOL)canBecomeFirstResponder {
     NSLog (@"Yes, I can become first responder");
     return YES;
@@ -2752,23 +2751,64 @@ Next:
     isPrinting = NO;
 }
 
-//
-// The email button
-//
+#pragma mark -
+#pragma mark Email related
+
+-(BOOL) canEmail
+{
+    NSLog(@"Checking if user has an email account set up...");
+    if (! [MFMailComposeViewController canSendMail]) {
+        [UIAlertView doAlert: @"Email" 
+                     withMsg: @"You need to setup an email account"];
+        NSLog(@"Nope. Displayed alert to user");
+        return NO;
+    } else {
+        NSLog(@"Yes, proceeding with email process");
+        return YES;
+    }
+}
+
+// 5 touches to pull up logfile emailer
+- (void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event 
+{
+    // Here we can check the number of taps
+    int taps = [[touches anyObject] tapCount];
+    // Look at the start of the method to interpret the tap count
+    if (taps == 5) {
+        NSLog(@"5 taps, erasing view, launching logfile emailer");
+        [[kAppDel viewController] erase];
+        if ([self canEmail]) [self emailLogfile];
+        return;
+    }
+}
+
+- (void) emailLogfile
+{
+    NSLog(@"Opening window for logfile email");
+    NSArray *paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *saveDirectory = [paths objectAtIndex:0];
+    NSString *logFilePath = [NSString stringWithFormat: @"%@/logfile.%@.txt", saveDirectory, [[UIDevice currentDevice] uniqueIdentifier]];
+    NSLog(@"Log file path: %@", logFilePath);
+    NSString *logContents = [NSString stringWithContentsOfFile:logFilePath
+                                                      encoding:NSASCIIStringEncoding
+                                                         error:nil];
+    // Got the log contents, now compose an email
+	MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
+	picker.mailComposeDelegate = self;
+    [picker setSubject:@"Logfile Report"];
+    NSArray *toRecipients = [NSArray arrayWithObject:@"support@digitalfilmtree.com"];
+    [picker setToRecipients:toRecipients];
+    [picker setMessageBody:logContents isHTML:NO];
+    [self presentModalViewController: picker animated:YES];
+    [picker release];
+}
 
 -(IBAction) emailNotes
 {
+    if (! [self canEmail]) return;
+    
     NSString *emailBody;
     
-    // Make sure email account is installed and available here
-
-    if (! [MFMailComposeViewController canSendMail]) {
-		[UIAlertView doAlert: @"email" 
-            withMsg: @"You need to setup an email account"];
-
-        return;
-    }
-        
     if (emailPDF) 
         [self saveToPDF];
  

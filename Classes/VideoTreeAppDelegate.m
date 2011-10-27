@@ -30,6 +30,7 @@ int gIOSMajorVersion;
 static int retryCount = 0;
 static int tryOne = 0;
 
+
 #pragma mark -
 #pragma mark Application lifecycle
 
@@ -408,8 +409,8 @@ static int tryOne = 0;
     
     [self addObserver: self forKeyPath: @"FTPHomeDir" options: NSKeyValueObservingOptionNew context: nil];
     
-    NSLog (@"**** UDID is %@, Bonjour user is %@, password is %@, http server is %@", 
-           [[UIDevice currentDevice] uniqueIdentifier], FTPusername, FTPpassword, kHTTPserver);
+    NSLog (@"**** UDID is %@, Bonjour user is %@, password is [hidden], http server is %@", 
+           [[UIDevice currentDevice] uniqueIdentifier], FTPusername, kHTTPserver);
 }
 
 // This method looks at the user defaults and sets up various parameters
@@ -492,8 +493,8 @@ static int tryOne = 0;
         }
         
                 
-        NSLog (@"**** UDID is %@, FTP server is %@, FTP user is %@, password is %@, HTTP server is %@ (base is %@)", [[UIDevice currentDevice] uniqueIdentifier], 
-               FTPserver, FTPusername, FTPpassword, HTTPserver, serverBase);
+        NSLog (@"**** UDID is %@, FTP server is %@, FTP user is %@, password is [hidden], HTTP server is %@ (base is %@)", [[UIDevice currentDevice] uniqueIdentifier], 
+               FTPserver, FTPusername, HTTPserver, serverBase);
 
     }
     else if (BonjourMode) 

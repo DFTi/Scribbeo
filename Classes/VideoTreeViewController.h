@@ -361,6 +361,9 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(NSMutableString *) saveToHTML;
 -(NSString *) noteToHTML: (Note *) theNote;
 
+
+-(BOOL) canEmail; // Checks to see if email account exists
+-(void) emailLogfile;
 -(IBAction) emailNotes;
 -(NSString *) uploadAudio: (Note *) theNote;
 -(void) uploadHTML: (NSString *) theHTML file: (NSString *) fileName;
