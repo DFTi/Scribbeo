@@ -2784,21 +2784,24 @@ Next:
 
 - (void) emailLogfile
 {
-    NSLog(@"Opening window for logfile email");
+    NSLog(@"Want to email the log file. Where is the log file?");
     NSArray *paths = NSSearchPathForDirectoriesInDomains (NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *saveDirectory = [paths objectAtIndex:0];
     NSString *logFilePath = [NSString stringWithFormat: @"%@/logfile.%@.txt", saveDirectory, [[UIDevice currentDevice] uniqueIdentifier]];
-    NSLog(@"Log file path: %@", logFilePath);
-    NSString *logContents = [NSString stringWithContentsOfFile:logFilePath
-                                                      encoding:NSASCIIStringEncoding
-                                                         error:nil];
-    // Got the log contents, now compose an email
+    // Located the log file, now let's send it if it truly exists, else do nothing.
+    if (![[NSFileManager defaultManager] fileExistsAtPath:logFilePath]) {
+        NSLog(@"Log file does not exist where expected (%@) Will not continue with email.", logFilePath);
+        return;
+    }
 	MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
 	picker.mailComposeDelegate = self;
-    [picker setSubject:@"Logfile Report"];
-    NSArray *toRecipients = [NSArray arrayWithObject:@"support@digitalfilmtree.com"];
+    [picker setSubject:@"Bug Report"];
+    NSArray *toRecipients = [NSArray arrayWithObject:@"keyvan@digitalfilmtree.com"]; // needs to be changed to support@scribbeo.com or something official
     [picker setToRecipients:toRecipients];
-    [picker setMessageBody:logContents isHTML:NO];
+    NSData *myData = [NSData dataWithContentsOfFile: logFilePath];
+    [picker addAttachmentData: myData mimeType: @"text/plain" 
+                     fileName: [logFilePath lastPathComponent]];
+    [picker setMessageBody:@"Please give as much information as possible below so that we can locate and resolve any issue you are experiencing with the app. A debug log will also be sent with this email.\n\n" isHTML:NO];
     [self presentModalViewController: picker animated:YES];
     [picker release];
 }
