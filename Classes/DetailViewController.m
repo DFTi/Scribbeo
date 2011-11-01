@@ -12,7 +12,7 @@
 @implementation DetailViewController
 
 @synthesize currentClip, popoverController, moviePath;
-@synthesize currentPath, files, fileTypes;
+@synthesize currentPath, files, fileTypes, assetURLs;
 @synthesize progressView, activityIndicator;
 
 static int retryCount;      // We don't give up on FTP failures that easily
@@ -103,7 +103,8 @@ static int retryCount;      // We don't give up on FTP failures that easily
 
 -(void) makeList
 {
-    if (! kFTPMode) {
+    NSLog(@"Create the clip list for the table");
+    if ((!kFTPMode) && (!kBonjourMode)) {
         UIBarButtonItem *cRollButton = 
         [[[UIBarButtonItem alloc] initWithImage: 
                     [UIImage imageNamed: @"cameraRoll.png"]
@@ -127,25 +128,27 @@ static int retryCount;      // We don't give up on FTP failures that easily
     if (!files) {
         self.files = [NSMutableArray array];
         self.fileTypes = [NSMutableArray array];
+        self.assetURLs = [NSMutableArray array];
     }
     else {
         [files removeAllObjects];
         [fileTypes removeAllObjects];
+        [assetURLs removeAllObjects];
     }
     
-    if (kFTPMode)
+    if (kFTPMode || kBonjourMode)
         self.title = @"Files";          // No title in local mode needed
     
     [self.tableView reloadData];        // Refresh the table
     
     // Get the current settings
     
-    [kAppDel makeSettings];
+    [kAppDel makeSettings]; // Why is this happening again? 
     
     // If running in local mode, populate the clip table
     // with local video files
     
-    if (!kFTPMode) {
+    if (!(kFTPMode || kBonjourMode)) {
         [self iTunesLoad];
         return;
     }
@@ -154,21 +157,82 @@ static int retryCount;      // We don't give up on FTP failures that easily
     
     if (! currentPath ) {
         self.title = @"Files";
-        self.currentPath = homeDir;
+        if (!kBonjourMode)
+            self.currentPath = homeDir;
+        else
+            self.currentPath = @"/list"; // this is root in the py server
     }
     
-    // Initiate an ftp list request to get a directory listing
-    
-    [FTPHelper sharedInstance].delegate = self;
-    [FTPHelper sharedInstance].uname = kFTPusername;
-    [FTPHelper sharedInstance].pword = kFTPpassword;
-
     [self showActivity];
     
-    NSLog2 (@"list %@",  [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, currentPath]);
+   
+    if (kFTPMode) {
+        // Initiate an ftp list request to get a directory listing
+        NSLog(@"Making list for FTPMode");
+        [FTPHelper sharedInstance].delegate = self;
+        [FTPHelper sharedInstance].uname = kFTPusername;
+        [FTPHelper sharedInstance].pword = kFTPpassword;
+      
+        NSLog2 (@"list %@",  [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, currentPath]);
+        
+        [FTPHelper list: [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, currentPath]];
+    } else if (kBonjourMode && ([kAppDel HTTPserver] != nil)) {
+        // Send a list request to our HTTPServer
+        NSString *urlstr = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], currentPath];
+        NSLog(@"Making list for BonjourMode. Querying: %@", urlstr);
+        NSURL *url = [NSURL URLWithString:urlstr];
+        NSString *list = [NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:nil];
+        NSLog(list);
+        NSDictionary *fileDict = [list objectFromJSONString];
+        // Now we need to populate the files array using our nice JSON list
+        [self filesFromJSONFileListing:fileDict];       
+    }
     
-    [FTPHelper list: [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, currentPath]];
 }
+
+
+// This method will fill the files array from the JSON received from the py bonjour webserver
+- (void) filesFromJSONFileListing: (NSDictionary *) listing
+{
+    NSLog (@"filesFromJSONFileListing");
+    allStills = YES; // For album mode. This will become NO if there's non-stills here.
+    
+    NSArray *fileList = [listing objectForKey:@"files"];
+    NSArray *folderList = [listing objectForKey:@"folders"];
+
+    // Folders at the top, files below    
+    for (NSDictionary *dict in folderList) {
+        NSString *folderName = [dict objectForKey:@"name"];
+        NSLog(@"See a folder called: %@", folderName);
+        [files addObject:folderName];
+        [fileTypes addObject:[NSNumber numberWithInt: kDirectory]];
+        NSString *listURL = [dict objectForKey:@"list_url"]; // URL by which to retreive this asset
+        [assetURLs addObject:listURL]; // Dir has no asset retrieval URL.
+    }
+    // Now the files...
+    for (NSDictionary *dict in fileList) {
+        NSString *fileName = [dict objectForKey:@"name"];
+        NSString *fileExt = [dict objectForKey:@"ext"];
+        NSString *assetURL = [dict objectForKey:@"asset_url"]; // URL by which to retreive this asset
+        NSLog(@"See a file named: %@", fileName);
+        NSLog(@"Asset located at: %@", assetURL);
+        [files addObject:fileName];
+        [fileTypes addObject:[NSNumber numberWithInt: 8]];
+        [assetURLs addObject:assetURL];
+        // If we have any clips, this folder isn't all stills.
+        if kIsMovie(fileExt) allStills = NO;
+    }
+    NSLog(@"from with JSON File Listing... AssetURLS has %d items", [assetURLs count] );
+
+    [self.tableView reloadData];
+    [self finishLoad];
+}
+
+
+
+
+
+
 
 //
 // Finished downloading the file listing--the files array should
@@ -572,8 +636,9 @@ static int retryCount;      // We don't give up on FTP failures that easily
         self.moviePath = [[self.moviePath stringByReplacingOccurrencesOfString:@"/Sites/" withString: @"/"]
                        stringByReplacingOccurrencesOfString:@" " withString: @"%20"];
         NSLog (@"moviePath = %@", moviePath);
-    }
-    else {
+    } else if (kBonjourMode) {
+        self.moviePath = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], theMovie];
+    } else {
         NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *docDir = [dirList objectAtIndex: 0];
         self.moviePath = [docDir stringByAppendingPathComponent: theMovie];
@@ -619,19 +684,25 @@ static int retryCount;      // We don't give up on FTP failures that easily
     }
     else {   
         // Play the selected movie or display the selected still
-        
+
         if (vc.runAllMode) {
             [vc airPlay];
             vc.runAllMode = NO;
         }
         
-         NSString *theMedia;
-         
-         theMedia = [NSString stringWithFormat: @"%@/%@", currentPath, 
-                     [files objectAtIndex: indexPath.row]];
-         
+        NSString *theMedia;
+
+        if (kBonjourMode) {
+            //NSString *assetURL = [assetURLs objectAtIndex:indexPath.row];
+            //theMedia = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], assetURL];
+            theMedia = [assetURLs objectAtIndex:indexPath.row];
+        }
+        else
+            theMedia = [NSString stringWithFormat: @"%@/%@", currentPath, 
+                    [files objectAtIndex: indexPath.row]];
+        
         NSLog (@"The movie/still = %@", theMedia);
-         
+        
         [self setTheMoviePath: theMedia];  // Get the correct path to the selected movie
         
         vc.clip =  theMedia;
@@ -641,6 +712,8 @@ static int retryCount;      // We don't give up on FTP failures that easily
         NSString *extension = [[files objectAtIndex: indexPath.row] pathExtension];
         
         vc.noteTableSelected = NO;
+        
+        NSLog(@"Now will try loading the movie or still at: %@", moviePath);
         
         if ( kIsMovie (extension) )
             [vc loadMovie: moviePath];

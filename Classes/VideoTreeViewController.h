@@ -338,6 +338,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 -(void) loadData: (NSString *) theInitials;
 -(void) getAllFTPNotes;
+-(void) getAllHTTPNotes;
 -(void) storeData;
 #ifdef APPSTORE
 -(void) drawMarkups: (CGContextRef) ctx;
@@ -383,6 +384,8 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(void) leaveFullScreenStill;
 
 -(NSURL *) getTheURL: (NSString *) thePath;   // Used by loadMovie: and loadStill:
+
+
 
 @end
 

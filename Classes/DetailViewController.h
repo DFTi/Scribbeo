@@ -12,11 +12,13 @@
 #import <UIKit/UIKit.h>
 #import "myDefs.h"
 #import "FTPHelper.h"
+#import "JSONKit.h"
 
 @interface DetailViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource, UIPopoverControllerDelegate, UINavigationControllerDelegate,
     UIImagePickerControllerDelegate> {
     NSString                 *currentPath;           // The current path for the current clip
     NSMutableArray           *files, *fileTypes;     // A list of files are their corresponding type (e.g., directory)
+    NSMutableArray           *assetURLs;              // Used in Bonjour Mode
     UIView                   *progressView;          // A view to hold an activity indicator when the clip table loads
     UIActivityIndicatorView  *activityIndicator;
     
@@ -28,7 +30,7 @@
 }
 
 @property (nonatomic, retain) NSString                  *currentPath, *moviePath;
-@property (nonatomic, retain) NSMutableArray            *files, *fileTypes;
+@property (nonatomic, retain) NSMutableArray            *files, *fileTypes, *assetURLs;
 @property (nonatomic, retain) UIView                    *progressView;
 @property (nonatomic, retain) UIActivityIndicatorView   *activityIndicator;
 @property (nonatomic, retain)  UIPopoverController      *popoverController;
@@ -38,6 +40,9 @@
 -(void) makeList;
 -(void) iTunesLoad;
 -(void) setTheMoviePath: (NSString *) movie;
+-(void) filesFromJSONFileListing: (NSDictionary *) listing;
+
+
 
 #ifdef OLDSTUFF
 @property (nonatomic, retain)  NSString        *episode, *date, *tape, *clip;

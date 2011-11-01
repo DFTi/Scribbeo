@@ -24,7 +24,7 @@ int gIOSMajorVersion;
 
 @synthesize window, demoView;
 @synthesize tvc, nc, clipList, rootTvc;
-@synthesize FTPMode, FTPusername, FTPpassword, FTPserver, iPhone, viewController, BonjourMode; 
+@synthesize FTPMode, FTPusername, FTPpassword, FTPserver, iPhone, viewController, BonjourMode;
 @synthesize serverBrowser, server, bonjour, FTPHomeDir, theURL, theExtension, HTTPserver, serverBase, outputFilename;
 
 static int retryCount = 0;
@@ -305,7 +305,9 @@ static int tryOne = 0;
 - (void)updateServerList {
     if (serverBrowser.servers.count == 0) {
         NSLog (@"VideoTree Server disconnected!");
-        // put up an alert here??
+//        [UIAlertView doAlert: @"Network interruption!" withMsg: 
+//         @"The Scribbeo Server can no longer be found on your network!"];
+        // that alert is pretty annoying
         return;
     }
     
@@ -316,7 +318,7 @@ static int tryOne = 0;
         self.bonjour = nil;
     
     bonjour = [[BonjourConnection alloc] initWithNetService: server];
-    
+        
     if (! [bonjour connect]) {
         [UIAlertView doAlert: @"" 
                      withMsg: @"Couldn't connect to the VideoTree server!"];
@@ -333,28 +335,25 @@ static int tryOne = 0;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    NSLog (@"Observe value change for FTPHomeDir: %@", FTPHomeDir);
+    NSLog (@"Observe value change for HTTPserver: %@", HTTPserver);
     
     if ([[change objectForKey: NSKeyValueChangeKindKey] integerValue] !=  NSKeyValueChangeSetting) {
         NSLog (@"Key value did not change: %i", [change objectForKey: NSKeyValueChangeKindKey]);
         return;
     }
     
-    if (! FTPHomeDir)
+    if (! HTTPserver)
         return;
     
-    [self removeObserver: self forKeyPath: @"FTPHomeDir"];
+    [self removeObserver: self forKeyPath: @"HTTPserver"];
     
-    if (tryOne || [rootTvc.activityIndicator isAnimating])
-        return;
-    else
-        tryOne = 1;
-    
-    // Note that bonjour connection sets some server ivars
- 
-    serverBase = kFTPserver;
-     
+//    if (tryOne || [rootTvc.activityIndicator isAnimating])
+//        return;
+//    else
+//        tryOne = 1;
+        
     if (! iPhone) {
+        NSLog(@"Now we need to make the list of files");
         [rootTvc makeList];
     }
     else
@@ -367,7 +366,7 @@ static int tryOne = 0;
 {
     static int once;
     
-    FTPMode = YES;
+    FTPMode = NO;
 
     if (once)
         return;
@@ -379,8 +378,8 @@ static int tryOne = 0;
     if (! BonjourMode )
         return;
     
-    // Get Bonjour server user name
-    
+/*  No FTP! No username/pass necessary for internal LAN operation.
+ 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     self.FTPusername = [defaults objectForKey: @"BonjourUsername"];
     
@@ -393,6 +392,7 @@ static int tryOne = 0;
     
     if (!FTPpassword || [FTPpassword isEqualToString: @""])
         FTPpassword = @"";  
+*/
     
     tryOne = 0;
         
@@ -407,7 +407,7 @@ static int tryOne = 0;
 
     [serverBrowser start];
     
-    [self addObserver: self forKeyPath: @"FTPHomeDir" options: NSKeyValueObservingOptionNew context: nil];
+    [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
     
     NSLog (@"**** UDID is %@, Bonjour user is %@, password is [hidden], http server is %@", 
            [[UIDevice currentDevice] uniqueIdentifier], FTPusername, kHTTPserver);
@@ -596,21 +596,26 @@ static int tryOne = 0;
     // We've never selected a clip, let's get the app's settings
     
     if (! tvc.currentPath) {
+        NSLog(@"Never selected a clip, get new settings");
         [self makeSettings];
         [viewController makeSettings];  
+        if (BonjourMode) {
+            [self doBonjour];            
+        }
+
     }
     
     // We're either loading clips locally or over the network 
     // (but not via Bonjour)  Load the clip table (if we're not in the process of loading it)
     
-    if (!BonjourMode)
+    if (!kFTPMode) {
         if (!iPHONE) {
             if (! [rootTvc.activityIndicator isAnimating]) {
                 [rootTvc makeList];
             }
         }
-        else
-            [viewController showNav];
+    } else
+        [viewController showNav];
   
     [self releasemem];
 }

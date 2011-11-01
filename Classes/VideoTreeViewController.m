@@ -453,6 +453,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         
         if (kFTPMode)
             [self getAllFTPNotes];
+        if (kBonjourMode) {}
         else {
             [self loadData: initials];
         }
@@ -1939,9 +1940,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         
         NSString *home = homeDir;
         
-        if ( kBonjourMode )
-            home = @"/Sites";
-        
         NSString *urlString = [NSString stringWithFormat: @"ftp://%@%@", kFTPserver, home ];
  //     urlString = [urlString stringByReplacingOccurrencesOfString: @" " withString: @"%20"];
         
@@ -1950,8 +1948,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         
         [FTPHelper download: downloadPath to: [self archiveFilePath]];
         NSLog (@"download returned...in process");
-    }
-    else 
+    } if (kBonjourMode) {
+        // Handled elsewhere...
+    } else  // Local mode
         dispatch_async (dispatch_get_main_queue(),
             ^{
                 NSFileManager *fm = [NSFileManager defaultManager];
@@ -1993,25 +1992,32 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             
             return;
         }
-        
-        download = kTimecode;
-        
-        [FTPHelper sharedInstance].delegate = self;
-        [FTPHelper sharedInstance].uname = kFTPusername;
-        [FTPHelper sharedInstance].pword = kFTPpassword;
-        
-         NSString *urlString = [NSString stringWithFormat: @"ftp://%@/", kFTPserver];
-        
-        [FTPHelper sharedInstance].urlString = urlString;
-        
-        NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *docDir = [dirList objectAtIndex: 0];
-        
-        NSString *fileName = [NSString stringWithFormat: @"%@.tc", [clip stringByDeletingPathExtension]];
-        fileName = [docDir stringByAppendingPathComponent: fileName];
-        NSLog (@"Trying to download ftp timecode file %@ to %@", [clipPath stringByDeletingPathExtension], fileName);
       
-        [FTPHelper download: [NSString stringWithFormat: @"Storage/%@/%@.tc", kFTPusername, [clipPath stringByDeletingPathExtension]] to: fileName];
+        if (kFTPMode) {
+            download = kTimecode;
+            [FTPHelper sharedInstance].delegate = self;
+            [FTPHelper sharedInstance].uname = kFTPusername;
+            [FTPHelper sharedInstance].pword = kFTPpassword;
+            
+            NSString *urlString = [NSString stringWithFormat: @"ftp://%@/", kFTPserver];
+            
+            [FTPHelper sharedInstance].urlString = urlString;
+            NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+            NSString *docDir = [dirList objectAtIndex: 0];
+            
+            NSString *fileName = [NSString stringWithFormat: @"%@.tc", [clip stringByDeletingPathExtension]];
+            fileName = [docDir stringByAppendingPathComponent: fileName];
+            NSLog (@"Trying to download ftp timecode file %@ to %@", [clipPath stringByDeletingPathExtension], fileName);
+            
+            [FTPHelper download: [NSString stringWithFormat: @"Storage/%@/%@.tc", kFTPusername, [clipPath stringByDeletingPathExtension]] to: fileName];
+        } else if (kBonjourMode) {
+            // FIXME
+            // NSString *urlString = [NSString stringWithFormat: @"%@/asset/", kHTTPserver];
+            // We could either pass in the timecode in that initial JSON (probly best)
+            // Or go ahead and write another request... The former is probably better,
+            // although if a timecode /just/ got updated, they won't see til they reload the file list.
+            // and there will be more effort involved in changing the code up too.
+        }
     }
 }
 
@@ -2027,16 +2033,48 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 	[FTPHelper sharedInstance].pword = kFTPpassword;
     
     NSString *home = homeDir;
-    
-    if (kBonjourMode)
-        home = @"/Sites";
-    
+        
 	// Listing
     [FTPHelper list: [NSString stringWithFormat: @"ftp://%@:%@@%@%@/Notes/", [FTPHelper sharedInstance].uname, 
     [FTPHelper sharedInstance].pword, kFTPserver, home]];
 }
 
-
+//  Download the notes archive from the bonjour py server
+// So I just want to say that the way the notes is being done is terrible for collaboration.
+// When someone creates a note, an entire archive gets sent up the wire of what they currently have.
+// This means that if someone has just added a note (and it was uploaded) it would be overwritten by an old
+// archive with that person's note and old list of previous notes. terrible terrible.
+-(void) getAllHTTPNotes
+{
+    NSLog(@"Retrieving notes archive.");
+    NSError *error = nil;
+    NSURLResponse *response;
+    NSString *archivePath = [self archiveFilePath];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, [archivePath lastPathComponent]]];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:60.0];
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    if (error != nil)
+        NSLog(@"%@", error.localizedDescription);
+    NSLog(@"Got back this much data: %d", [data length]);
+    if ([notePaths count])
+        [notePaths removeAllObjects];
+    [data writeToFile:archivePath atomically:YES];
+    NSLog(@"Downloaded the note archive, attempting to restore...");
+    NSFileManager *fm = [NSFileManager defaultManager];
+    [self noteShowActivity];
+    if ([fm fileExistsAtPath: archivePath] && ([data length] > 50000)) {
+        NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
+        [noteData release];
+        noteData = [noteArray mutableCopy];
+        NSLog (@"Restored %i downloaded", [noteData count]);
+    } else {
+        [noteData removeAllObjects];
+        [self.notes setEditing: NO];            
+        NSLog (@"No notes to restore");
+    }
+    [self noteStopActivity];
+    [notes reloadData];
+}
 #define CONTAINS(x,y) ([x rangeOfString: y].location != NSNotFound)
 
 #pragma mark -
@@ -2112,8 +2150,14 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     if (!XMLURLreader)
 		XMLURLreader = [[XMLURL alloc] init];
 
-    NSString *url = [NSString stringWithFormat: @"%@%@/Notes/%@", kHTTPserver, userDir, file];
-    
+    NSString *url;
+    if (kBonjourMode) {
+        url = [NSString stringWithFormat: @"/notes/%@", kHTTPserver, file];
+    } else {
+        url = [NSString stringWithFormat: @"%@%@/Notes/%@", kHTTPserver, userDir, file];   
+    }
+
+    NSLog(@"Getting FCP XML marker file at: %@", url);
     // This is the guy that will parset the XML.  The XMLDone: method will get called when
     // the parsing has been completed
 	
@@ -2272,6 +2316,20 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
             [FTPHelper upload: archivePath];
             NSLog2 (@"upload returned...in process");
+        } else if (kBonjourMode) { // Upload the notes with HTTP
+            [myNotes release];
+            NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, [archivePath lastPathComponent]]];
+            NSLog(@"Uploading note to server at: %@", [url absoluteString]);
+            NSData *postData = [NSData dataWithContentsOfFile:archivePath];
+            NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+            NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+            [request setURL:url];
+            [request setHTTPMethod:@"POST"];
+            [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+            [request setValue:@"application/x-gzip" forHTTPHeaderField:@"Content-Type"];
+            [request setHTTPBody:postData];
+            [NSURLConnection connectionWithRequest:request delegate:self];
+            [request release];
         }
     }
 }
@@ -2652,14 +2710,30 @@ Next:
 -(void) getAvid: (NSString *) file
 {
     NSLog (@"processing Avid import file %@", file);
-	
+
+    if ( kBonjourMode ) {
+        // need to refactor to not use FTP
+        NSLog(@"!! This has yet to be implemented for Bonjour Mode");
+        return;
+        // FIXME
+        // NSString *url;
+        // Here's a nice example from the FCP XML stuff... This is all jargon to me though (Avid, FCP, etc)
+        //        if (kBonjourMode) {
+        //            url = [NSString stringWithFormat: @"/notes/%@", kHTTPserver, file];
+        //        } else {
+        //            url = [NSString stringWithFormat: @"%@%@/Notes/%@", kHTTPserver, userDir, file];   
+        //        }
+        //        
+        //        NSLog(@"Getting FCP XML marker file at: %@", url);
+    }
+
+    
+    
     [FTPHelper sharedInstance].delegate = self;
     [FTPHelper sharedInstance].uname = kFTPusername;
     [FTPHelper sharedInstance].pword = kFTPpassword;    
     NSString *home = homeDir;
     
-    if ( kBonjourMode )
-        home = @"/Sites";
     
     NSString *urlString = [NSString stringWithFormat: @"ftp://%@%@", kFTPserver, home ];
     
@@ -3579,15 +3653,16 @@ static int saveRate;
         // solution was to create a separate .tc file
         //
         
-        if (! kFTPMode) {
+        if ((! kFTPMode) && (! kBonjourMode)) { // Only local mode can do this since we're using AVAssetReader
             NSLog (@"trying to read start time code");
-            startTimecode = [self getStartTimecode];
+            startTimecode = [self getStartTimecode]; // AVAssetReader, local only
         }
         
         // If we haven't set the frame rate by now, something has gone
         // horribly wrong
         
         if (fps == 0) {
+            // FIXME something might be weird here, where is fps getting set?
             [self cleanup];
             [UIAlertView doAlert:  @"Error" withMsg:
                  @"Trouble playing the movie--you may not have permission"];
@@ -3949,9 +4024,10 @@ static int saveRate;
 {
     editButton.title = @"Edit";
 
-    if (player || stillShows) 
+    if (player || stillShows) {
+        NSLog(@"Player or still shows -- cleanup");
         [self cleanup];
-    else
+    } else
         [self erase];
     
     if (iPHONE) {
@@ -3972,6 +4048,7 @@ static int saveRate;
     [[NSNotificationCenter defaultCenter] removeObserver:self
                 name:AVPlayerItemDidPlayToEndTimeNotification  object:nil];
 
+   
     self.movieURL = [self getTheURL: theMovie];
     self.mediaPath = theMovie;
     
@@ -3988,13 +4065,16 @@ static int saveRate;
         return;
 
     self.clip = [theMovie lastPathComponent];
+    NSLog(@"loadMovie sees self.clip as %@", self.clip);
     [self showActivity];        // Get the spinner going while we load the movie
 
     // Load the notes table
-    
-    if (kFTPMode)
+    // Yes, each mode has its own way of loading notes
+    if (kFTPMode) 
         [self getAllFTPNotes];
-    else {
+    else if (kBonjourMode) {
+        [self getAllHTTPNotes];
+    } else { 
         if (!allStills)
             [self loadData: [NSString stringWithFormat: @"%@.%@", 
                     [clipPath stringByReplacingOccurrencesOfString: @"/" withString: kNoteDelimiter], initials]];   
@@ -4003,7 +4083,7 @@ static int saveRate;
     }
     
     // Create the movie asset and get the tracks keys
-    
+    NSLog(@"We will load the AVURLAsset with this movieURL: %@", movieURL);
     NSMutableDictionary *optionsDict = [NSMutableDictionary dictionaryWithObjectsAndKeys: 
             [NSNumber numberWithBool: YES], AVURLAssetPreferPreciseDurationAndTimingKey, nil];
     self.theAsset = [AVURLAsset URLAssetWithURL: movieURL options: optionsDict];
@@ -4029,6 +4109,7 @@ static int saveRate;
 
         if (player && playerItem)
         {
+            NSLog(@"player and playerItem exist");
             // Tell us if we reach the end
             
             [[NSNotificationCenter defaultCenter]
@@ -4126,6 +4207,7 @@ static int saveRate;
 
          NSLog (@"playbackLikelyToKeepUp = %i", player.currentItem.isPlaybackLikelyToKeepUp);
 
+         NSLog(@"loadMovie calling updateTimeControl");
          [self updateTimeControl];
          
          if (airPlayMode) 
@@ -4605,7 +4687,7 @@ static int saveRate;
 
 - (void)observeValueForKeyPath:(NSString*) path ofObject:(id) object change:(NSDictionary*)change context:(void*)context
 {
- //  NSLog (@"observe value %@", context);
+    NSLog (@"observe value %@", context);
 	if (context == VideoTreeViewControllerRateObservationContext)
 	{
 		dispatch_async(dispatch_get_main_queue(),

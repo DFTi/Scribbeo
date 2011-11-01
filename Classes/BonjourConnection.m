@@ -155,13 +155,17 @@ void writeStreamEventHandler(CFWriteStreamRef stream, CFStreamEventType eventTyp
 - (BOOL) connect {    
   if ( self.host != nil ) {
       
-      NSLog (@"connecting to host %@, port %i, IP Address: %@", host, port, [self IPAddress]);
+      NSLog (@"connecting to Bonjour host %@, port %i, IP Address: %@", host, port, [self IPAddress]);
       
       NSString *serverIP = [self IPAddress];
       
-      [(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] setFTPserver: serverIP];
-
-      [(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] setHTTPserver: [@"http://" stringByAppendingString: serverIP]];
+      //[(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] setFTPserver: serverIP];
+      // Defuncted by Keyvan -- Oct 28 2011 
+      // Path to our pythonic bonjour+web combo server:
+      NSString *httpServer = [NSString stringWithFormat:@"http://%@:%d", serverIP, port];
+      // Set it to the HTTPserver in the app delegate
+      [(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] setHTTPserver: httpServer];
+      NSLog(@"HTTP Server has been set to %@", httpServer);
       
       // Bind read/write streams to a new socket
       CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, (CFStringRef)self.host,
@@ -241,9 +245,11 @@ void writeStreamEventHandler(CFWriteStreamRef stream, CFStreamEventType eventTyp
   }
   
   NSLog (@"Server streams open!");
-  NSDictionary *list = [NSDictionary dictionaryWithObject: @"all" forKey:@"list"];
-    
-  [self sendNetworkPacket: list];
+  // I dont see the point in all this. We already know what server to talk to.
+  // NSDictionary *list = [NSDictionary dictionaryWithObject: @"all" forKey:@"list"];
+  // [self sendNetworkPacket: list];
+  // Let's just close the connection and work with the HTTP now.
+  [self close];
   return YES;
 }
 
