@@ -97,7 +97,7 @@
 		02E83886141AA38B001B6CA5 /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E83885141AA38B001B6CA5 /* camera.png */; };
 		02E83888141AA95D001B6CA5 /* movies.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E83887141AA95D001B6CA5 /* movies.png */; };
 		02E8388C141AABF3001B6CA5 /* rotate.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E8388B141AABF3001B6CA5 /* rotate.png */; };
-		BCE5C484145B615D003A0238 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = BCE5C483145B615D003A0238 /* JSONKit.m */; };
+		BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = BCCDB3B61468C8FC008D41B2 /* JSONKit.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -217,8 +217,8 @@
 		02E83887141AA95D001B6CA5 /* movies.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = movies.png; sourceTree = "<group>"; };
 		02E8388B141AABF3001B6CA5 /* rotate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rotate.png; sourceTree = "<group>"; };
 		BCBB9E25143431F600EA4486 /* VideoTree.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = VideoTree.entitlements; sourceTree = "<group>"; };
-		BCE5C482145B615D003A0238 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSONKit.h; path = ../../videotree_enterprise/Classes/JSONKit.h; sourceTree = "<group>"; };
-		BCE5C483145B615D003A0238 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = JSONKit.m; path = ../../videotree_enterprise/Classes/JSONKit.m; sourceTree = "<group>"; };
+		BCCDB3B51468C8FC008D41B2 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
+		BCCDB3B61468C8FC008D41B2 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -440,8 +440,8 @@
 		BCE5C486145B617A003A0238 /* JSON */ = {
 			isa = PBXGroup;
 			children = (
-				BCE5C482145B615D003A0238 /* JSONKit.h */,
-				BCE5C483145B615D003A0238 /* JSONKit.m */,
+				BCCDB3B51468C8FC008D41B2 /* JSONKit.h */,
+				BCCDB3B61468C8FC008D41B2 /* JSONKit.m */,
 			);
 			name = JSON;
 			sourceTree = "<group>";
@@ -587,7 +587,7 @@
 				02A3067613C686D300E7340D /* XMLURL.m in Sources */,
 				02A3067E13C686D300E7340D /* main.m in Sources */,
 				0224AAE814181DB0005AFBAB /* UIImageView+Scaling.m in Sources */,
-				BCE5C484145B615D003A0238 /* JSONKit.m in Sources */,
+				BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
