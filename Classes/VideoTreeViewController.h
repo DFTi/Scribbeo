@@ -147,6 +147,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
     MPMoviePlayerController     *movieController;       // for AirPlay
     BOOL                        FTPMode;
                     
+    NSString                    *timeCode;      // start timecode for current clip from json
     Float64                     startTimecode;
     BOOL                        selectedNextClip;
     BOOL                        emailPDF, isPrinting;
@@ -264,7 +265,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property (nonatomic, retain)   IBOutlet  UILabel *stampLabel;
 @property (nonatomic, retain) UILabel *stampLabelFull;
 @property (nonatomic, retain) VoiceMemo *voiceMemo;
-
+@property (nonatomic, retain) NSString *timeCode;
 @property BOOL uploadIndicator;
 @property enum downloadType download;
 
@@ -385,6 +386,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 -(NSURL *) getTheURL: (NSString *) thePath;   // Used by loadMovie: and loadStill:
 
+-(void) directlySetStartTimecode: (NSString *) timeCodeStr;
 
 
 @end

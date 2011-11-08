@@ -71,7 +71,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 @synthesize  stampLabel, stampLabelFull, theAsset, startTimecode, download, clipLabel, runAllMode;
 @synthesize rewindToStartButton, frameBackButton, frameForwardButton, forwardToEndButton, fullScreenButton, rewindButton, fastForwardButton, airPlayMode, remote;
 @synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo, mediaPath;
-@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage;
+@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage, timeCode;
 
 #pragma mark -
 #pragma mark view loading/unloading
@@ -1972,13 +1972,28 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             });
 }
 
+
+-(void) directlySetStartTimecode: (NSString *) timeCodeStr {
+    NSLog(@"Called directlySetStartTimecode with timeCodeStr being: %@", timeCodeStr);
+    startTimecode = 0.0;
+    if (timeCodeStr) {
+        startTimecode = [self convertTimeToSecs:timeCodeStr];
+        durationSet = NO;
+        maxLabelSet = NO;
+        [self updateTimeControl];
+        [self updateTimeLabel];
+        NSLog(@"Successfully set timecode directly to: %@", timeCodeStr);
+    } else
+        NSLog(@"Could not set timecode directly. String was: %@", timeCodeStr);
+}
+
+
 //
 // Here we're gonna look to download:
 //  1. An FCP XML file with markers
 //  2. An AVid Locator (txt) file
 //  3. A .tc file that contains a start timecode
 //
-
 
 -(void) setStartTimecode   
 {
@@ -2011,12 +2026,18 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
             
             [FTPHelper download: [NSString stringWithFormat: @"Storage/%@/%@.tc", kFTPusername, [clipPath stringByDeletingPathExtension]] to: fileName];
         } else if (kBonjourMode) {
+            
+            
+            
             // FIXME
             // NSString *urlString = [NSString stringWithFormat: @"%@/asset/", kHTTPserver];
             // We could either pass in the timecode in that initial JSON (probly best)
             // Or go ahead and write another request... The former is probably better,
             // although if a timecode /just/ got updated, they won't see til they reload the file list.
             // and there will be more effort involved in changing the code up too.
+            // NSString *urlString = [NSString stringWithFormat: @"%@/tc/%@", kHTTPserver];
+            // [assetURLs objectAtIndex:indexPath.row]
+
         }
     }
 }
@@ -2243,8 +2264,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     else {
         [self noteStopActivity];
         
-        if (!stillShows)
+        if (!stillShows) {
+            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             [self setStartTimecode];
+        }
     }
 }
 
@@ -2356,7 +2379,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 {
     NSFileManager *fm = [NSFileManager defaultManager];
     
-    if (download == kTimecode) {
+    if (download == kTimecode) { // FIXME ugh defuncted
         // We've downloaded the timecode (.tc) file.  Let's just read it in and parse it
         
         startTimecode = 0.0;
@@ -2450,9 +2473,10 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 Next:
     ++noteFileProcessed;
     if (noteFileProcessed >= [notePaths count]) {
-        if (!stillShows)
+        if (!stillShows){
+            NSLog(@"?????????????????????????????????????????????");
             [self setStartTimecode]; 
-        
+        }
         [self noteStopActivity];
 
         return;
@@ -3684,6 +3708,8 @@ static int saveRate;
         if (timecodeFormat)
             duration += startTimecode;
 
+        NSLog(@"UpdateTimeControl has incremented the duration (%f) by the startTimecode (%f)", theEnd, startTimecode);
+        
         // If we have a meaningful duration set, set the min/max times at the ends of the scrubber
         
         if (isfinite(duration))
@@ -4022,6 +4048,8 @@ static int saveRate;
 
 - (void)loadMovie: (id) theMovie
 {
+    
+    
     editButton.title = @"Edit";
 
     if (player || stillShows) {
@@ -4207,8 +4235,8 @@ static int saveRate;
 
          NSLog (@"playbackLikelyToKeepUp = %i", player.currentItem.isPlaybackLikelyToKeepUp);
 
-         NSLog(@"loadMovie calling updateTimeControl");
-         [self updateTimeControl];
+         NSLog(@"loadMovie calling directlySetStartTimecode for timecode: %@", [self timeCode]);
+         [self directlySetStartTimecode: [self timeCode]];
          
          if (airPlayMode) 
              [self airPlayWork];

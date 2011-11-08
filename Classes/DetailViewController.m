@@ -12,7 +12,7 @@
 @implementation DetailViewController
 
 @synthesize currentClip, popoverController, moviePath;
-@synthesize currentPath, files, fileTypes, assetURLs;
+@synthesize currentPath, files, fileTypes, assetURLs, timeCodes;
 @synthesize progressView, activityIndicator;
 
 static int retryCount;      // We don't give up on FTP failures that easily
@@ -129,11 +129,13 @@ static int retryCount;      // We don't give up on FTP failures that easily
         self.files = [NSMutableArray array];
         self.fileTypes = [NSMutableArray array];
         self.assetURLs = [NSMutableArray array];
+        self.timeCodes = [NSMutableArray array];
     }
     else {
         [files removeAllObjects];
         [fileTypes removeAllObjects];
         [assetURLs removeAllObjects];
+        [timeCodes removeAllObjects];
     }
     
     if (kFTPMode || kBonjourMode)
@@ -207,22 +209,27 @@ static int retryCount;      // We don't give up on FTP failures that easily
         [files addObject:folderName];
         [fileTypes addObject:[NSNumber numberWithInt: kDirectory]];
         NSString *listURL = [dict objectForKey:@"list_url"]; // URL by which to retreive this asset
-        [assetURLs addObject:listURL]; // Dir has no asset retrieval URL.
+        [assetURLs addObject:listURL]; // Dir has no asset retrieval URL, instead use assetURL for traversal
+        [timeCodes addObject:@""];
     }
     // Now the files...
     for (NSDictionary *dict in fileList) {
         NSString *fileName = [dict objectForKey:@"name"];
         NSString *fileExt = [dict objectForKey:@"ext"];
         NSString *assetURL = [dict objectForKey:@"asset_url"]; // URL by which to retreive this asset
+        NSString *timeCode = [dict objectForKey:@"timecode"];
         NSLog(@"See a file named: %@", fileName);
+        NSLog(@"File was assigned a start timecode of: %@", timeCode);
         NSLog(@"Asset located at: %@", assetURL);
         [files addObject:fileName];
         [fileTypes addObject:[NSNumber numberWithInt: 8]];
         [assetURLs addObject:assetURL];
+        [timeCodes addObject:timeCode];
         // If we have any clips, this folder isn't all stills.
         if kIsMovie(fileExt) allStills = NO;
     }
-    NSLog(@"from with JSON File Listing... AssetURLS has %d items", [assetURLs count] );
+    NSLog(@"from with JSON File Listing... AssetURLs has %d items", [assetURLs count] );
+    NSLog(@"timeCodes has %d items", [timeCodes count] );
 
     [self.tableView reloadData];
     [self finishLoad];
@@ -693,9 +700,15 @@ static int retryCount;      // We don't give up on FTP failures that easily
         NSString *theMedia;
 
         if (kBonjourMode) {
-            //NSString *assetURL = [assetURLs objectAtIndex:indexPath.row];
-            //theMedia = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], assetURL];
+            // Loading the URL to the asset, originally stored in assetURLs during /list/
             theMedia = [assetURLs objectAtIndex:indexPath.row];
+            
+            // Trying to set the timecode based on the stored timecode 
+            // from the JSON data returned by the /list/
+            vc.timeCode = @"";
+            vc.timeCode = [timeCodes objectAtIndex:indexPath.row];
+            NSLog(@"User tapped, loading the movie, the timecode is: %@ It will be converted to float and set in loadMovie shortly.", vc.timeCode);
+            // We need to set the timecode within loadMovie           
         }
         else
             theMedia = [NSString stringWithFormat: @"%@/%@", currentPath, 
