@@ -145,7 +145,6 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
     UIView                      *mySquareView;
     int                         noteFileProcessed;
     MPMoviePlayerController     *movieController;       // for AirPlay
-    BOOL                        FTPMode;
                     
     NSString                    *timeCode;      // start timecode for current clip from json
     Float64                     startTimecode;
@@ -338,7 +337,6 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 // Data storage and loading
 
 -(void) loadData: (NSString *) theInitials;
--(void) getAllFTPNotes;
 -(void) getAllHTTPNotes;
 -(void) storeData;
 #ifdef APPSTORE

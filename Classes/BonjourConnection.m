@@ -159,8 +159,6 @@ void writeStreamEventHandler(CFWriteStreamRef stream, CFStreamEventType eventTyp
       
       NSString *serverIP = [self IPAddress];
       
-      //[(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] setFTPserver: serverIP];
-      // Defuncted by Keyvan -- Oct 28 2011 
       // Path to our pythonic bonjour+web combo server:
       NSString *httpServer = [NSString stringWithFormat:@"http://%@:%d", serverIP, port];
       // Set it to the HTTPserver in the app delegate
@@ -308,17 +306,6 @@ void writeStreamEventHandler(CFWriteStreamRef stream, CFStreamEventType eventTyp
 
   // Try to write to stream
   [self writeOutgoingBufferToStream];
-}
-
-// One of connected clients sent a chat message. Propagate it further.
-- (void) receivedNetworkPacket:(NSDictionary*)packet viaConnection:(BonjourConnection *)connection {
-    NSLog (@"Received network packet: %@", packet);
-    NSString *path = [packet objectForKey: @"folder"];
-    
-    NSLog (@"received folder from Bonjour server: %@", path);
-    //   [[[UIApplication sharedApplication] delegate] setFTPHomeDir: [NSString stringWithFormat: @"/Library/WebServer/Documents/%@", path]];
-    [(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] setFTPHomeDir: [[NSString stringWithFormat: @"/Sites/%@", path]
-        stringByReplacingOccurrencesOfString: @"%20" withString: @" "]];
 }
 
 #pragma mark Read stream methods

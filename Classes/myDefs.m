@@ -32,7 +32,6 @@ void mySleep(unsigned long millisec)
 #import "VideoTreeAppDelegate.h"
 #import <MessageUI/MessageUI.h>
 #import <MessageUI/MFMailComposeViewController.h>
-#import "FTPHelper.h"
 
 #define kLogFile  @"logfile"
 
@@ -81,14 +80,8 @@ void uploadLogFile (void)
     if (!checkLogFile ())
         return;
     
-    VideoTreeAppDelegate *appDel = (VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate];
-    if ([appDel FTPMode]) {
-        [FTPHelper sharedInstance].delegate = appDel;
-        [FTPHelper sharedInstance].uname =  [appDel FTPusername];
-        [FTPHelper sharedInstance].pword = [appDel FTPpassword];
-        [FTPHelper sharedInstance].urlString = [NSString stringWithFormat: @"ftp://%@", [appDel FTPserver]];
-        
-        [FTPHelper upload: pathToLogFile ()];
+    if (kBonjourMode) {
+        // Here's where we can upload the log file using pathToLogFile if desired.
     }
 }
 

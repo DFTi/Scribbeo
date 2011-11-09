@@ -12,7 +12,6 @@
 #import <QuartzCore/QuartzCore.h>
 #import "Note.h"
 #import "FullScreen.h"
-#import "FTPHelper.h"
 #import <Endian.h>
 #import "VoiceMemo.h"
 
@@ -75,8 +74,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 #pragma mark -
 #pragma mark view loading/unloading
-
-static int reTryCount = 0;   // number of retries for an ftp list: request???
 
 - (BOOL)canBecomeFirstResponder {
     NSLog (@"Yes, I can become first responder");
@@ -451,10 +448,9 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 
         // Load the notes table
         
-        if (kFTPMode)
-            [self getAllFTPNotes];
-        if (kBonjourMode) {}
-        else {
+        if (kBonjourMode) {
+            [self getAllHTTPNotes];
+        } else {
             [self loadData: initials];
         }
     }
@@ -1933,24 +1929,8 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     
     NSLog (@"*** Download path = %@", downloadPath);
     
-    if (kFTPMode) {
-        [FTPHelper sharedInstance].delegate = self;
-        [FTPHelper sharedInstance].uname =  kFTPusername;
-        [FTPHelper sharedInstance].pword =  kFTPpassword;
-        
-        NSString *home = homeDir;
-        
-        NSString *urlString = [NSString stringWithFormat: @"ftp://%@%@", kFTPserver, home ];
- //     urlString = [urlString stringByReplacingOccurrencesOfString: @" " withString: @"%20"];
-        
-        NSLog (@"Trying to download file from %@",  urlString);
-        [FTPHelper sharedInstance].urlString = urlString;
-        
-        [FTPHelper download: downloadPath to: [self archiveFilePath]];
-        NSLog (@"download returned...in process");
-    } if (kBonjourMode) {
-        // Handled elsewhere...
-    } else  // Local mode
+    if (!kBonjourMode) {
+        // Local mode
         dispatch_async (dispatch_get_main_queue(),
             ^{
                 NSFileManager *fm = [NSFileManager defaultManager];
@@ -1970,6 +1950,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
                 [self noteStopActivity];
                 [notes reloadData];
             });
+    }
 }
 
 
@@ -1987,78 +1968,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
         NSLog(@"Could not set timecode directly. String was: %@", timeCodeStr);
 }
 
-
-//
-// Here we're gonna look to download:
-//  1. An FCP XML file with markers
-//  2. An AVid Locator (txt) file
-//  3. A .tc file that contains a start timecode
-//
-
--(void) setStartTimecode   
-{
-    if (kFTPMode) {
-        if (startTimecode > 0.001) {
-            if ([xmlPaths count]) 
-                [self getXML: [xmlPaths objectAtIndex: 0]];
-                        
-            if ([txtPaths count]) 
-                [self getAvid: [txtPaths objectAtIndex: 0]];
-            
-            return;
-        }
-      
-        if (kFTPMode) {
-            download = kTimecode;
-            [FTPHelper sharedInstance].delegate = self;
-            [FTPHelper sharedInstance].uname = kFTPusername;
-            [FTPHelper sharedInstance].pword = kFTPpassword;
-            
-            NSString *urlString = [NSString stringWithFormat: @"ftp://%@/", kFTPserver];
-            
-            [FTPHelper sharedInstance].urlString = urlString;
-            NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-            NSString *docDir = [dirList objectAtIndex: 0];
-            
-            NSString *fileName = [NSString stringWithFormat: @"%@.tc", [clip stringByDeletingPathExtension]];
-            fileName = [docDir stringByAppendingPathComponent: fileName];
-            NSLog (@"Trying to download ftp timecode file %@ to %@", [clipPath stringByDeletingPathExtension], fileName);
-            
-            [FTPHelper download: [NSString stringWithFormat: @"Storage/%@/%@.tc", kFTPusername, [clipPath stringByDeletingPathExtension]] to: fileName];
-        } else if (kBonjourMode) {
-            
-            
-            
-            // FIXME
-            // NSString *urlString = [NSString stringWithFormat: @"%@/asset/", kHTTPserver];
-            // We could either pass in the timecode in that initial JSON (probly best)
-            // Or go ahead and write another request... The former is probably better,
-            // although if a timecode /just/ got updated, they won't see til they reload the file list.
-            // and there will be more effort involved in changing the code up too.
-            // NSString *urlString = [NSString stringWithFormat: @"%@/tc/%@", kHTTPserver];
-            // [assetURLs objectAtIndex:indexPath.row]
-
-        }
-    }
-}
-
-//
-// Get all a listing of all the FTP note files for the current clip (from all users)
-// Since the ftp download is asynchronous, this just kicks off the list request
-//
-
--(void) getAllFTPNotes
-{
-    [FTPHelper sharedInstance].delegate = self;
-	[FTPHelper sharedInstance].uname = kFTPusername;
-	[FTPHelper sharedInstance].pword = kFTPpassword;
-    
-    NSString *home = homeDir;
-        
-	// Listing
-    [FTPHelper list: [NSString stringWithFormat: @"ftp://%@:%@@%@%@/Notes/", [FTPHelper sharedInstance].uname, 
-    [FTPHelper sharedInstance].pword, kFTPserver, home]];
-}
 
 //  Download the notes archive from the bonjour py server
 // So I just want to say that the way the notes is being done is terrible for collaboration.
@@ -2161,7 +2070,7 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
 }
 
 // Parse FCP XML marker file
-
+// FIXME No idea about this stuff
 -(void) getXML: (NSString *) file
 {
     NSLog (@"processing XML file %@", file);
@@ -2174,8 +2083,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     NSString *url;
     if (kBonjourMode) {
         url = [NSString stringWithFormat: @"/notes/%@", kHTTPserver, file];
-    } else {
-        url = [NSString stringWithFormat: @"%@%@/Notes/%@", kHTTPserver, userDir, file];   
     }
 
     NSLog(@"Getting FCP XML marker file at: %@", url);
@@ -2183,114 +2090,6 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     // the parsing has been completed
 	
 	[XMLURLreader parseXMLURL: url atEndDoSelector: @selector (XMLDone:) withObject: self];
-}
-
-//
-// The ftp list request has finished.  Now we are given a list of file paths as
-// the argument to this method.
-//
-
--(void) receivedListing: (NSArray *) listing
-{
-    [self noteShowActivity];
-    NSString *f = [clipPath stringByReplacingOccurrencesOfString: @"%20" withString: @" "];
-
-    NSLog (@"receivedListing, clip is %@, allStills is %i", f, allStills);
-    
-    if ([notePaths count])
-        [notePaths removeAllObjects];
-    
-    [xmlPaths removeAllObjects];
-    [txtPaths removeAllObjects];
-    
-    // We will look at each file to see if it contains the clip name.  Then look at the extension.
-    // 1. XML: FCP XML file for import
-    // 2. txt: Avid Locator file for import
-    // 3. movie or still file: Skip it
-    // 4. Anything else: assume it's a note file (the extension is the initials)
-    
-    NSString *dirPath = [clipPath stringByDeletingLastPathComponent];
-
-	for (NSDictionary *dict in listing) {
-        NSString *fileName = [FTPHelper textForDirectoryListing:(CFDictionaryRef) dict];
-        NSString *extension = [fileName pathExtension];
-        NSString *rootExtension = [[fileName stringByDeletingPathExtension] pathExtension];
-        NSString *translatedPath = [[fileName stringByReplacingOccurrencesOfString: kNoteDelimiter withString: @"/"] stringByDeletingPathExtension];   // Deletes the initials
-        
-		NSLog (@"Found ftp file: %@ extension: %@\n\ttranslatedPath = %@", fileName, extension, translatedPath);
-        
-        if (allStills) {
-            NSLog (@"Testing %@ against %@ (%@)", dirPath, fileName, [translatedPath stringByDeletingLastPathComponent]);
-            
-            if ([dirPath isEqualToString: [translatedPath stringByDeletingLastPathComponent]] && kIsStill (rootExtension)) {
-                    NSLog (@"Found a still note: %@", fileName);
-                    [notePaths addObject: fileName];  // Make sure it's at the end of the path
-                }
-            
-            continue;
-        }
-        
-        if ( [translatedPath rangeOfString: f].location == NSNotFound ) {
-            NSLog2 (@"Skipping file %@", fileName);
-            continue;
-        }
-        
-        if ( kIsMovie (extension) || kIsStill (extension))
-            continue;
-        
-        // Look for an XML or txt (Avid import) or note file for a video clip
-        
-        if ( !stillShows && EQUALS (extension, @"xml") ) {
-            [xmlPaths addObject: fileName];
-            NSLog (@"Found XML file %@", fileName );
-        }
-        else if ( !stillShows && EQUALS (extension, @"txt") ) {
-            [txtPaths addObject: fileName];
-            NSLog (@"Found txt file (Avid import) %@", fileName );
-        }
-        else {
-            NSLog (@"Adding %@ to notePaths", fileName);
-            [notePaths addObject: fileName];
-        }
-    }
-        
-    
-    // kick off the loading of the individual note files; the rest are loaded from the downloadFinished callback
-    
-    noteFileProcessed = 0;
-
-    if ([notePaths count] != 0)
-        [self loadData: [notePaths objectAtIndex: 0]];
-    else {
-        [self noteStopActivity];
-        
-        if (!stillShows) {
-            NSLog(@"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            [self setStartTimecode];
-        }
-    }
-}
-
-//
-// The ftp listing failed.  We'll retry three times.  Often works on a retry
-// 
-
-- (void) listingFailed
-{    
-	NSLog (@"Nothing to list on the server?");
-    
-    // retry -- seems to be a problem when awakening the App
-    
-    if (reTryCount < 3) {
-        [self noteStopActivity];
-        ++reTryCount;
-        NSLog (@"retry #%i listing", reTryCount);
-        [self getAllFTPNotes];
-    }
-    else {
-        reTryCount = 0;
-        [self noteStopActivity];
-    }
 }
 
 // Look at all the notes in the noteData array and just get mine to archive and upload
@@ -2317,198 +2116,35 @@ static int reTryCount = 0;   // number of retries for an ftp list: request???
     NSMutableArray *myNotes = [self getMyNotes];
     NSString *archivePath = [self archiveFilePath];
         
-    // Write the notes to a local archive file first 
-    
+    // Write the notes to a local archive file first
     if ([NSKeyedArchiver archiveRootObject: myNotes toFile: archivePath] == NO) {
         [myNotes release];
         [UIAlertView doAlert: @"Notes" 
                      withMsg: @"Couldn't save your notes locally!"];
         NSLog (@"Save failed");
-    }
-    else {
-        if (kFTPMode) {   // Upload the notes archive with FTP
-            [myNotes release];
-            [FTPHelper sharedInstance].delegate = self;
-            [FTPHelper sharedInstance].uname = kFTPusername;
-            [FTPHelper sharedInstance].pword = kFTPpassword;
-            
-            NSString *urlString = [NSString stringWithFormat: @"ftp://%@", kFTPserver];
-            
-            NSLog (@"Saving file %@ to %@", archivePath, urlString);
-            [FTPHelper sharedInstance].urlString = urlString;
-
-            [FTPHelper upload: archivePath];
-            NSLog2 (@"upload returned...in process");
-        } else if (kBonjourMode) { // Upload the notes with HTTP
-            [myNotes release];
-            NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, [archivePath lastPathComponent]]];
-            NSLog(@"Uploading note to server at: %@", [url absoluteString]);
-            NSData *postData = [NSData dataWithContentsOfFile:archivePath];
-            NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
-            NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-            [request setURL:url];
-            [request setHTTPMethod:@"POST"];
-            [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
-            [request setValue:@"application/x-gzip" forHTTPHeaderField:@"Content-Type"];
-            [request setHTTPBody:postData];
-            [NSURLConnection connectionWithRequest:request delegate:self];
-            [request release];
-        }
+    } else if (kBonjourMode) { // Upload the notes with HTTP
+        [myNotes release];
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, [archivePath lastPathComponent]]];
+        NSLog(@"Uploading note to server at: %@", [url absoluteString]);
+        NSData *postData = [NSData dataWithContentsOfFile:archivePath];
+        NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+        [request setURL:url];
+        [request setHTTPMethod:@"POST"];
+        [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+        [request setValue:@"application/x-gzip" forHTTPHeaderField:@"Content-Type"];
+        [request setHTTPBody:postData];
+        [NSURLConnection connectionWithRequest:request delegate:self];
+        [request release];
     }
 }
 
-#pragma mark -
-#pragma mark FTP Callbacks
-
-- (void) dataUploadFinished: (NSNumber *) bytes;
-{
-	NSLog (@"Uploaded %@ bytes", bytes);
-    [self uploadActivityIndicator: NO];
-}
-
-- (void) dataUploadFailed: (NSString *) reason
-{
-	NSLog (@"Upload Failed: %@", reason);
-    [UIAlertView doAlert: @"File Server" 
-                 withMsg: [NSString stringWithFormat: @"File upload failed.  Reason: %@", reason]];
-    [self uploadActivityIndicator: NO];
-}
-
-
-- (void) downloadFinished
-{
-    NSFileManager *fm = [NSFileManager defaultManager];
-    
-    if (download == kTimecode) { // FIXME ugh defuncted
-        // We've downloaded the timecode (.tc) file.  Let's just read it in and parse it
-        
-        startTimecode = 0.0;
-        
-        NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *docDir = [dirList objectAtIndex: 0];
-        
-        NSString *fileName = [NSString stringWithFormat: @"%@.tc", [clip stringByDeletingPathExtension]];
-        fileName = [docDir stringByAppendingPathComponent: fileName];
-        
-        NSString *data = [NSString stringWithContentsOfFile: fileName encoding: NSASCIIStringEncoding error: NULL];
-        
-        if (data) {
-            startTimecode = [self convertTimeToSecs: data];
-            NSLog (@"Read starting timecode from file: %@ (%lg)", data, startTimecode);
-            if (startTimecode == NAN)
-                startTimecode = 0;
-
-            durationSet = NO;
-            maxLabelSet = NO;
-            [self updateTimeControl];
-            [self updateTimeLabel];
-        }        
-        
-        // Try to download the avid locator file next
-        
-        if ([txtPaths count]) {
-            download = kAvidTXT;
-            
-            [self getAvid: [txtPaths objectAtIndex: 0]];
-        }
-        
-        // XML file access is done via http: so we can start that now
-        
-        if ([xmlPaths count]) 
-            [self getXML: [xmlPaths objectAtIndex: 0]];
-        
-        return;
-    }
-    else if (download == kAvidTXT) {
-        // Avid import support is done through ftp download--so it's done
-
-        self.markers = [self parseAvidMarkers];
-        download  = kNotes;
-
-        return;
-    }
-    
-    // Download notes files now
-    
-    NSString *path = [self archiveFilePath];
-    
-	NSLog (@"File stored to %@", path);
-
-    NSArray *noteArray = nil;
-    
-    if ([fm fileExistsAtPath: path]) {
-        // This can throw an exception, so let's catch it if it does
-        
-        @try  {
-            noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: path];
-        }
-        @catch (NSException *exception) {
-            NSLog (@"unarchiving failed!");
-            goto Next;
-        }
-        
-        [fm removeItemAtPath: path error: NULL];
-            
-        for (Note *theNote in noteArray) {
-            Float64 now = [self convertTimeToSecs: theNote.timeStamp];
-            int row = 0;
-            
-            for (Note *aNote in noteData) {
-                if ([self convertTimeToSecs: aNote.timeStamp] > now)
-                    break;
-                ++row;
-            }
-            
-            // Insert the note into the array and table
-            
-            [noteData insertObject: theNote atIndex: row];
-        }
-        
-        NSLog (@"Restored %i notes", [noteData count]);
-        [notes reloadData];
-    }  
-    
-    // kick off the next download now
-    
-Next:
-    ++noteFileProcessed;
-    if (noteFileProcessed >= [notePaths count]) {
-        if (!stillShows){
-            NSLog(@"?????????????????????????????????????????????");
-            [self setStartTimecode]; 
-        }
-        [self noteStopActivity];
-
-        return;
-    }
-    else
-        [self loadData: [notePaths objectAtIndex: noteFileProcessed]];
-}
 
 -(void) clearAnyNotes
 {
     [noteData removeAllObjects];
     [self.notes setEditing: NO];
     [notes reloadData];
-}
-
-// 
-// FTP download failed
-//
-
-- (void) dataDownloadFailed: (NSString *) reason
-{
-	NSLog (@"Download failed... %@", reason);
-    
-    if (download == kTimecode) {
-        if ([xmlPaths count]) 
-            [self getXML: [xmlPaths objectAtIndex: 0]];
-        
-        if ([txtPaths count])  {
-            download = kAvidTXT;
-            [self getAvid: [txtPaths objectAtIndex: 0]];
-        }
-    }
 }
 
 
@@ -2752,35 +2388,10 @@ Next:
     }
 
     
-    
-    [FTPHelper sharedInstance].delegate = self;
-    [FTPHelper sharedInstance].uname = kFTPusername;
-    [FTPHelper sharedInstance].pword = kFTPpassword;    
-    NSString *home = homeDir;
-    
-    
-    NSString *urlString = [NSString stringWithFormat: @"ftp://%@%@", kFTPserver, home ];
-    
-    NSLog (@"Trying to download file from %@",  urlString);
-    [FTPHelper sharedInstance].urlString = urlString;
-    
-    [FTPHelper download: [NSString stringWithFormat: @"Notes/%@", file] to: [self txtFilePath]];
+    // [FTPHelper download: [NSString stringWithFormat: @"Notes/%@", file] to: [self txtFilePath]];
     NSLog (@"Avid txt download returned...in process");  
 }
 
-
-#pragma mark -
-#pragma mark misc
-
-- (void) credentialsMissing
-{
-	NSLog (@"Please supply both user name and password for ftp");
-}
-
-- (void) progressAtPercent: (NSNumber *) aPercent;
-{
-	// printf("%0.2f\n", aPercent.floatValue);
-}
 
 #pragma mark -
 #pragma mark PDF, email and printing
@@ -2904,6 +2515,8 @@ Next:
     [picker release];
 }
 
+
+// FIXME needs to be refactored, see ticket #13
 -(IBAction) emailNotes
 {
     if (! [self canEmail]) return;
@@ -2996,8 +2609,8 @@ Next:
         
         NSString *saveFileName = [NSString stringWithFormat: @"%@_%lu.html", initials, (long) [NSDate timeIntervalSinceReferenceDate]];
         
-        NSString *fileName = [NSString stringWithFormat: @"%@/%@/Notes/%@", 
-                 kHTTPserver, userDir, saveFileName]; 
+//        NSString *fileName = [NSString stringWithFormat: @"%@/%@/Notes/%@", 
+//                 kHTTPserver, userDir, saveFileName]; 
         
         emailBody =  [NSString stringWithFormat: 
                        @"<html>Sent from VideoTree (v%@.%@), \u00A9 2010-2011 by DFT Software<br><p>",                         
@@ -3006,16 +2619,19 @@ Next:
 
         // Upload the HTML file to the server (as long as we use ftp and http from the same place)
         // And place a hyperlink in the emailed HTML
-        
-        if (kFTPMode && kSameServerAddress) 
-            emailBody = [emailBody stringByAppendingString: 
-                [NSString stringWithFormat: @"<a href=\"%@\">Click here to view this page in your browser.</a><p>%@</p>", fileName, theTitle]];
 
-        emailBody = [emailBody stringByAppendingString: [self saveToHTML]];
-        [picker setMessageBody:emailBody isHTML:YES];
         
-        if (kFTPMode && kSameServerAddress) 
-            [self uploadHTML: emailBody file: saveFileName];
+        // FIXME Refactor this to work with the new scribbeo server
+        NSLog(@"emailNotes not yet implemented for new server");
+//        if (kFTPMode && kSameServerAddress) 
+//            emailBody = [emailBody stringByAppendingString: 
+//                [NSString stringWithFormat: @"<a href=\"%@\">Click here to view this page in your browser.</a><p>%@</p>", fileName, theTitle]];
+//
+//        emailBody = [emailBody stringByAppendingString: [self saveToHTML]];
+//        [picker setMessageBody:emailBody isHTML:YES];
+//        
+//        if (kFTPMode && kSameServerAddress) 
+//            [self uploadHTML: emailBody file: saveFileName];
     }
 	
 	[self presentModalViewController: picker animated:YES];
@@ -3119,7 +2735,7 @@ Next:
 }
 
 // Convert a single note into HTML
-                      
+// FIXME to work with new server, see issue #13                      
 -(NSString *) noteToHTML: (Note *) theNote {
     NSMutableString *emailBody = [NSMutableString string];
     
@@ -3131,8 +2747,8 @@ Next:
     
     NSString *comment = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
     
-    if (kFTPMode && kSameServerAddress) 
-        comment = [comment stringByReplacingOccurrencesOfString: @"<<<Audio Note>>>" withString: @""];
+//    if (kFTPMode && kSameServerAddress) 
+//        comment = [comment stringByReplacingOccurrencesOfString: @"<<<Audio Note>>>" withString: @""];
     
     comment = [[comment stringByReplacingOccurrencesOfString:  @"<" withString: @"&lt;"] stringByReplacingOccurrencesOfString: @">" withString: @"&gt;"];
     
@@ -3155,7 +2771,7 @@ Next:
  
     // audio -- upload to server and embed in HTML
     
-    if (theNote.voiceMemo && kFTPMode && kSameServerAddress) {
+    if (theNote.voiceMemo && kBonjourMode) {
         NSString *addr = [self uploadAudio: theNote];
         
         [emailBody appendString: [NSString stringWithFormat: @"<br><br><br><center><object type=\"audio/mpeg\" data=\"%@\"\
@@ -3306,7 +2922,7 @@ Next:
 //
 // Uploads the full HTML Notes to the server
 //
-
+// FIXME refactor see ticket #13
 -(void) uploadHTML: (NSString *) theHTML file: (NSString *) fileName
 {
     // Save the audio file and upload to the server
@@ -3318,22 +2934,22 @@ Next:
     if (! [theHTML writeToFile: HTMLPath atomically: NO encoding: NSUTF8StringEncoding error: NULL]) 
         NSLog (@"Save of HTML file failed!");
     
-    [FTPHelper sharedInstance].delegate = self;
-    [FTPHelper sharedInstance].uname = kFTPusername;
-    [FTPHelper sharedInstance].pword = kFTPpassword;    
-    NSString *urlString = [NSString stringWithFormat: @"ftp://%@", kFTPserver];
-    
-    NSLog (@"Saving file %@ to %@", HTMLPath, urlString);
-    [FTPHelper sharedInstance].urlString = urlString;
-    
-    [FTPHelper upload: HTMLPath];
+//    [FTPHelper sharedInstance].delegate = self;
+//    [FTPHelper sharedInstance].uname = kFTPusername;
+//    [FTPHelper sharedInstance].pword = kFTPpassword;    
+//    NSString *urlString = [NSString stringWithFormat: @"ftp://%@", kFTPserver];
+//    
+//    NSLog (@"Saving file %@ to %@", HTMLPath, urlString);
+//    [FTPHelper sharedInstance].urlString = urlString;
+//    
+//    [FTPHelper upload: HTMLPath];
     NSLog2 (@"upload returned...in process");
 }
 
 //
 // Upolaoads an audio note to the server as an aac file for playback from the HTML or PDF notes
 //
-
+// FIXME refactor see ticket #13
 -(NSString *) uploadAudio: (Note *) aNote
 {
     // Save the audio file and upload to the server
@@ -3351,19 +2967,20 @@ Next:
     if (! [aNote.voiceMemo writeToFile: audioPath atomically: NO]) 
         NSLog (@"Save of audio file failed!");
     
-    [FTPHelper sharedInstance].delegate = self;
-    [FTPHelper sharedInstance].uname = kFTPusername;
-    [FTPHelper sharedInstance].pword = kFTPpassword;    
-    NSString *urlString = [NSString stringWithFormat: @"ftp://%@", kFTPserver];
-    
-    NSLog (@"Saving file %@ to %@", audioPath, urlString);
-    [FTPHelper sharedInstance].urlString = urlString;
-    
-    [FTPHelper upload: audioPath];
-    NSLog2 (@"upload returned...in process");
-    
-    return [NSString stringWithFormat: @"%@/%@/Notes/audio/%@", 
-            kHTTPserver, userDir, fileName]; 
+//    [FTPHelper sharedInstance].delegate = self;
+//    [FTPHelper sharedInstance].uname = kFTPusername;
+//    [FTPHelper sharedInstance].pword = kFTPpassword;    
+//    NSString *urlString = [NSString stringWithFormat: @"ftp://%@", kFTPserver];
+//    
+//    NSLog (@"Saving file %@ to %@", audioPath, urlString);
+//    [FTPHelper sharedInstance].urlString = urlString;
+//    
+//    [FTPHelper upload: audioPath];
+//    NSLog2 (@"upload returned...in process");
+//    
+//    return [NSString stringWithFormat: @"%@/%@/Notes/audio/%@", 
+//            kHTTPserver, userDir, fileName]; 
+    return @""; // temporary
 }
 
 //
@@ -3421,7 +3038,7 @@ Next:
     
     // If there's an audio note, upload the note and insert the hyperlink....but note if we're printing!
     
-    if (aNote.voiceMemo && kFTPMode && !isPrinting) {
+    if (aNote.voiceMemo && kBonjourMode && !isPrinting) {
         NSURL *addr = [NSURL URLWithString: [self uploadAudio: aNote]];
                        
         CGPDFContextSetURLForRect (pdfContext, (CFURLRef) addr, CGRectMake (330, currentY - 140, 100.0, 20.0));
@@ -3677,7 +3294,7 @@ static int saveRate;
         // solution was to create a separate .tc file
         //
         
-        if ((! kFTPMode) && (! kBonjourMode)) { // Only local mode can do this since we're using AVAssetReader
+        if (! kBonjourMode) { // Only local mode can do this since we're using AVAssetReader
             NSLog (@"trying to read start time code");
             startTimecode = [self getStartTimecode]; // AVAssetReader, local only
         }
@@ -4004,7 +3621,6 @@ static int saveRate;
     theTime.text = [self timeFormat: kCMTimeZero];
     maxLabelSet = NO;  
     startTimecode = 0.0;
-    reTryCount = 0;
     maxLabel.text = [self timeFormat: kCMTimeZero];
     minLabel.text = [self timeFormat: kCMTimeZero];
 }
@@ -4096,11 +3712,7 @@ static int saveRate;
     NSLog(@"loadMovie sees self.clip as %@", self.clip);
     [self showActivity];        // Get the spinner going while we load the movie
 
-    // Load the notes table
-    // Yes, each mode has its own way of loading notes
-    if (kFTPMode) 
-        [self getAllFTPNotes];
-    else if (kBonjourMode) {
+    if (kBonjourMode) {
         [self getAllHTTPNotes];
     } else { 
         if (!allStills)

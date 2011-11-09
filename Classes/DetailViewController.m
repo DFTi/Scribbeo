@@ -15,8 +15,6 @@
 @synthesize currentPath, files, fileTypes, assetURLs, timeCodes;
 @synthesize progressView, activityIndicator;
 
-static int retryCount;      // We don't give up on FTP failures that easily
-
 #pragma mark -
 #pragma mark View Loading
 
@@ -104,7 +102,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
 -(void) makeList
 {
     NSLog(@"Create the clip list for the table");
-    if ((!kFTPMode) && (!kBonjourMode)) {
+    if (!kBonjourMode) {
         UIBarButtonItem *cRollButton = 
         [[[UIBarButtonItem alloc] initWithImage: 
                     [UIImage imageNamed: @"cameraRoll.png"]
@@ -138,7 +136,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
         [timeCodes removeAllObjects];
     }
     
-    if (kFTPMode || kBonjourMode)
+    if (kBonjourMode)
         self.title = @"Files";          // No title in local mode needed
     
     [self.tableView reloadData];        // Refresh the table
@@ -150,7 +148,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
     // If running in local mode, populate the clip table
     // with local video files
     
-    if (!(kFTPMode || kBonjourMode)) {
+    if (!kBonjourMode) {
         [self iTunesLoad];
         return;
     }
@@ -159,26 +157,13 @@ static int retryCount;      // We don't give up on FTP failures that easily
     
     if (! currentPath ) {
         self.title = @"Files";
-        if (!kBonjourMode)
-            self.currentPath = homeDir;
-        else
-            self.currentPath = @"/list"; // this is root in the py server
+        self.currentPath = @"/list"; // this is root in the py server
     }
     
     [self showActivity];
     
    
-    if (kFTPMode) {
-        // Initiate an ftp list request to get a directory listing
-        NSLog(@"Making list for FTPMode");
-        [FTPHelper sharedInstance].delegate = self;
-        [FTPHelper sharedInstance].uname = kFTPusername;
-        [FTPHelper sharedInstance].pword = kFTPpassword;
-      
-        NSLog2 (@"list %@",  [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, currentPath]);
-        
-        [FTPHelper list: [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, currentPath]];
-    } else if (kBonjourMode && ([kAppDel HTTPserver] != nil)) {
+    if (kBonjourMode && ([kAppDel HTTPserver] != nil)) {
         // Send a list request to our HTTPServer
         NSString *urlstr = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], currentPath];
         NSLog(@"Making list for BonjourMode. Querying: %@", urlstr);
@@ -261,73 +246,6 @@ static int retryCount;      // We don't give up on FTP failures that easily
     [self.tableView reloadData];
 
 }
-
-//
-// ftp callback says our listing is done
-// Let's look at each file and decide if its goes into the clip table or gets
-// skipped.  Valid entries are movie files or directories (excep special ones like Notes)
-//
-
-- (void) receivedListing: (NSArray *) listing
-{
-    NSLog (@"receivedListing");
-    
-    allStills = YES;
-    
-	for (NSDictionary *dict in listing) {
-        NSString *fileName = [FTPHelper textForDirectoryListing:(CFDictionaryRef) dict];
-        
-        int cfType = [(NSNumber *) CFDictionaryGetValue((CFDictionaryRef) dict, kCFFTPResourceType) intValue];
-        
-        NSLog2 (@"Ftp file: %@ (%i)", fileName, cfType);
-        
-        NSString *extension = [fileName pathExtension];
-        
-        
-        if (cfType != kDirectory && kIsMovie (extension))
-            allStills = NO;
-        
-        if ( cfType != kDirectory && !(kIsMovie (extension) || kIsStill (extension)) )
-            continue;
-        
-        if ( cfType == kDirectory && ([fileName isEqualToString: @"Notes"]
-                        || [fileName isEqualToString: @"Library"]))
-            continue;
-        
-        [files addObject: fileName];
-        [fileTypes addObject: [NSNumber numberWithInt: cfType]];
-        [self.tableView reloadData];
-    }
-    
-    [self finishLoad];
-}
-
-//
-// ftp listing failed.  We will retry!
-//
-
-- (void) listingFailed
-{
-	NSLog (@"Listing failed.");
-    
-    // retry -- seems to be a problem when awakening the App
-    
-    if (retryCount < 3) {
-        [self stopActivity];
-        ++retryCount;
-        NSLog (@"retry #%i listing", retryCount);
-        [self showActivity];
-        [FTPHelper list: [NSString stringWithFormat: @"ftp://%@:%@@%@%@/", kFTPusername, kFTPpassword, kFTPserver, homeDir]];
-    }
-    else {
-        [UIAlertView doAlert: @"Network error" withMsg: 
-          @"Couldn't connect to the server.  Check your network and server settings"];
-        [self stopActivity];
-
-        retryCount = 0;
-    }
-}
-
 
 #pragma mark -
 #pragma mark iTunes Loading
@@ -536,7 +454,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
         cell.textLabel.adjustsFontSizeToFitWidth = YES;
         cell.textLabel.numberOfLines = 2;
         
-        if (! kFTPMode)  // We only allow clip deletion when in local mode
+        if (! kBonjourMode)  // We only allow clip deletion when in local mode
             cell.editingAccessoryType = UITableViewCellEditingStyleDelete;
 
         if (!iPHONE) {
@@ -636,14 +554,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
            
 -(void) setTheMoviePath: (NSString *) theMovie
 {
-    if ( kFTPMode ) {
-        // self.moviePath = [NSString stringWithFormat: @"https://documations.net/VideoTree/%@", fileName];
-        self.moviePath = [NSString stringWithFormat: @"%@%@%@", kHTTPserver, userDir, theMovie];
-        
-        self.moviePath = [[self.moviePath stringByReplacingOccurrencesOfString:@"/Sites/" withString: @"/"]
-                       stringByReplacingOccurrencesOfString:@" " withString: @"%20"];
-        NSLog (@"moviePath = %@", moviePath);
-    } else if (kBonjourMode) {
+    if (kBonjourMode) {
         self.moviePath = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], theMovie];
     } else {
         NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -654,7 +565,7 @@ static int retryCount;      // We don't give up on FTP failures that easily
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return (kFTPMode) ? NO : YES;
+    return (kBonjourMode) ? NO : YES;
 }
 
 // 

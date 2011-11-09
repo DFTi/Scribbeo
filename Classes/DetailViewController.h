@@ -11,7 +11,6 @@
 
 #import <UIKit/UIKit.h>
 #import "myDefs.h"
-#import "FTPHelper.h"
 #import "JSONKit.h"
 
 @interface DetailViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource, UIPopoverControllerDelegate, UINavigationControllerDelegate,

@@ -13,21 +13,17 @@
 
 int gIOSMajorVersion;
 
-#define FTPLOAD
-
 // #define RELEASEMEM
 
-#import "FTPHelper.h"
 #define kFileDelimiterString   @"_"
 
 @implementation VideoTreeAppDelegate
 
 @synthesize window, demoView;
 @synthesize tvc, nc, clipList, rootTvc;
-@synthesize FTPMode, FTPusername, FTPpassword, FTPserver, iPhone, viewController, BonjourMode;
-@synthesize serverBrowser, server, bonjour, FTPHomeDir, theURL, theExtension, HTTPserver, serverBase, outputFilename;
+@synthesize iPhone, viewController, BonjourMode;
+@synthesize serverBrowser, server, bonjour, theURL, theExtension, HTTPserver, serverBase, outputFilename;
 
-static int retryCount = 0;
 static int tryOne = 0;
 
 
@@ -84,9 +80,7 @@ static int tryOne = 0;
     // Force the server into local mode; as we don't want to deal with
     // where to store the notes or where to play the clips from
     
-    [defaults setBool: NO forKey: @"FTPMode"];
     [defaults setBool: NO forKey: @"BonjourMode"];
-    FTPMode = NO;
     BonjourMode = NO;
     
     [defaults synchronize];
@@ -330,7 +324,7 @@ static int tryOne = 0;
 #pragma mark settings
 
 // When we receive the IP address from the Bonjour server, it will be stored
-// in the FTPHomeDir variable.  We're observing that variable so we are alerted
+// in the HTTPServer variable.  We're observing that variable so we are alerted
 // when it changes
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -346,12 +340,7 @@ static int tryOne = 0;
         return;
     
     [self removeObserver: self forKeyPath: @"HTTPserver"];
-    
-//    if (tryOne || [rootTvc.activityIndicator isAnimating])
-//        return;
-//    else
-//        tryOne = 1;
-        
+           
     if (! iPhone) {
         NSLog(@"Now we need to make the list of files");
         [rootTvc makeList];
@@ -366,8 +355,6 @@ static int tryOne = 0;
 {
     static int once;
     
-    FTPMode = NO;
-
     if (once)
         return;
     else
@@ -377,23 +364,7 @@ static int tryOne = 0;
     
     if (! BonjourMode )
         return;
-    
-/*  No FTP! No username/pass necessary for internal LAN operation.
- 
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    self.FTPusername = [defaults objectForKey: @"BonjourUsername"];
-    
-    if (!FTPusername || [FTPusername isEqualToString: @""])
-        FTPusername = @""; // kFTPusername;
-    
-    // Get Bonjour server password
-    
-    self.FTPpassword = [defaults objectForKey: @"BonjourPassword"];
-    
-    if (!FTPpassword || [FTPpassword isEqualToString: @""])
-        FTPpassword = @"";  
-*/
-    
+  
     tryOne = 0;
         
     // restart server browser if already running
@@ -409,8 +380,7 @@ static int tryOne = 0;
     
     [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
     
-    NSLog (@"**** UDID is %@, Bonjour user is %@, password is [hidden], http server is %@", 
-           [[UIDevice currentDevice] uniqueIdentifier], FTPusername, kHTTPserver);
+    NSLog (@"**** UDID is %@", [[UIDevice currentDevice] uniqueIdentifier]);
 }
 
 // This method looks at the user defaults and sets up various parameters
@@ -420,86 +390,24 @@ static int tryOne = 0;
     static int count = 1;
     NSLog (@"makeSettings: %i", count++);
     
-    // See if we're using FTP
-    
+    // Load the user settings
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    FTPMode = [defaults boolForKey: @"FTPMode"];
-    
-    if (!FTPMode)
-        FTPMode = NO;
-    
+   
     // Bonjour support
     
     BonjourMode = [defaults boolForKey: @"Bonjour"];
     
     if (!BonjourMode) 
         BonjourMode = NO;
-    
-    // Can't have both FTP and Bonjour Server mode on
-    
-    if (FTPMode && BonjourMode) {
-        [UIAlertView doAlert:  @"Warning" 
-            withMsg: @"Turn on either FTP or Bonjour Server Mode--defaulting to FTP Server Mode"];
-        
-        BonjourMode = NO;
-    }
-    
+
     // show finger presses (good for demos)
     
     demoView = [defaults boolForKey: @"showPresses"]; 
 
-    if (FTPMode) {
-        self.FTPHomeDir = @"";
-        
-        // Get FTP server address 
-        
-        self.FTPserver = [defaults objectForKey: @"server"];
-    
-        if (!FTPserver || [FTPserver isEqualToString: @""])
-            FTPserver = @""; // kFTPserver;
-
-        // Get FTP user name
-        
-        self.FTPusername = [defaults objectForKey: @"username"];
-        
-        if (!FTPusername || [FTPusername isEqualToString: @""])
-            FTPusername = @""; // kFTPusername;
-        
-        // Get FTP password
-        
-        self.FTPpassword = [defaults objectForKey: @"password"];
-        
-        if (!FTPpassword || [FTPpassword isEqualToString: @""])
-            FTPpassword = @""; 
-        
-        // Get HTTP server address (okay to be nil)
-        
-        self.HTTPserver = [defaults objectForKey: @"HTTPserver"];
-        
-        if (!HTTPserver || [HTTPserver isEqualToString: @""]) {
-            self.HTTPserver = [@"http://" stringByAppendingString: FTPserver]; 
-            serverBase = kFTPserver;
-        }
-        else {
-            NSRange  theRange;
-            
-            theRange = [HTTPserver rangeOfString: @"https:"];
-            
-            if (theRange.location == NSNotFound) 
-                self.serverBase = [HTTPserver substringFromIndex: 8];
-            else
-                self.serverBase = [HTTPserver substringFromIndex: 7];
-        }
-        
-                
-        NSLog (@"**** UDID is %@, FTP server is %@, FTP user is %@, password is [hidden], HTTP server is %@ (base is %@)", [[UIDevice currentDevice] uniqueIdentifier], 
-               FTPserver, FTPusername, HTTPserver, serverBase);
-
-    }
-    else if (BonjourMode) 
-        [self doBonjour];
-    else
+    if (BonjourMode) {
+        [self doBonjour]; // Initiate the search for our py http server using bonjour
+        NSLog(@"Running in Bonjour Mode");
+    } else
         NSLog (@"Running in iTunes Document sharing mode");
 }
 
@@ -576,7 +484,6 @@ static int tryOne = 0;
      */
     
     NSLog (@"app did become active");
-    retryCount = 0;
     
     [[NSUserDefaults standardUserDefaults] synchronize];
     [viewController uploadActivityIndicator: NO];
@@ -608,7 +515,7 @@ static int tryOne = 0;
     // We're either loading clips locally or over the network 
     // (but not via Bonjour)  Load the clip table (if we're not in the process of loading it)
     
-    if (!kFTPMode) {
+    if (!kBonjourMode) {
         if (!iPHONE) {
             if (! [rootTvc.activityIndicator isAnimating]) {
                 [rootTvc makeList];
@@ -663,14 +570,6 @@ static int tryOne = 0;
 
 }
 #endif
-
-#pragma mark Missing Credentials
-
-- (void) credentialsMissing
-{
-	NSLog (@"Please supply both user name and password before using FTP Helper");
-}
-
 
 - (void)dealloc {
     [viewController release];

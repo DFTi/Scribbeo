@@ -34,28 +34,12 @@ extern int gIOSMajorVersion;
 #define kHTTPserver  ([kAppDel HTTPserver])
 #define kVideoTreeWebsite @"http://www.digitalfilmtree.com"
 
-// FTP stuff
 
-#define kFTPMode ([kAppDel FTPMode])
 #define kBonjourMode ([kAppDel BonjourMode])
-#define kFTPusername ([kAppDel FTPusername])
-#define kFTPpassword ([kAppDel FTPpassword])
-#define kFTPserver ([kAppDel FTPserver])
-#define kSameServerAddress ([kFTPserver isEqualToString: [kAppDel serverBase]])
 
 // #define Turner  ////////////////////////////////
 // #define kOSXServer
 
-#define homeDir ([kAppDel FTPHomeDir])
-
-#ifdef Turner   // Special code for Turner to support their name mapping
-    #define userDir  ([kAppDel BonjourMode] \
-    ? [NSString stringWithFormat: @"~%@", [kAppDel FTPusername]] : @"")
-#else
-    #define userDir  ([kAppDel BonjourMode] \
-          ? [NSString stringWithFormat: @"/~%@", [kAppDel FTPusername]] \
-          : [NSString stringWithFormat: @"/%@", [kAppDel FTPusername]] )
-#endif
 
 #ifdef DEBUG
 #define kMakeLogFile        // Only make log files for our own use (not the app store version)

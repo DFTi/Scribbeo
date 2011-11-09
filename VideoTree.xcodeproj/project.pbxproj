@@ -25,7 +25,6 @@
 		02A3066413C686D300E7340D /* Clip.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305F513C686D300E7340D /* Clip.m */; };
 		02A3066513C686D300E7340D /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305F713C686D300E7340D /* DetailViewController.m */; };
 		02A3066613C686D300E7340D /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305F913C686D300E7340D /* DrawView.m */; };
-		02A3066713C686D300E7340D /* FTPHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305FB13C686D300E7340D /* FTPHelper.m */; };
 		02A3066813C686D300E7340D /* FullScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305FD13C686D300E7340D /* FullScreen.m */; };
 		02A3066913C686D300E7340D /* HelpScreenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 02A305FF13C686D300E7340D /* HelpScreenController.m */; };
 		02A3066A13C686D300E7340D /* HelpScreenController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 02A3060013C686D300E7340D /* HelpScreenController.xib */; };
@@ -127,8 +126,6 @@
 		02A305F713C686D300E7340D /* DetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
 		02A305F813C686D300E7340D /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
 		02A305F913C686D300E7340D /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
-		02A305FA13C686D300E7340D /* FTPHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FTPHelper.h; sourceTree = "<group>"; };
-		02A305FB13C686D300E7340D /* FTPHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FTPHelper.m; sourceTree = "<group>"; };
 		02A305FC13C686D300E7340D /* FullScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FullScreen.h; sourceTree = "<group>"; };
 		02A305FD13C686D300E7340D /* FullScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FullScreen.m; sourceTree = "<group>"; };
 		02A305FE13C686D300E7340D /* HelpScreenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelpScreenController.h; sourceTree = "<group>"; };
@@ -287,7 +284,6 @@
 				BCE5C486145B617A003A0238 /* JSON */,
 				02FA173F13FD9F6F00E25826 /* Old code */,
 				02A3065513C686D300E7340D /* VideoTree_Prefix.pch */,
-				02A306CB13C6883E00E7340D /* FTP */,
 				02A306CA13C6882300E7340D /* Bonjour */,
 				02A305F013C686D300E7340D /* base64.c */,
 				02A305F813C686D300E7340D /* DrawView.h */,
@@ -344,15 +340,6 @@
 				02A305F313C686D300E7340D /* BonjourConnectionDelegate.h */,
 			);
 			name = Bonjour;
-			sourceTree = "<group>";
-		};
-		02A306CB13C6883E00E7340D /* FTP */ = {
-			isa = PBXGroup;
-			children = (
-				02A305FA13C686D300E7340D /* FTPHelper.h */,
-				02A305FB13C686D300E7340D /* FTPHelper.m */,
-			);
-			name = FTP;
 			sourceTree = "<group>";
 		};
 		02A306CC13C6886100E7340D /* Resources */ = {
@@ -572,7 +559,6 @@
 				02A3066413C686D300E7340D /* Clip.m in Sources */,
 				02A3066513C686D300E7340D /* DetailViewController.m in Sources */,
 				02A3066613C686D300E7340D /* DrawView.m in Sources */,
-				02A3066713C686D300E7340D /* FTPHelper.m in Sources */,
 				02A3066813C686D300E7340D /* FullScreen.m in Sources */,
 				02A3066913C686D300E7340D /* HelpScreenController.m in Sources */,
 				02A3066C13C686D300E7340D /* myDefs.m in Sources */,
