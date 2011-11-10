@@ -64,7 +64,6 @@
 		02A3069213C686D300E7340D /* fullscreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3063B13C686D300E7340D /* fullscreen.png */; };
 		02A3069513C686D300E7340D /* fcpXML.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3063E13C686D300E7340D /* fcpXML.png */; };
 		02A3069613C686D300E7340D /* cameraRoll.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3063F13C686D300E7340D /* cameraRoll.png */; };
-		02A3069713C686D300E7340D /* note.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3064013C686D300E7340D /* note.png */; };
 		02A3069813C686D300E7340D /* bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3064113C686D300E7340D /* bg.png */; };
 		02A3069913C686D300E7340D /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3064213C686D300E7340D /* Default.png */; };
 		02A3069A13C686D300E7340D /* mic.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3064313C686D300E7340D /* mic.png */; };
@@ -98,6 +97,7 @@
 		02E8388C141AABF3001B6CA5 /* rotate.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E8388B141AABF3001B6CA5 /* rotate.png */; };
 		BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = BCCDB3B61468C8FC008D41B2 /* JSONKit.m */; };
 		BCCDB3C2146BE3B7008D41B2 /* Disconnected.png in Resources */ = {isa = PBXBuildFile; fileRef = BCCDB3C1146BE3B7008D41B2 /* Disconnected.png */; };
+		BCCDB3C4146BFDFB008D41B2 /* note.png in Resources */ = {isa = PBXBuildFile; fileRef = BCCDB3C3146BFDFB008D41B2 /* note.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -181,7 +181,6 @@
 		02A3063B13C686D300E7340D /* fullscreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fullscreen.png; sourceTree = "<group>"; };
 		02A3063E13C686D300E7340D /* fcpXML.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fcpXML.png; sourceTree = "<group>"; };
 		02A3063F13C686D300E7340D /* cameraRoll.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = cameraRoll.png; sourceTree = "<group>"; };
-		02A3064013C686D300E7340D /* note.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = note.png; sourceTree = "<group>"; };
 		02A3064113C686D300E7340D /* bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bg.png; sourceTree = "<group>"; };
 		02A3064213C686D300E7340D /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		02A3064313C686D300E7340D /* mic.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mic.png; sourceTree = "<group>"; };
@@ -218,6 +217,7 @@
 		BCCDB3B51468C8FC008D41B2 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
 		BCCDB3B61468C8FC008D41B2 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
 		BCCDB3C1146BE3B7008D41B2 /* Disconnected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Disconnected.png; sourceTree = "<group>"; };
+		BCCDB3C3146BFDFB008D41B2 /* note.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = note.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -355,6 +355,7 @@
 				02E83885141AA38B001B6CA5 /* camera.png */,
 				02A3061D13C686D300E7340D /* Refresh.png */,
 				02A3062313C686D300E7340D /* spot.png */,
+				BCCDB3C3146BFDFB008D41B2 /* note.png */,
 				02E83887141AA95D001B6CA5 /* movies.png */,
 				02A3062413C686D300E7340D /* airplay.png */,
 				02A3062513C686D300E7340D /* blank.png */,
@@ -366,7 +367,6 @@
 				02A3063313C686D300E7340D /* folder.png */,
 				02A3063E13C686D300E7340D /* fcpXML.png */,
 				02A3063F13C686D300E7340D /* cameraRoll.png */,
-				02A3064013C686D300E7340D /* note.png */,
 				02A3064113C686D300E7340D /* bg.png */,
 				02A3064213C686D300E7340D /* Default.png */,
 				02A3064713C686D300E7340D /* dvd-icon.png */,
@@ -513,7 +513,6 @@
 				02A3069213C686D300E7340D /* fullscreen.png in Resources */,
 				02A3069513C686D300E7340D /* fcpXML.png in Resources */,
 				02A3069613C686D300E7340D /* cameraRoll.png in Resources */,
-				02A3069713C686D300E7340D /* note.png in Resources */,
 				02A3069813C686D300E7340D /* bg.png in Resources */,
 				02A3069913C686D300E7340D /* Default.png in Resources */,
 				02A3069A13C686D300E7340D /* mic.png in Resources */,
@@ -548,6 +547,7 @@
 				02E6571D1433DE52004334C9 /* helpScreen.png in Resources */,
 				02E6571E1433DE52004334C9 /* helpScreeniPhone.png in Resources */,
 				BCCDB3C2146BE3B7008D41B2 /* Disconnected.png in Resources */,
+				BCCDB3C4146BFDFB008D41B2 /* note.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

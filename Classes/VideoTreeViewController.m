@@ -2512,7 +2512,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 }
 
 
-// FIXME needs to be refactored, see ticket #13
+// So previously, when the server was a static install, we were uploading the email HTML to the server so as to provide a link
+// But now the bonjour server can be on some local machine, not static, change ip/port on a whim. We can't create a link for it.
+// So we won't upload it or anything--we need to send the entire note package at once with all relevant info, no links.
 -(IBAction) emailNotes
 {
     if (! [self canEmail]) return;
@@ -2597,37 +2599,13 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         [picker setMessageBody:emailBody isHTML:NO];
     }
     else  {
-        NSString *theTitle = @"";
-        
-        //  NSString *theTitle = [
-        //    [clip stringByReplacingOccurrencesOfString: @"_" withString: @" : "]
-        //    stringByReplacingOccurrencesOfString: @"%20" withString:@" "];
-        
-        NSString *saveFileName = [NSString stringWithFormat: @"%@_%lu.html", initials, (long) [NSDate timeIntervalSinceReferenceDate]];
-        
-//        NSString *fileName = [NSString stringWithFormat: @"%@/%@/Notes/%@", 
-//                 kHTTPserver, userDir, saveFileName]; 
-        
         emailBody =  [NSString stringWithFormat: 
-                       @"<html>Sent from VideoTree (v%@.%@), \u00A9 2010-2011 by DFT Software<br><p>",                         
+                       @"<html>Notes created with Scribbeo™ for %@<br><p>", (iPHONE ? @"iPhone" : @"iPad"),
                 [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],  
                 [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
 
-        // Upload the HTML file to the server (as long as we use ftp and http from the same place)
-        // And place a hyperlink in the emailed HTML
-
-        
-        // FIXME Refactor this to work with the new scribbeo server
-        NSLog(@"emailNotes not yet implemented for new server");
-//        if (kFTPMode && kSameServerAddress) 
-//            emailBody = [emailBody stringByAppendingString: 
-//                [NSString stringWithFormat: @"<a href=\"%@\">Click here to view this page in your browser.</a><p>%@</p>", fileName, theTitle]];
-//
-//        emailBody = [emailBody stringByAppendingString: [self saveToHTML]];
-//        [picker setMessageBody:emailBody isHTML:YES];
-//        
-//        if (kFTPMode && kSameServerAddress) 
-//            [self uploadHTML: emailBody file: saveFileName];
+        emailBody = [emailBody stringByAppendingString: [self saveToHTML]];
+        [picker setMessageBody:emailBody isHTML:YES];
     }
 	
 	[self presentModalViewController: picker animated:YES];
@@ -2709,9 +2687,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     return result;
 }   
 
-// Save the notes in HTML format
-
-                      
+// Save the notes in HTML format                     
 -(NSMutableString *) saveToHTML {
         NSMutableString *emailBody = [NSMutableString string];
         [emailBody appendString: @"<table border=2 cellpadding=10 cellspacing=10>"];
@@ -2724,14 +2700,13 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
             ++noteNumber;
         }
         
-       [emailBody appendString: [NSString stringWithFormat: @"</table><p>Created by VideoTree(TM) %@ App. Copyright (c) 2010-2011 by DFT Software.",
+       [emailBody appendString: [NSString stringWithFormat: @"</table><p>Sent from Scribbeo™ for %@",
             iPHONE ? @"iPhone" : @"iPad"]]; 
         
         return emailBody;
 }
 
 // Convert a single note into HTML
-// FIXME to work with new server, see issue #13                      
 -(NSString *) noteToHTML: (Note *) theNote {
     NSMutableString *emailBody = [NSMutableString string];
     
