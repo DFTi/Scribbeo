@@ -96,43 +96,60 @@ static int tryOne = 0;
     NSLog (@"app did become active");
     
     [[NSUserDefaults standardUserDefaults] synchronize];
+
+    BOOL wasBonjourMode = BonjourMode;
+
+    
+    [self makeSettings]; // Get any new setting changes.
+    
+
     [viewController uploadActivityIndicator: NO];
     
     // NSLog (@"player = %@, moviePath = %@", viewController.player, tvc.moviePath);
     
     // Restart playback as appropriate
     
-    if ([viewController player] && tvc.moviePath) {
-        NSLog (@"setting playback rate to %g", theRate);
-        if (theRate)
-            [viewController playPauseButtonPressed: nil];
-        
-        return;
+    if (wasBonjourMode != BonjourMode) {
+        NSLog(@"Mode was changed, cleaning up");
+        [viewController cleanup];
+    } else {
+        NSLog(@"Mode was not changed");
+        if ([viewController player] && tvc.moviePath) {
+            NSLog (@"going to play where we left off ... setting playback rate to %g", theRate);
+            if (theRate)
+                [viewController playPauseButtonPressed: nil];
+            
+            return;  
+        }
     }
     
-    // We've never selected a clip, let's get the app's settings
-    
-    if (! tvc.currentPath) {
-        NSLog(@"Never selected a clip, get new settings");
-        [self makeSettings];
-        [viewController makeSettings];  
-        if (BonjourMode) {
-            [self doBonjour];            
-        }
-        
+    if (BonjourMode && (!HTTPserver)) {
+        [self doBonjour];
     }
-    
-    // We're either loading clips locally or over the network 
-    // (but not via Bonjour)  Load the clip table (if we're not in the process of loading it)
-    
-    if (!kBonjourMode) {
-        if (!iPHONE) {
-            if (! [rootTvc.activityIndicator isAnimating]) {
-                [rootTvc makeList];
-            }
-        }
-    } else
-        [viewController showNav];
+//    
+//    // We've never selected a clip, let's get the app's settings
+//    
+//    if (! tvc.currentPath) {
+//        NSLog(@"Never selected a clip, get new settings");
+//        [self makeSettings];
+//        [viewController makeSettings];  
+//        if (BonjourMode) {
+//            [self doBonjour];            
+//        }
+//        
+//    }
+//    
+//    // We're either loading clips locally or over the network 
+//    // (but not via Bonjour)  Load the clip table (if we're not in the process of loading it)
+//    
+//    if (!kBonjourMode) { // if local mode on ipad and the activity indicator is animating, then makeList . (huh?)
+//        if (!iPHONE) {
+//            if (! [rootTvc.activityIndicator isAnimating]) {
+//                [rootTvc makeList];
+//            }
+//        }
+//    } else
+    [viewController showNav];
     
     [self releasemem];
 }
@@ -383,6 +400,7 @@ static int tryOne = 0;
     if (serverBrowser.servers.count == 0) {
         NSLog (@"Scribbeo Server disconnected!");
         [rootTvc showActivity];
+        [rootTvc showDisconnected]; // show the disconnected indicator
         return;
     }
     // else...
@@ -401,7 +419,8 @@ static int tryOne = 0;
         [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
         if (! [bonjour connect])  // ~connect updates the HTTPserver address
             NSLog (@"Couldn't reconnect to Scribbeo server");
-        
+        else
+            [rootTvc hideDisconnected]; // Remove the 'disconnected' indicator
     }
 }
 

@@ -35,6 +35,8 @@
 @property (nonatomic, retain)  UIPopoverController      *popoverController;
 @property int     currentClip;
 
+-(void) showDisconnected;
+-(void) hideDisconnected;
 -(void) showActivity;
 -(void) stopActivity;
 -(BOOL) nextClip;

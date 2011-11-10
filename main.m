@@ -2,8 +2,8 @@
 //  main.m
 //  VideoTree
 //
-//  Created by Steve Kochan on 9/10/10.
-//  Copyright 2010 ClassroomM, Inc. All rights reserved.
+//  Steve Kochan & Keyvan Fatehi
+//  Copyright 2011-2012 DigitalFilm Tree. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

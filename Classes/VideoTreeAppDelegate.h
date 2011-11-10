@@ -71,7 +71,7 @@
 
 -(natural_t) freemem; 
 -(void) releasemem;
-
+-(void) doBonjour;
 -(void) makeSettings;
 -(void) copyVideoOrImageIntoApp: (id) from;
 -(void) saveFileNameEntered;

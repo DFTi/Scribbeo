@@ -41,6 +41,27 @@
 }
 
 #pragma mark -
+#pragma mark Connection status indicator
+
+-(void) showDisconnected
+{
+    NSLog(@"Showing the disconnected png");
+    CGSize  theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};  // hard-coded #'s--uggh! :(
+    UIImageView *imgView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Disconnected.png"]];
+    imgView.frame = CGRectMake((theSize.width / 2)-32, (theSize.height / 2)-72, 64, 64);
+    imgView.tag = 75;
+    [[self view] addSubview:imgView];
+    [imgView release];
+}
+
+-(void) hideDisconnected
+{
+    NSLog(@"Hiding the disconnected png");
+    UIView *imgView = [self.view viewWithTag:75];
+    if (imgView)
+        [imgView removeFromSuperview];
+}
+#pragma mark -
 #pragma mark Activity indicator
 
 //
@@ -101,7 +122,7 @@
 
 -(void) makeList
 {
-    NSLog(@"Create the clip list for the table");
+    NSLog(@"DetailView::makeList called");
     if (!kBonjourMode) {
         UIBarButtonItem *cRollButton = 
         [[[UIBarButtonItem alloc] initWithImage: 
@@ -111,8 +132,9 @@
         self.navigationItem.leftBarButtonItem = cRollButton;
     }
     else {
+        self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
-        
+
         if (! iPHONE) {
             UIBarButtonItem *refresh =  [[[UIBarButtonItem alloc] initWithImage: 
           [UIImage imageNamed: @"Refresh.png"]
@@ -136,19 +158,30 @@
         [timeCodes removeAllObjects];
     }
     
-    if (kBonjourMode)
-        self.title = @"Files";          // No title in local mode needed
+    if (kBonjourMode) { 
+        if (currentPath) {
+            NSString *theFolder = [currentPath lastPathComponent];
+            if ([theFolder isEqualToString:@"list"])
+                self.title = @"Files";
+            else
+                self.title = [theFolder stringByReplacingOccurrencesOfString:@"%20" withString:@" "];
+        }
+        else 
+            self.title = @"Files";
+    } else
+        self.title = @""; // No title needed in local mode
     
     [self.tableView reloadData];        // Refresh the table
     
     // Get the current settings
     
-    [kAppDel makeSettings]; // Why is this happening again? 
+    [kAppDel makeSettings];
     
     // If running in local mode, populate the clip table
     // with local video files
     
     if (!kBonjourMode) {
+        NSLog(@"makeList knows we're not in bonjour mode... calling iTunesLoad to serve local files");
         [self iTunesLoad];
         return;
     }
@@ -170,6 +203,10 @@
         NSLog(@"Making list for BonjourMode. Querying: %@", urlstr);
         NSURL *url = [NSURL URLWithString:urlstr];
         NSString *list = [NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:nil];
+        if (!list) {
+            NSLog(@"Could not get data from the URL");
+            return;
+        }
         NSLog(list);
         NSDictionary *fileDict = [list objectFromJSONString];
         // Now we need to populate the files array using our nice JSON list
@@ -202,7 +239,7 @@
     for (NSDictionary *dict in fileList) {
         NSString *fileName = [dict objectForKey:@"name"];
         NSString *fileExt = [dict objectForKey:@"ext"];
-        NSString *assetURL = [[dict objectForKey:@"asset_url"] stringByReplacingOccurrencesOfString:@" " withString:@"%20"]; // URL by which to retreive this asset
+        NSString *assetURL = [dict objectForKey:@"asset_url"]; // URL by which to retreive this asset
         NSString *timeCode = [dict objectForKey:@"timecode"];
         NSLog(@"See a file named: %@", fileName);
         NSLog(@"File was assigned a start timecode of: %@", timeCode);

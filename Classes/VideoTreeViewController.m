@@ -1904,19 +1904,13 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 -(NSString *) archiveFilePath
 {
+    NSLog(@"Getting archive file path... ");
 	NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
 	NSString *docDir = [dirList objectAtIndex: 0];
 
-#if 0
-    NSMutableString *filePath = [clipPath mutableCopy];
-    
-    if ([filePath characterAtIndex: 0] == '/')
-        [filePath deleteCharactersInRange: NSMakeRange (0, 1)];
-#endif
-        
     NSString *fileName = [NSString stringWithFormat: @"%@.%@", 
             [clipPath stringByReplacingOccurrencesOfString: @"/" withString: kNoteDelimiter], initials];
-    
+    NSLog(@"clippath: %@", clipPath);    
     NSLog (@"Archive file name = %@", fileName);
 	return [docDir stringByAppendingPathComponent: fileName];
 }
@@ -1980,7 +1974,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSError *error = nil;
     NSURLResponse *response;
     NSString *archivePath = [self archiveFilePath];
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, [archivePath lastPathComponent]]];
+    NSString *noteNameForURL = [[archivePath lastPathComponent] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, noteNameForURL]];
     NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:60.0];
     NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     if (error != nil)
@@ -1992,7 +1987,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSLog(@"Downloaded the note archive, attempting to restore...");
     NSFileManager *fm = [NSFileManager defaultManager];
     [self noteShowActivity];
-    if ([fm fileExistsAtPath: archivePath] && ([data length] > 50000)) {
+    if ([fm fileExistsAtPath: archivePath]) {
         NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
         [noteData release];
         noteData = [noteArray mutableCopy];
@@ -2124,7 +2119,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         NSLog (@"Save failed");
     } else if (kBonjourMode) { // Upload the notes with HTTP
         [myNotes release];
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, [archivePath lastPathComponent]]];
+        NSString *noteNameForURL = [[archivePath lastPathComponent] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, noteNameForURL]];
         NSLog(@"Uploading note to server at: %@", [url absoluteString]);
         NSData *postData = [NSData dataWithContentsOfFile:archivePath];
         NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
@@ -2538,17 +2534,17 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                     stringByDeletingPathExtension];
     else
         noteName = [NSString stringWithFormat: @"Album %@", [[[clipPath stringByReplacingOccurrencesOfString: @"%20" withString:@" "] stringByDeletingLastPathComponent] lastPathComponent]];
-                    
+         
 	[picker setSubject: [NSString stringWithFormat: @"Notes for %@ %@", noteName,  (FCPXML) ? @"(FCP XML attached)" : @"", 
                          (AvidExport) ? @"(Avid Locator file attached)" : @""]];
     
 	// Set up recipients
     
-//	NSArray *toRecipients = [NSArray arrayWithObject: @"steve_kochan@mac.com"]; 
+	NSArray *toRecipients = [NSArray arrayWithObject: @"keyvan@digitalfilmtree.com"];  // testing
 	NSArray *ccRecipients = [NSArray array];
 	NSArray *bccRecipients = [NSArray array];
 	
-//	[picker setToRecipients: toRecipients];
+	[picker setToRecipients: toRecipients];
 	[picker setCcRecipients: ccRecipients];	   // empty here
 	[picker setBccRecipients: bccRecipients];  // ditto
     
@@ -3627,6 +3623,7 @@ static int saveRate;
 
 -(NSURL *) getTheURL: (NSString *) thePath
 {
+    thePath = [thePath stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
     NSURL  *theURL = (NSURL *) thePath;
     
     // Generate an NSURL object from the argument if it's a string 
