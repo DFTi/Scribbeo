@@ -2,8 +2,8 @@
 //  VideoTreeAppDelegate.m
 //  VideoTree
 //
-//  Created by Steve Kochan on 9/10/10.
-//  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.
+//  Steven Kochan & Keyvan Fatehi
+//  Copyright © 2011-2012 by Digital Film Tree. All rights reserved.
 //
 
 #import "VideoTreeAppDelegate.h"
@@ -61,6 +61,88 @@ static int tryOne = 0;
 
     return YES;
 }
+
+// If we're moving into the background, let's stop video playback; however, let's
+// record where we are so we can resume playback when we become active again
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+    /*
+     Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
+     Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. 
+     Games should use this method to pause the game.
+     */
+    
+    if (viewController.player) {
+        NSLog (@"stopping player");
+        theTime = viewController.player.currentTime;
+        theRate = viewController.player.rate;
+        
+        if (viewController.player.rate)
+            [viewController playPauseButtonPressed: nil];
+    }
+    
+#ifdef kMakeLogFile
+    uploadLogFile ();
+#endif
+    
+    NSLog (@"app will resign active");
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    /*
+     Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+     */
+    
+    NSLog (@"app did become active");
+    
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [viewController uploadActivityIndicator: NO];
+    
+    // NSLog (@"player = %@, moviePath = %@", viewController.player, tvc.moviePath);
+    
+    // Restart playback as appropriate
+    
+    if ([viewController player] && tvc.moviePath) {
+        NSLog (@"setting playback rate to %g", theRate);
+        if (theRate)
+            [viewController playPauseButtonPressed: nil];
+        
+        return;
+    }
+    
+    // We've never selected a clip, let's get the app's settings
+    
+    if (! tvc.currentPath) {
+        NSLog(@"Never selected a clip, get new settings");
+        [self makeSettings];
+        [viewController makeSettings];  
+        if (BonjourMode) {
+            [self doBonjour];            
+        }
+        
+    }
+    
+    // We're either loading clips locally or over the network 
+    // (but not via Bonjour)  Load the clip table (if we're not in the process of loading it)
+    
+    if (!kBonjourMode) {
+        if (!iPHONE) {
+            if (! [rootTvc.activityIndicator isAnimating]) {
+                [rootTvc makeList];
+            }
+        }
+    } else
+        [viewController showNav];
+    
+    [self releasemem];
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+#ifdef kMakeLogFile
+    uploadLogFile ();
+#endif
+}
+
 
 #pragma mark -
 #pragma mark Handle "Open in" and Camera Roll support
@@ -294,29 +376,32 @@ static int tryOne = 0;
 #pragma mark -
 #pragma mark Bonjour
 
-// Part of Bonjour server support; connect to a discovered VideoTree server
-
+// Part of Bonjour server support; connect to a discovered Scribbeo server
 - (void)updateServerList {
+    NSLog(@"updateServerList called");
+    
     if (serverBrowser.servers.count == 0) {
-        NSLog (@"VideoTree Server disconnected!");
-//        [UIAlertView doAlert: @"Network interruption!" withMsg: 
-//         @"The Scribbeo Server can no longer be found on your network!"];
-        // that alert is pretty annoying
+        NSLog (@"Scribbeo Server disconnected!");
+        [rootTvc showActivity];
         return;
     }
-    
+    // else...
     self.server = [serverBrowser.servers objectAtIndex: 0];
-    NSLog (@"Connecting to VideoTree server");
+    NSLog (@"Connecting to Scribbeo server");
     
     if (bonjour)
         self.bonjour = nil;
     
     bonjour = [[BonjourConnection alloc] initWithNetService: server];
+
+    
+    // If it is animating, it is likely we are coming back from a disconnect.
+    if ( [[rootTvc activityIndicator] isAnimating]) {
+        HTTPserver = nil; // Clear our http server, the ip and port may change.
+        [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
+        if (! [bonjour connect])  // ~connect updates the HTTPserver address
+            NSLog (@"Couldn't reconnect to Scribbeo server");
         
-    if (! [bonjour connect]) {
-        [UIAlertView doAlert: @"" 
-                     withMsg: @"Couldn't connect to the VideoTree server!"];
-        NSLog (@"Couldn't connect to VideoTree Bonjour server");
     }
 }
 
@@ -452,86 +537,6 @@ static int tryOne = 0;
     nc.toolbar.translucent = YES;
 }
 
-// If we're moving into the background, let's stop video playback; however, let's
-// record where we are so we can resume playback when we become active again
-
-- (void)applicationWillResignActive:(UIApplication *)application {
-    /*
-     Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-        Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. 
-        Games should use this method to pause the game.
-    */
-    
-    if (viewController.player) {
-        NSLog (@"stopping player");
-        theTime = viewController.player.currentTime;
-        theRate = viewController.player.rate;
-        
-        if (viewController.player.rate)
-            [viewController playPauseButtonPressed: nil];
-    }
-
-#ifdef kMakeLogFile
-    uploadLogFile ();
-#endif
-    
-    NSLog (@"app will resign active");
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    /*
-     Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-     */
-    
-    NSLog (@"app did become active");
-    
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [viewController uploadActivityIndicator: NO];
-    
-    // NSLog (@"player = %@, moviePath = %@", viewController.player, tvc.moviePath);
-    
-    // Restart playback as appropriate
-    
-    if ([viewController player] && tvc.moviePath) {
-        NSLog (@"setting playback rate to %g", theRate);
-        if (theRate)
-            [viewController playPauseButtonPressed: nil];
-        
-        return;
-    }
-    
-    // We've never selected a clip, let's get the app's settings
-    
-    if (! tvc.currentPath) {
-        NSLog(@"Never selected a clip, get new settings");
-        [self makeSettings];
-        [viewController makeSettings];  
-        if (BonjourMode) {
-            [self doBonjour];            
-        }
-
-    }
-    
-    // We're either loading clips locally or over the network 
-    // (but not via Bonjour)  Load the clip table (if we're not in the process of loading it)
-    
-    if (!kBonjourMode) {
-        if (!iPHONE) {
-            if (! [rootTvc.activityIndicator isAnimating]) {
-                [rootTvc makeList];
-            }
-        }
-    } else
-        [viewController showNav];
-  
-    [self releasemem];
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application {
-#ifdef kMakeLogFile
-    uploadLogFile ();
-#endif
-}
 
 #pragma mark -
 #pragma mark Memory management

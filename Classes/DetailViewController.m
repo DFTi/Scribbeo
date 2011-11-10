@@ -155,10 +155,11 @@
     
     // If this is the first time populating the table...
     
-    if (! currentPath ) {
+    if ((! currentPath) || ([currentPath length] == 0)) {
         self.title = @"Files";
         self.currentPath = @"/list"; // this is root in the py server
     }
+    NSLog(@"Current path is set to: %@", self.currentPath);
     
     [self showActivity];
     
@@ -201,7 +202,7 @@
     for (NSDictionary *dict in fileList) {
         NSString *fileName = [dict objectForKey:@"name"];
         NSString *fileExt = [dict objectForKey:@"ext"];
-        NSString *assetURL = [dict objectForKey:@"asset_url"]; // URL by which to retreive this asset
+        NSString *assetURL = [[dict objectForKey:@"asset_url"] stringByReplacingOccurrencesOfString:@" " withString:@"%20"]; // URL by which to retreive this asset
         NSString *timeCode = [dict objectForKey:@"timecode"];
         NSLog(@"See a file named: %@", fileName);
         NSLog(@"File was assigned a start timecode of: %@", timeCode);

@@ -35,6 +35,8 @@
 @property (nonatomic, retain)  UIPopoverController      *popoverController;
 @property int     currentClip;
 
+-(void) showActivity;
+-(void) stopActivity;
 -(BOOL) nextClip;
 -(void) makeList;
 -(void) iTunesLoad;
