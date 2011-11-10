@@ -1987,7 +1987,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSLog(@"Downloaded the note archive, attempting to restore...");
     NSFileManager *fm = [NSFileManager defaultManager];
     [self noteShowActivity];
-    if ([fm fileExistsAtPath: archivePath]) {
+    if ([fm fileExistsAtPath: archivePath] && ([data length] > 50)) {
         NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
         [noteData release];
         noteData = [noteArray mutableCopy];
