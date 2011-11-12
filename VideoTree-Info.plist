@@ -62,7 +62,7 @@
 		<string>videotree_icon3-2.png</string>
 	</array>
 	<key>CFBundleIdentifier</key>
-	<string>com.digitalfilmtree.videotree</string>
+	<string>com.digitalfilmtree.scribbeo</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
