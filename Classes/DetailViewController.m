@@ -107,6 +107,7 @@
 {
     NSLog (@"Stop activity");
     [activityIndicator stopAnimating];
+    [self hideDisconnected]; // Remove the 'disconnected' indicator
     [progressView removeFromSuperview];
 }
 

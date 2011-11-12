@@ -392,8 +392,6 @@ static int tryOne = 0;
         [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
         if (! [bonjour connect])  // ~connect updates the HTTPserver address
             NSLog (@"Couldn't reconnect to Scribbeo server");
-        else
-            [rootTvc hideDisconnected]; // Remove the 'disconnected' indicator
     }
 }
 

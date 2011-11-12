@@ -14,7 +14,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "02A305C513C6868B00E7340D"
-               BuildableName = "VideoTree.app"
+               BuildableName = "Scribbeo.app"
                BlueprintName = "Scribbeo"
                ReferencedContainer = "container:Scribbeo.xcodeproj">
             </BuildableReference>
@@ -32,7 +32,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "02A305C513C6868B00E7340D"
-            BuildableName = "VideoTree.app"
+            BuildableName = "Scribbeo.app"
             BlueprintName = "Scribbeo"
             ReferencedContainer = "container:Scribbeo.xcodeproj">
          </BuildableReference>
@@ -50,7 +50,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "02A305C513C6868B00E7340D"
-            BuildableName = "VideoTree.app"
+            BuildableName = "Scribbeo.app"
             BlueprintName = "Scribbeo"
             ReferencedContainer = "container:Scribbeo.xcodeproj">
          </BuildableReference>
@@ -68,7 +68,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "02A305C513C6868B00E7340D"
-            BuildableName = "VideoTree.app"
+            BuildableName = "Scribbeo.app"
             BlueprintName = "Scribbeo"
             ReferencedContainer = "container:Scribbeo.xcodeproj">
          </BuildableReference>
