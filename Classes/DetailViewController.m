@@ -45,6 +45,7 @@
 
 -(void) showDisconnected
 {
+    if (!kBonjourMode) return;
     NSLog(@"Showing the disconnected png");
     CGSize  theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};  // hard-coded #'s--uggh! :(
     UIImageView *imgView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Disconnected.png"]];
@@ -175,7 +176,7 @@
     
     // Get the current settings
     
-    [kAppDel makeSettings];
+    // [kAppDel makeSettings]; No need... we do this at launch always.
     
     // If running in local mode, populate the clip table
     // with local video files
@@ -197,7 +198,7 @@
     [self showActivity];
     
    
-    if (kBonjourMode && ([kAppDel HTTPserver] != nil)) {
+    if (kBonjourMode && kHTTPserver) {
         // Send a list request to our HTTPServer
         NSString *urlstr = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], currentPath];
         NSLog(@"Making list for BonjourMode. Querying: %@", urlstr);
@@ -211,6 +212,10 @@
         NSDictionary *fileDict = [list objectFromJSONString];
         // Now we need to populate the files array using our nice JSON list
         [self filesFromJSONFileListing:fileDict];       
+    } else if (kBonjourMode && (!kHTTPserver)) {
+        NSLog(@"In bonjour mode, but the http server has not been set yet.");
+        [[kAppDel serverBrowser] stop];
+        [[kAppDel serverBrowser] start];
     }
     
 }

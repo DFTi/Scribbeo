@@ -21,7 +21,7 @@ int gIOSMajorVersion;
 
 @synthesize window, demoView;
 @synthesize tvc, nc, clipList, rootTvc;
-@synthesize iPhone, viewController, BonjourMode;
+@synthesize iPhone, viewController, BonjourMode, UseManualServerDetails;
 @synthesize serverBrowser, server, bonjour, theURL, theExtension, HTTPserver, serverBase, outputFilename;
 
 static int tryOne = 0;
@@ -98,18 +98,16 @@ static int tryOne = 0;
     [[NSUserDefaults standardUserDefaults] synchronize];
 
     BOOL wasBonjourMode = BonjourMode;
-
-    
+    BOOL wasUsingManualServerDetails = UseManualServerDetails;
     [self makeSettings]; // Get any new setting changes.
     
-
     [viewController uploadActivityIndicator: NO];
     
     // NSLog (@"player = %@, moviePath = %@", viewController.player, tvc.moviePath);
     
     // Restart playback as appropriate
-    
-    if (wasBonjourMode != BonjourMode) {
+    // But first, check if the user changed any important settings.
+    if ((wasBonjourMode != BonjourMode) || (wasUsingManualServerDetails != UseManualServerDetails)) { 
         NSLog(@"Mode was changed, cleaning up");
         [viewController cleanup];
     } else {
@@ -122,33 +120,8 @@ static int tryOne = 0;
             return;  
         }
     }
+
     
-    if (BonjourMode && (!HTTPserver)) {
-        [self doBonjour];
-    }
-//    
-//    // We've never selected a clip, let's get the app's settings
-//    
-//    if (! tvc.currentPath) {
-//        NSLog(@"Never selected a clip, get new settings");
-//        [self makeSettings];
-//        [viewController makeSettings];  
-//        if (BonjourMode) {
-//            [self doBonjour];            
-//        }
-//        
-//    }
-//    
-//    // We're either loading clips locally or over the network 
-//    // (but not via Bonjour)  Load the clip table (if we're not in the process of loading it)
-//    
-//    if (!kBonjourMode) { // if local mode on ipad and the activity indicator is animating, then makeList . (huh?)
-//        if (!iPHONE) {
-//            if (! [rootTvc.activityIndicator isAnimating]) {
-//                [rootTvc makeList];
-//            }
-//        }
-//    } else
     [viewController showNav];
     
     [self releasemem];
@@ -181,7 +154,7 @@ static int tryOne = 0;
     
     [defaults setBool: NO forKey: @"BonjourMode"];
     BonjourMode = NO;
-    
+
     [defaults synchronize];
     
     // Update the clip list to reflect the switch to local mode
@@ -496,21 +469,48 @@ static int tryOne = 0;
     
     // Load the user settings
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-   
+
     // Bonjour support
     
     BonjourMode = [defaults boolForKey: @"Bonjour"];
+    UseManualServerDetails = [defaults boolForKey:@"UseManualServerDetails"];
     
-    if (!BonjourMode) 
-        BonjourMode = NO;
+    if (!BonjourMode) BonjourMode = NO;
+    if (!UseManualServerDetails) UseManualServerDetails = NO;
 
     // show finger presses (good for demos)
     
     demoView = [defaults boolForKey: @"showPresses"]; 
 
     if (BonjourMode) {
-        [self doBonjour]; // Initiate the search for our py http server using bonjour
-        NSLog(@"Running in Bonjour Mode");
+        NSLog(@"Running in Networked Mode");
+        if (UseManualServerDetails) {
+            [self setHTTPserver:nil];
+            NSString *manualIP = [defaults stringForKey:@"ServerIP"];
+            NSString *manualPort = [defaults stringForKey:@"ServerPort"];            
+            NSString *manualServer = [NSString stringWithFormat:@"http://%@:%@", manualIP, manualPort];
+            NSLog(@"Manual override requested, will not do bonjour discovery.");
+            NSLog(@"Checking for valid Scribbeo server: %@", manualServer);
+            NSError *error = nil;
+            NSURLResponse *response;
+            NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:manualServer] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:3];
+            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+            if (error != nil) {
+                NSLog(@"%@", error.localizedDescription);
+                [UIAlertView doAlert:  @"Connection Error" 
+                         withMsg: [NSString stringWithFormat:@"Cannot find a Scribbeo Server at %@. Please disable the manual server or network mode in Settings.", manualServer]];
+                NSLog(@"Failed to connect to manually entered server %@", manualServer);
+            } else {
+                NSLog(@"Got back this much data: %d", [data length]);   
+                [self setHTTPserver:manualServer];
+            }
+        } else {
+            [self setHTTPserver:nil];
+            // maybe put an observer now? :/
+            NSLog(@"No manual override, will now discover bonjour servers.");
+            NSLog(@"HTTP server: %@", HTTPserver);
+            [self doBonjour];
+        }
     } else
         NSLog (@"Running in iTunes Document sharing mode");
 }

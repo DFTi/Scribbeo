@@ -147,7 +147,7 @@
 		</dict>
         <dict>
 			<key>Title</key>
-			<string>Scribbeo Bonjour Server</string>
+			<string>Bonjour Server Settings</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
@@ -157,11 +157,45 @@
 			<key>Key</key>
 			<string>Bonjour</string>
 			<key>Title</key>
-			<string>Bonjour Server</string>
+			<string>Network Mode</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
-
+        <dict>
+			<key>DefaultValue</key>
+			<false/>
+			<key>Key</key>
+			<string>UseManualServerDetails</string>
+			<key>Title</key>
+			<string>Manual Override</string>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+            <false/>
+			<key>Key</key>
+			<string>ServerIP</string>
+			<key>Title</key>
+			<string>Manual IP</string>
+            <key>KeyboardType</key>
+            <string>NumbersAndPunctuation</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+		</dict>
+        <dict>
+			<key>DefaultValue</key>
+            <false/>
+			<key>Key</key>
+			<string>ServerPort</string>
+			<key>Title</key>
+			<string>Manual Port</string>
+            <key>KeyboardType</key>
+            <string>NumbersAndPunctuation</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+		</dict>
+        
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>

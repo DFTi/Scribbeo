@@ -35,6 +35,7 @@
     NSString                *HTTPserver, *serverBase;
     BOOL                    iPhone;         // Running on an iPhone
     BOOL                    BonjourMode;
+    BOOL                    UseManualServerDetails;
     BOOL                    demoView;
     CMTime                  theTime;
     float                   theRate;
@@ -59,7 +60,7 @@
 @property (nonatomic, retain)  NSURL                *theURL;
 @property (nonatomic, retain)  NSString             *theExtension, *outputFilename;
 
-@property BOOL  iPhone, BonjourMode;
+@property BOOL  iPhone, BonjourMode, UseManualServerDetails;
 @property (nonatomic, retain)  NSString             *HTTPserver;
 @property (nonatomic, retain)  NSString             *serverBase;
 
