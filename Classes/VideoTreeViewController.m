@@ -2064,7 +2064,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 }
 
 // Parse FCP XML marker file
-// FIXME No idea about this stuff
 -(void) getXML: (NSString *) file
 {
     NSLog (@"processing XML file %@", file);
@@ -2076,11 +2075,11 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
     NSString *url;
     if (kBonjourMode) {
-        url = [NSString stringWithFormat: @"/notes/%@", kHTTPserver, file];
+        url = [NSString stringWithFormat: @"/xml/%@", kHTTPserver, file];
     }
 
     NSLog(@"Getting FCP XML marker file at: %@", url);
-    // This is the guy that will parset the XML.  The XMLDone: method will get called when
+    // This is the guy that will parse the XML.  The XMLDone: method will get called when
     // the parsing has been completed
 	
 	[XMLURLreader parseXMLURL: url atEndDoSelector: @selector (XMLDone:) withObject: self];
@@ -2118,19 +2117,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         NSLog (@"Save failed");
     } else if (kBonjourMode) { // Upload the notes with HTTP
         [myNotes release];
-        NSString *noteNameForURL = [[archivePath lastPathComponent] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, noteNameForURL]];
-        NSLog(@"Uploading note to server at: %@", [url absoluteString]);
-        NSData *postData = [NSData dataWithContentsOfFile:archivePath];
-        NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
-        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-        [request setURL:url];
-        [request setHTTPMethod:@"POST"];
-        [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
-        [request setValue:@"application/x-gzip" forHTTPHeaderField:@"Content-Type"];
-        [request setHTTPBody:postData];
-        [NSURLConnection connectionWithRequest:request delegate:self];
-        [request release];
+        NSString *remotePath = [NSString stringWithFormat:@"%@/note/%@", kHTTPserver, [archivePath lastPathComponent]];
+        [self uploadFile:archivePath to:remotePath];
     }
 }
 
@@ -2360,30 +2348,16 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 //
 // We have a txt file, presumably with Avid markers
 // We'll download the file and then parse it in the previous method
-//
-
+// (Doesn't look like this is actually called anywhere... Did we stop supporting this halfway?)
 -(void) getAvid: (NSString *) file
 {
     NSLog (@"processing Avid import file %@", file);
-
-    if ( kBonjourMode ) {
-        // need to refactor to not use FTP
-        NSLog(@"!! This has yet to be implemented for Bonjour Mode");
-        return;
-        // FIXME
-        // NSString *url;
-        // Here's a nice example from the FCP XML stuff... This is all jargon to me though (Avid, FCP, etc)
-        //        if (kBonjourMode) {
-        //            url = [NSString stringWithFormat: @"/notes/%@", kHTTPserver, file];
-        //        } else {
-        //            url = [NSString stringWithFormat: @"%@%@/Notes/%@", kHTTPserver, userDir, file];   
-        //        }
-        //        
-        //        NSLog(@"Getting FCP XML marker file at: %@", url);
-    }
-
-    
-    // [FTPHelper download: [NSString stringWithFormat: @"Notes/%@", file] to: [self txtFilePath]];
+    NSString *remotePath = [NSString stringWithFormat:@"%@/avid/%@", kHTTPserver, file];
+    // Make sure we don't need to URI-encode... Can't test right now since nobody is calling this method.
+    NSURL *remoteURL = [NSURL URLWithString:remotePath];
+    NSString *avidTxtFile = [NSString stringWithContentsOfURL:remoteURL encoding:NSUTF8StringEncoding error:nil];    
+    [avidTxtFile writeToFile:[self txtFilePath] atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    // remember to get rid of error:nil & do real checks
     NSLog (@"Avid txt download returned...in process");  
 }
 
@@ -2537,16 +2511,16 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     else
         noteName = [NSString stringWithFormat: @"Album %@", [[[clipPath stringByReplacingOccurrencesOfString: @"%20" withString:@" "] stringByDeletingLastPathComponent] lastPathComponent]];
          
-	[picker setSubject: [NSString stringWithFormat: @"Notes for %@ %@", noteName,  (FCPXML) ? @"(FCP XML attached)" : @"", 
+	[picker setSubject: [NSString stringWithFormat: @"Notes for %@ %@ %@", noteName,  (FCPXML) ? @"(FCP XML attached)" : @"", 
                          (AvidExport) ? @"(Avid Locator file attached)" : @""]];
     
 	// Set up recipients
     
-	NSArray *toRecipients = [NSArray arrayWithObject: @"keyvan@digitalfilmtree.com"];  // testing
+	//NSArray *toRecipients = [NSArray arrayWithObject: @"keyvan@digitalfilmtree.com"];  // testing
 	NSArray *ccRecipients = [NSArray array];
 	NSArray *bccRecipients = [NSArray array];
 	
-	[picker setToRecipients: toRecipients];
+	//[picker setToRecipients: toRecipients];
 	[picker setCcRecipients: ccRecipients];	   // empty here
 	[picker setBccRecipients: bccRecipients];  // ditto
     
@@ -3272,6 +3246,7 @@ static int saveRate;
         // We've had to kludge the timecode for nonlocal files since
         // we can't seem to get it out of the timecode track.  The 
         // solution was to create a separate .tc file
+        // Update: Timecode is now being sent along with the list of files from the HTTP server.
         //
         
         if (! kBonjourMode) { // Only local mode can do this since we're using AVAssetReader
