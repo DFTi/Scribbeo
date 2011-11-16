@@ -209,6 +209,7 @@
             NSLog(@"Could not get data from the URL");
             return;
         }
+        [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
         NSLog(list);
         NSDictionary *fileDict = [list objectFromJSONString];
         // Now we need to populate the files array using our nice JSON list

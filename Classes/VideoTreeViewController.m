@@ -328,7 +328,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                                                  name:UIKeyboardDidHideNotification
                                                object:nil];
     
-    [self makeSettings];
 	[self startObservingTimeChanges];
 }
 
@@ -2194,7 +2193,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     for (Note *aNote in noteData) {
        [XML appendString: [NSString stringWithFormat: 
 @"<marker>\n\
-    <name>VideoTree #%i</name>\n\
+    <name>Scribbeo #%i</name>\n\
     <comment>%@</comment>\n\
     <in>%i</in>\n\
     <out>-1</out>\n\
@@ -2249,7 +2248,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     for (Note *aNote in noteData) {
         [LocatorString appendString: 
-        [NSString stringWithFormat: @"VideoTree #%i\t%i\tred\t%@\n", marker, 
+        [NSString stringWithFormat: @"Scribbeo #%i\t%i\tred\t%@\n", marker, 
         (int) (([self convertTimeToSecs: aNote.timeStamp] - startTimecode) * (int) (fps + .50000001)), aNote.text]];
         ++marker;
     }
@@ -2431,7 +2430,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         
         UIPrintInfo *printInfo = [UIPrintInfo printInfo];
         printInfo.outputType = UIPrintInfoOutputGeneral;
-        printInfo.jobName = @"VideoTree Notes";
+        printInfo.jobName = @"Scribbeo Notes";
         printInfo.duplex = UIPrintInfoDuplexLongEdge;
         pic.printInfo = printInfo;
         pic.showsPageRange = YES;
@@ -2515,6 +2514,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 // So previously, when the server was a static install, we were uploading the email HTML to the server so as to provide a link
 // But now the bonjour server can be on some local machine, not static, change ip/port on a whim. We can't create a link for it.
 // So we won't upload it or anything--we need to send the entire note package at once with all relevant info, no links.
+// -------- However, for now we don't have a good solution yet, so we'll use HTTP to upload in the old way for now...
 -(IBAction) emailNotes
 {
     if (! [self canEmail]) return;
@@ -2592,20 +2592,37 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
         // Fill out the email body text
         
-        emailBody = [NSString stringWithFormat: 
-                    @"Sent from VideoTree (v%@.%@), \u00A9 2010-2011 by DFT Software", 
-                    [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],  [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
+        emailBody = [NSString stringWithFormat: @"Sent from Scribbeo™ for %@", (iPHONE ? @"iPhone" : @"iPad")];
         
         [picker setMessageBody:emailBody isHTML:NO];
     }
     else  {
+        NSString *theTitle = @"";
+        
+        //  NSString *theTitle = [
+        //    [clip stringByReplacingOccurrencesOfString: @"_" withString: @" : "]
+        //    stringByReplacingOccurrencesOfString: @"%20" withString:@" "];
+        
+        NSString *saveFileName = [NSString stringWithFormat: @"%@_%lu.html", initials, (long) [NSDate timeIntervalSinceReferenceDate]];
+        
+        NSString *remotePath = [NSString stringWithFormat: @"%@/email/%@", kHTTPserver, saveFileName]; 
+        
         emailBody =  [NSString stringWithFormat: 
-                       @"<html>Notes created with Scribbeo™ for %@<br><p>", (iPHONE ? @"iPhone" : @"iPad"),
-                [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],  
-                [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
-
+                      @"<html>Sent from Scribbeo™ (v%@.%@), \u00A9 2011-2012 by DigitalFilm Tree<br><p>",                         
+                      [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],  
+                      [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
+        
+        // Upload the HTML file to the server (as long as we use ftp and http from the same place)
+        // And place a hyperlink in the emailed HTML
+        
+        emailBody = [emailBody stringByAppendingString: 
+                         [NSString stringWithFormat: @"<a href=\"%@\">Click here to view this page in your browser.</a><p>%@</p>", remotePath, theTitle]];
+        
         emailBody = [emailBody stringByAppendingString: [self saveToHTML]];
         [picker setMessageBody:emailBody isHTML:YES];
+        
+        [self uploadHTML: emailBody file: saveFileName];
+
     }
 	
 	[self presentModalViewController: picker animated:YES];
@@ -2718,8 +2735,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     NSString *comment = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
     
-//    if (kFTPMode && kSameServerAddress) 
-//        comment = [comment stringByReplacingOccurrencesOfString: @"<<<Audio Note>>>" withString: @""];
+    comment = [comment stringByReplacingOccurrencesOfString: @"<<<Audio Note>>>" withString: @""];
     
     comment = [[comment stringByReplacingOccurrencesOfString:  @"<" withString: @"&lt;"] stringByReplacingOccurrencesOfString: @">" withString: @"&gt;"];
     
@@ -2739,7 +2755,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                                  image, theNote.initials, theNote.date, comment]];
     }
         
- 
+    
     // audio -- upload to server and embed in HTML
     
     if (theNote.voiceMemo && kBonjourMode) {
@@ -2747,13 +2763,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         
         [emailBody appendString: [NSString stringWithFormat: @"<br><br><br><center><object type=\"audio/mpeg\" data=\"%@\"\
              width=\"175\" height=\"25\" alt=\"Audio link\" autoplay=false></object></center>", addr]];  
-
-//      Following is HTML 5
-//      [emailBody appendString: [NSString stringWithFormat: @"<br><br><br><center><audio src=\"%@\"></audio></center>", addr]];  
     }
-     
      [emailBody appendString: @"</td></tr>"];
-
      return emailBody;
 }
 
@@ -2881,21 +2892,40 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     char *text;
     
     if (iPHONE)
-        text = "Created by VideoTree(TM) iPhone App.  Copyright \251 2010-2011 by DFT Software.";
+        text = "Created by Scribbeo™ iPhone App.  Copyright \251 2010-2012 by DigitalFilm Tree.";
     else
-        text = "Created by VideoTree(TM) iPad App.  Copyright \251 2010-2011 by DFT Software.";
+        text = "Created by Scribbeo™ iPad App.  Copyright \251 2010-2012 by DigitalFilm Tree.";
 
     CGContextShowTextAtPoint (pdfContext, 25 + CGImageGetWidth (ref) / 5 + 15, .65 inches, text, strlen(text));
 //  text = "VideoTree is a trademark of DFT Software.";
 //  CGContextShowTextAtPoint (pdfContext, 25 + CGImageGetWidth (ref) / 5 + 15, .65 inches - 10, text, strlen(text));
 }
 
+// Reusable HTTP Upload via POST
+-(NSString *) uploadFile: (NSString *) localPath to: (NSString *) remotePath
+{
+    NSLog(@"uploadFile is POSTing data from: %@ to server: %@", localPath, remotePath);
+    NSString *remoteURL = [remotePath stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+    NSURL *url = [NSURL URLWithString:remoteURL];
+    NSData *postData = [NSData dataWithContentsOfFile:localPath];
+    NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    [request setURL:url];
+    [request setHTTPMethod:@"POST"];
+    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    [request setValue:@"application/x-gzip" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPBody:postData];
+    [NSURLConnection connectionWithRequest:request delegate:self];
+    [request release];
+    return remoteURL;
+}
+
 //
 // Uploads the full HTML Notes to the server
 //
-// FIXME refactor see ticket #13
 -(void) uploadHTML: (NSString *) theHTML file: (NSString *) fileName
 {
+    NSLog(@"uploadHTML, filename: %@", fileName);
     // Save the audio file and upload to the server
     NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *docDir = [dirList objectAtIndex: 0];
@@ -2905,22 +2935,13 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     if (! [theHTML writeToFile: HTMLPath atomically: NO encoding: NSUTF8StringEncoding error: NULL]) 
         NSLog (@"Save of HTML file failed!");
     
-//    [FTPHelper sharedInstance].delegate = self;
-//    [FTPHelper sharedInstance].uname = kFTPusername;
-//    [FTPHelper sharedInstance].pword = kFTPpassword;    
-//    NSString *urlString = [NSString stringWithFormat: @"ftp://%@", kFTPserver];
-//    
-//    NSLog (@"Saving file %@ to %@", HTMLPath, urlString);
-//    [FTPHelper sharedInstance].urlString = urlString;
-//    
-//    [FTPHelper upload: HTMLPath];
-    NSLog2 (@"upload returned...in process");
+    [self uploadFile:HTMLPath to:[NSString stringWithFormat:@"%@/email/%@", kHTTPserver, fileName]];
+    NSLog(@"HTML Uploaded");
 }
 
 //
 // Upolaoads an audio note to the server as an aac file for playback from the HTML or PDF notes
 //
-// FIXME refactor see ticket #13
 -(NSString *) uploadAudio: (Note *) aNote
 {
     // Save the audio file and upload to the server
@@ -2930,29 +2951,17 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // If the audio link is in a PDF file, we need to use the .mov.aac extension for proper playback
     // We'll write the audio clip to a local file first before uploading
     
-    NSString *fileName = [NSString stringWithFormat: @"%@_%i_%@.%@", 
-                          [clip stringByDeletingPathExtension], noteNumber, initials, emailPDF ? @"mov.aac" : @"aac"];  // DUH!
+    NSString *fileName = [NSString stringWithFormat: @"%@_%i_%@.%@", [clip stringByDeletingPathExtension], noteNumber, initials, emailPDF ? @"mov.aac" : @"aac"];  // DUH!
     NSLog (@"Audio file name = %@", fileName);
     NSString *audioPath = [docDir stringByAppendingPathComponent: fileName];
     
     if (! [aNote.voiceMemo writeToFile: audioPath atomically: NO]) 
         NSLog (@"Save of audio file failed!");
-    
-//    [FTPHelper sharedInstance].delegate = self;
-//    [FTPHelper sharedInstance].uname = kFTPusername;
-//    [FTPHelper sharedInstance].pword = kFTPpassword;    
-//    NSString *urlString = [NSString stringWithFormat: @"ftp://%@", kFTPserver];
-//    
-//    NSLog (@"Saving file %@ to %@", audioPath, urlString);
-//    [FTPHelper sharedInstance].urlString = urlString;
-//    
-//    [FTPHelper upload: audioPath];
-//    NSLog2 (@"upload returned...in process");
-//    
-//    return [NSString stringWithFormat: @"%@/%@/Notes/audio/%@", 
-//            kHTTPserver, userDir, fileName]; 
-    return @""; // temporary
+
+    NSString *remotePath = [NSString stringWithFormat:@"%@/email/%@", kHTTPserver, fileName];
+    return [self uploadFile:audioPath to:remotePath]; 
 }
+
 
 //
 // Converts a single note to PDF format -- used pdfContext for the drawing context

@@ -31,7 +31,7 @@ static int tryOne = 0;
 #pragma mark Application lifecycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {   
-    NSLog (@"****** Begin execution of VideoTree v%@.%@ (free mem = %.2f MB)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],  
+    NSLog (@"****** Begin execution of Scribbeo v%@.%@ (free mem = %.2f MB)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],  
            [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], ([self freemem]/ (1024. * 1024.)));
     
     gIOSMajorVersion = [[[UIDevice currentDevice] systemVersion] characterAtIndex: 0];
@@ -100,7 +100,7 @@ static int tryOne = 0;
     BOOL wasBonjourMode = BonjourMode;
     BOOL wasUsingManualServerDetails = UseManualServerDetails;
     [self makeSettings]; // Get any new setting changes.
-    
+    [viewController makeSettings]; // Get the lesser changes.    
     [viewController uploadActivityIndicator: NO];
     
     // NSLog (@"player = %@, moviePath = %@", viewController.player, tvc.moviePath);
@@ -121,7 +121,6 @@ static int tryOne = 0;
         }
     }
 
-    
     [viewController showNav];
     
     [self releasemem];
@@ -362,7 +361,6 @@ static int tryOne = 0;
 #endif
 }
 
-        
 #pragma mark -
 #pragma mark Bonjour
 

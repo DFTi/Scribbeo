@@ -365,6 +365,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(BOOL) canEmail; // Checks to see if email account exists
 -(void) emailLogfile;
 -(IBAction) emailNotes;
+-(NSString *) uploadFile: (NSString *) localPath to: (NSString *) remotePath;
 -(NSString *) uploadAudio: (Note *) theNote;
 -(void) uploadHTML: (NSString *) theHTML file: (NSString *) fileName;
 -(IBAction) printNotes;
