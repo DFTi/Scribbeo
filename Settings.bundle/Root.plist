@@ -44,7 +44,7 @@
 			<key>Key</key>
 			<string>AutoPlay</string>
 			<key>Title</key>
-			<string>Autoplay Clips</string>
+			<string>Autoplay Clips &amp; Stills</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>

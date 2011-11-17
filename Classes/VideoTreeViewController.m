@@ -444,7 +444,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         
         [self erase];
         [self clearAnyNotes];
-
+        newNote.text = @"";
+        
         // Load the notes table
         
         if (kBonjourMode) {
@@ -517,11 +518,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     stillView.userInteractionEnabled = YES;
     [playerLayerView addSubview: stillView];
     [stillView addSubview: drawView];
-    
-    if (autoPlay) {
-        pausePlayButton.image = pauseImage;
-        pausePlayButton.enabled = YES;
-    }
 
     if (stillShows) {
         stillView.alpha = 0;
@@ -575,6 +571,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 
     if (autoPlay) {
+        pausePlayButton.image = pauseImage;
         pausePlayButton.enabled = YES;
     }
     else
@@ -594,6 +591,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         [stillView addSubview: stampLabel];
         stampLabel.hidden = NO;
     }
+    
+    recordButton.enabled = YES; // Allow to record a voice memo too.
 }
 
 - (void) rotateStill {
@@ -4236,6 +4235,11 @@ static int saveRate;
 -(void) stillDidTimeOut: (NSTimer *) theTimer
 {
     NSLog (@"Still did time out autoplay");
+    
+    if ([[[self voiceMemo] audioRecorder] isRecording]) {
+        NSLog(@"We're currently recording a voice memo, ignoring timeout");
+        return;
+    }
     
     [slideshowTimer invalidate];
     self.slideshowTimer = nil;
