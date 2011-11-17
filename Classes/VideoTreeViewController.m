@@ -4236,8 +4236,8 @@ static int saveRate;
 {
     NSLog (@"Still did time out autoplay");
     
-    if ([[[self voiceMemo] audioRecorder] isRecording]) {
-        NSLog(@"We're currently recording a voice memo, ignoring timeout");
+    if ([[[self voiceMemo] audioRecorder] isRecording] || [self keyboardShows]) {
+        NSLog(@"We're currently recording or typing, ignore timeout");
         return;
     }
     
