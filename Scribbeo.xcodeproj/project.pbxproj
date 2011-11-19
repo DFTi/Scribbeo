@@ -95,6 +95,7 @@
 		02E83886141AA38B001B6CA5 /* camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E83885141AA38B001B6CA5 /* camera.png */; };
 		02E83888141AA95D001B6CA5 /* movies.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E83887141AA95D001B6CA5 /* movies.png */; };
 		02E8388C141AABF3001B6CA5 /* rotate.png in Resources */ = {isa = PBXBuildFile; fileRef = 02E8388B141AABF3001B6CA5 /* rotate.png */; };
+		7A89B2CC147740D300F172A3 /* FileCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A89B2CB147740D300F172A3 /* FileCell.m */; };
 		BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = BCCDB3B61468C8FC008D41B2 /* JSONKit.m */; };
 		BCCDB3C2146BE3B7008D41B2 /* Disconnected.png in Resources */ = {isa = PBXBuildFile; fileRef = BCCDB3C1146BE3B7008D41B2 /* Disconnected.png */; };
 /* End PBXBuildFile section */
@@ -194,7 +195,7 @@
 		02A3064D13C686D300E7340D /* videotree_icon4.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = videotree_icon4.png; sourceTree = "<group>"; };
 		02A3064E13C686D300E7340D /* videotree_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = videotree_icon.png; sourceTree = "<group>"; };
 		02A3065013C686D300E7340D /* micrec.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = micrec.png; sourceTree = "<group>"; };
-		02A3065513C686D300E7340D /* Scribbeo_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; name = Scribbeo_Prefix.pch; path = ../Scribbeo_Prefix.pch; sourceTree = "<group>"; };
+		02A3065513C686D300E7340D /* Scribbeo_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Scribbeo_Prefix.pch; path = ../Scribbeo_Prefix.pch; sourceTree = "<group>"; };
 		02A3065613C686D300E7340D /* forwardToEnd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = forwardToEnd.png; sourceTree = "<group>"; };
 		02A3065713C686D300E7340D /* rewindToStart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rewindToStart.png; sourceTree = "<group>"; };
 		02A3065813C686D300E7340D /* forwardframe.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = forwardframe.png; sourceTree = "<group>"; };
@@ -212,6 +213,8 @@
 		02E83885141AA38B001B6CA5 /* camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = camera.png; sourceTree = "<group>"; };
 		02E83887141AA95D001B6CA5 /* movies.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = movies.png; sourceTree = "<group>"; };
 		02E8388B141AABF3001B6CA5 /* rotate.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = rotate.png; sourceTree = "<group>"; };
+		7A89B2CA147740D300F172A3 /* FileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCell.h; sourceTree = "<group>"; };
+		7A89B2CB147740D300F172A3 /* FileCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileCell.m; sourceTree = "<group>"; };
 		BCBB9E25143431F600EA4486 /* VideoTree.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = VideoTree.entitlements; sourceTree = "<group>"; };
 		BCCDB3B51468C8FC008D41B2 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
 		BCCDB3B61468C8FC008D41B2 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
@@ -313,6 +316,8 @@
 				02A3061713C686D300E7340D /* XMLURL.h */,
 				02A3061813C686D300E7340D /* XMLURL.m */,
 				02A3062013C686D300E7340D /* main.m */,
+				7A89B2CA147740D300F172A3 /* FileCell.h */,
+				7A89B2CB147740D300F172A3 /* FileCell.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -574,6 +579,7 @@
 				02A3067E13C686D300E7340D /* main.m in Sources */,
 				0224AAE814181DB0005AFBAB /* UIImageView+Scaling.m in Sources */,
 				BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */,
+				7A89B2CC147740D300F172A3 /* FileCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

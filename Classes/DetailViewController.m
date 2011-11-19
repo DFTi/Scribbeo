@@ -38,6 +38,8 @@
     self.navigationController.navigationBar.tintColor = [UIColor blackColor];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 }
 
 #pragma mark -
@@ -47,7 +49,8 @@
 {
     if (!kBonjourMode) return;
     NSLog(@"Showing the disconnected png");
-    CGSize  theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};  // hard-coded #'s--uggh! :(
+    CGSize  theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};  
+    // hard-coded #'s--uggh! :(
     UIImageView *imgView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Disconnected.png"]];
     imgView.frame = CGRectMake((theSize.width / 2)-32, (theSize.height / 2)-72, 64, 64);
     imgView.tag = 75;
@@ -505,7 +508,7 @@
         if (!iPHONE) {
             CGRect theFrame = cell.selectedBackgroundView.frame;
             UIView *theBG = [[UIView alloc] initWithFrame: theFrame];
-            theBG.backgroundColor =  [UIColor colorWithRed: .5 green: .5 blue: .5 alpha: .7];;
+            theBG.backgroundColor =  [UIColor colorWithRed: .5 green: .5 blue: .5 alpha: .7];
             cell.selectedBackgroundView = theBG;
         }
         else

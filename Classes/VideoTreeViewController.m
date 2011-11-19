@@ -3274,7 +3274,7 @@ static int saveRate;
         endOfVid = player.currentItem.asset.duration; // [asset duration];
 	    duration = kCVTime (endOfVid);
         
-        Float64 theEnd = duration;
+        Float64 theEnd = duration + startTimecode;
         
         if (timecodeFormat)
             duration += startTimecode;
@@ -4023,7 +4023,7 @@ static int saveRate;
 
 -(BOOL) nextClip
 {
-    DetailViewController *dc =  [kAppDel tvc];
+    DetailViewController *dc =  [kAppDel rootTvc];
     
     NSLog (@"autoplay next clip");
     return [dc nextClip];
@@ -4359,7 +4359,7 @@ static int saveRate;
 - (CGFloat) tableView: (UITableView *) tableView heightForRowAtIndexPath: (NSIndexPath *) indexPath
 {
     if ( !iPHONE)
-        return 65.0;
+        return 132.0;
     else
         return 80.0;
 }
@@ -4381,10 +4381,13 @@ static int saveRate;
     
     static NSString *CellIdentifier = @"Cell";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    Note *theNote = [noteData objectAtIndex: indexPath.row];
+
+    
+    FileCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[[FileCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier] autorelease];
         [cell.textLabel setFont:[UIFont systemFontOfSize: 14.0]]; 
         [cell.detailTextLabel setFont:[UIFont systemFontOfSize: 12.0]];
         cell.editingAccessoryType = UITableViewCellEditingStyleDelete;
@@ -4398,11 +4401,10 @@ static int saveRate;
         theBG.backgroundColor =  [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: .7];;
         cell.selectedBackgroundView = theBG;
         cell.imageView.layer.masksToBounds = YES;
+               
     }
 
     // Fill in the cell with data from the note stored in noteData
-    
-    Note *theNote = [noteData objectAtIndex: indexPath.row];
     
     // The marked up frame thumbnail
  
@@ -4424,7 +4426,7 @@ static int saveRate;
  
     // The typed note 
    
-    cell.detailTextLabel.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
+   /* cell.detailTextLabel.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
     
     if (! theNote.imageName)  { // means it's a video 
         // The time in either timecode or frame number format
@@ -4454,8 +4456,20 @@ static int saveRate;
         cell.textLabel.textColor = [UIColor redColor];
         cell.textLabel.backgroundColor = MYGRAY;
         cell.detailTextLabel.backgroundColor = MYGRAY;
-    }
+    }*/
       
+    
+//    UILabel *timeLabel = [[UILabel alloc] init];
+//    timeLabel.frame = CGRectMake(0, 110, tableView.frame.size.width, 20);
+    cell.timeLabel.text = [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode)];
+//    timeLabel.textColor = [UIColor whiteColor];
+//     timeLabel.shadowColor = [UIColor blackColor];
+//    timeLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
+//    timeLabel.textAlignment = UITextAlignmentCenter;
+//    
+//    [cell addSubview:timeLabel];
+    
+    
     return cell;
 }
 

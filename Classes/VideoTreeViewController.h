@@ -28,6 +28,7 @@
 #import "XMLURL.h"
 #import "HelpScreenController.h"
 #import "UIImageView+Scaling.h"
+#import "FileCell.h"
 
 void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, int currentY);
 
@@ -152,7 +153,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
     BOOL                        emailPDF, isPrinting;
     int                         skipValue;
                     
-    UIView                      *uploadActivityIndicatorView;  // We show activity when uploading to the network
+    UIView                      *uploadActivityIndicatorView;  // We show activity when uploading to the networkƒ
     UIActivityIndicatorView     *uploadActivityIndicator;
 
     UIImage                     *FCPImage;              // FCP image for Notes table
