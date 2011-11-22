@@ -17,7 +17,7 @@
     UIImagePickerControllerDelegate> {
     NSString                 *currentPath;           // The current path for the current clip
     NSMutableArray           *files, *fileTypes;     // A list of files are their corresponding type (e.g., directory)
-    NSMutableArray           *assetURLs, *timeCodes              // Used in Bonjour Mode
+        NSMutableArray           *assetURLs, *timeCodes;              // Used in Bonjour Mode
     UIView                   *progressView;          // A view to hold an activity indicator when the clip table loads
     UIActivityIndicatorView  *activityIndicator;
     

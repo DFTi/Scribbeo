@@ -55,12 +55,27 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
-	<string>videotree_icon3.png</string>
+	<string>scribbeo-icon~ipad.png</string>
 	<key>CFBundleIconFiles</key>
 	<array>
-		<string>videotree_icon3.png</string>
-		<string>videotree_icon3-2.png</string>
+		<string>scribbeo-icon~ipad.png</string>
+		<string>scribbeo-icon.png</string>
+		<string>scribbeo-icon@2.png</string>
 	</array>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>videotree_icon3.png</string>
+				<string>scribbeo-icon.png</string>
+				<string>scribbeo-icon@2.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<false/>
+		</dict>
+	</dict>
 	<key>CFBundleIdentifier</key>
 	<string>com.digitalfilmtree.scribbeo</string>
 	<key>CFBundleInfoDictionaryVersion</key>
