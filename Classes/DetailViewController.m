@@ -229,6 +229,7 @@
 // This method will fill the files array from the JSON received from the py bonjour webserver
 - (void) filesFromJSONFileListing: (NSDictionary *) listing
 {
+    [[[kAppDel viewController] noteURLs] removeAllObjects];
     NSLog (@"filesFromJSONFileListing");
     allStills = YES; // For album mode. This will become NO if there's non-stills here.
     
@@ -243,7 +244,8 @@
         [fileTypes addObject:[NSNumber numberWithInt: kDirectory]];
         NSString *listURL = [dict objectForKey:@"list_url"]; // URL by which to retreive this asset
         [assetURLs addObject:listURL]; // Dir has no asset retrieval URL, instead use assetURL for traversal
-        [timeCodes addObject:@""];
+        [timeCodes addObject:@""]; // Empty
+        [[[kAppDel viewController] noteURLs] addObject:[NSArray array]]; // Empty
     }
     // Now the files...
     for (NSDictionary *dict in fileList) {
@@ -251,6 +253,8 @@
         NSString *fileExt = [dict objectForKey:@"ext"];
         NSString *assetURL = [dict objectForKey:@"asset_url"]; // URL by which to retreive this asset
         NSString *timeCode = [dict objectForKey:@"timecode"];
+        NSArray *noteArchiveURLs = [dict objectForKey:@"notes"]; // Array holding URLs to note archives for this asset
+        NSLog(@"JSON OF NOTE ARCHIVE URLS: %@", [noteArchiveURLs JSONString]);
         NSLog(@"See a file named: %@", fileName);
         NSLog(@"File was assigned a start timecode of: %@", timeCode);
         NSLog(@"Asset located at: %@", assetURL);
@@ -258,6 +262,7 @@
         [fileTypes addObject:[NSNumber numberWithInt: 8]];
         [assetURLs addObject:assetURL];
         [timeCodes addObject:timeCode];
+        [[[kAppDel viewController] noteURLs] addObject:noteArchiveURLs];
         // If we have any clips, this folder isn't all stills.
         if kIsMovie(fileExt) allStills = NO;
     }
@@ -661,7 +666,7 @@
         if (kBonjourMode) {
             // Loading the URL to the asset, originally stored in assetURLs during /list/
             theMedia = [assetURLs objectAtIndex:indexPath.row];
-            
+            [vc setCurFileIndex:indexPath.row];
             // Trying to set the timecode based on the stored timecode 
             // from the JSON data returned by the /list/
             vc.timeCode = @"";

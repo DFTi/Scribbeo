@@ -124,13 +124,13 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
     UILabel                     *recording;             // Recording message goes in the textview
                     
     NSMutableArray              *notePaths;             // paths to all the relevant note files
+    NSMutableArray              *noteURLs;
     NSMutableArray              *xmlPaths, *txtPaths;   // FCP and Avid import files
     NSMutableArray              *markers;             
     XMLURL                      *XMLURLreader;          // For parsing FCP markers in XML
 
     NSMutableArray              *allClips;
     int                         clipNumber;
-                    
     //   Show progress for clip loading
                     
     UIView                      *progressView;
@@ -175,6 +175,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
     CGRect                      drawViewFrame;
     UIImage                     *stillImage;
     BOOL                        allStills;              // Does the folder contain all stills?
+    int                         curFileIndex;        // Current index of file browser
 }
 
 @property (nonatomic, retain)  NSString                     *showName;
@@ -204,6 +205,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property  int    uploadCount;
 
 @property (nonatomic, retain) NSMutableArray     *notePaths;
+@property (nonatomic, retain) NSMutableArray     *noteURLs;
 @property (nonatomic, retain) NSMutableArray     *xmlPaths, *txtPaths;
 @property (nonatomic, retain) NSArray            *markers;
 @property (nonatomic, retain) XMLURL             *XMLURLreader;
@@ -276,6 +278,8 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
                 *fullScreenButton, *rewindButton, *fastForwardButton;
 @property (nonatomic, retain) IBOutlet MPMoviePlayerController *movieController;
 
+@property int curFileIndex;
+
 // Markup
 
 -(IBAction) erase;
@@ -314,6 +318,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 -(void) makeSettings;
 -(Float64) convertTimeToSecs: (NSString *) timeStamp;
+-(NSString *) convertSecsToTime: (Float64) secs;
 -(void) updateTimeLabel;
 -(NSString *) formatDate: (BOOL) includeTime;
 -(void) timeStats;
@@ -338,7 +343,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 // Data storage and loading
 
 -(void) loadData: (NSString *) theInitials;
--(void) getAllHTTPNotes;
+-(void) getAllHTTPNotes: (int)index;
 -(void) storeData;
 #ifdef APPSTORE
 -(void) drawMarkups: (CGContextRef) ctx;
@@ -367,6 +372,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(void) emailLogfile;
 -(IBAction) emailNotes;
 -(NSString *) uploadFile: (NSString *) localPath to: (NSString *) remotePath;
+-(NSString *) downloadFile: (NSString *) remotePath to: (NSString *) localPath;
 -(NSString *) uploadAudio: (Note *) theNote;
 -(void) uploadHTML: (NSString *) theHTML file: (NSString *) fileName;
 -(IBAction) printNotes;

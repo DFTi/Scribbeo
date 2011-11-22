@@ -66,11 +66,11 @@ static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewC
 @synthesize pausePlayButton, pauseImage, playImage, recImage, isRecordingImage, clip, clipPath, show, tape, filmDate, playerLayer, 
 editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSelected;
 ;
-@synthesize progressView, activityIndicator, notePaths, xmlPaths, txtPaths, noteProgressView, noteActivityIndicator, volLabel, curInitials, movieController;
+@synthesize progressView, activityIndicator, notePaths, noteURLs, xmlPaths, txtPaths, noteProgressView, noteActivityIndicator, volLabel, curInitials, movieController;
 @synthesize  stampLabel, stampLabelFull, theAsset, startTimecode, download, clipLabel, runAllMode;
 @synthesize rewindToStartButton, frameBackButton, frameForwardButton, forwardToEndButton, fullScreenButton, rewindButton, fastForwardButton, airPlayMode, remote;
 @synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo, mediaPath;
-@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage, timeCode;
+@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage, timeCode, curFileIndex;
 
 #pragma mark -
 #pragma mark view loading/unloading
@@ -241,6 +241,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // Tables of paths to notes, FCP XML files, Avid locator files
                     
     self.notePaths = [NSMutableArray array];
+    self.noteURLs = [NSMutableArray array];
     self.xmlPaths = [NSMutableArray array];
     self.txtPaths = [NSMutableArray array];
                     
@@ -449,7 +450,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         // Load the notes table
         
         if (kBonjourMode) {
-            [self getAllHTTPNotes];
+            [self getAllHTTPNotes:curFileIndex];
         } else {
             [self loadData: initials];
         }
@@ -1961,37 +1962,61 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 }
 
 
-//  Download the notes archive from the bonjour py server
+//  Download the notes archives from py server. Below comments apply if someone is using same initials.
 // So I just want to say that the way the notes is being done is terrible for collaboration.
 // When someone creates a note, an entire archive gets sent up the wire of what they currently have.
 // This means that if someone has just added a note (and it was uploaded) it would be overwritten by an old
 // archive with that person's note and old list of previous notes. terrible terrible.
--(void) getAllHTTPNotes
+-(void) getAllHTTPNotes: (int)index
 {
-    NSLog(@"Retrieving notes archive.");
-    NSError *error = nil;
-    NSURLResponse *response;
-    NSString *archivePath = [self archiveFilePath];
-    NSString *noteNameForURL = [[archivePath lastPathComponent] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/note/%@", kHTTPserver, noteNameForURL]];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:60.0];
-    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    if (error != nil)
-        NSLog(@"%@", error.localizedDescription);
-    NSLog(@"Got back this much data: %d", [data length]);
-    if ([notePaths count])
-        [notePaths removeAllObjects];
-    [data writeToFile:archivePath atomically:YES];
-    NSLog(@"Downloaded the note archive, attempting to restore...");
     NSFileManager *fm = [NSFileManager defaultManager];
+
+    // Get a list of notes for this clip first... 
+    NSLog(@"All the notes we know of files in this folder: %@", [noteURLs JSONString]);
+    NSLog(@"We are about to getAllHTTPNotes at index %d", index);
     [self noteShowActivity];
-    if ([fm fileExistsAtPath: archivePath] && ([data length] > 50)) {
-        NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
-        [noteData release];
-        noteData = [noteArray mutableCopy];
+    [noteData removeAllObjects];
+    for (NSString *noteArchiveURL in [noteURLs objectAtIndex:index]) {
+        NSLog(@"This asset has one or more note archives... %@", noteArchiveURL);
+        NSString *noteFileName = [noteArchiveURL lastPathComponent]; // blablabla.XXX
+        NSString *archivePathPrefix = [[self archiveFilePath] stringByDeletingLastPathComponent]; // /bla/bla/bla/
+        NSString *archivePath = [NSString stringWithFormat:@"%@/%@", archivePathPrefix, noteFileName];
+        NSString *remoteURL = [NSString stringWithFormat:@"%@%@", kHTTPserver, noteArchiveURL];        
+        NSLog(@"ARCHIVE PATH: %@ REMOTEPATH: %@", archivePath, remoteURL);    
+        // Download it...
+        [self downloadFile:remoteURL to:archivePath];
+        // Restore it...
+        NSLog(@"Downloaded the note archive, attempting to restore...");
+        if ([fm fileExistsAtPath: archivePath]) {
+            NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
+            for (Note *aNote in noteArray) {
+                NSLog(@"Got a note with a timestamp of %@, in float: %f, timestamp again: %@",
+                      aNote.timeStamp,
+                      [self convertTimeToSecs:aNote.timeStamp],
+                      [self convertSecsToTime:[self convertTimeToSecs:aNote.timeStamp]]);
+                // timestampCorrection, an attempt to get notes that were made
+                // prior to a timestamp correction (or when running on windows or something)
+                // to work fine logically...
+                NSLog(@"Clip has start timecode %@, in float: %f", timeCode, [self convertTimeToSecs:timeCode]);
+                // correc ttimecode
+                Float64 noteTime = [self convertTimeToSecs:aNote.timeStamp];
+                Float64 clipTime = [self convertTimeToSecs:timeCode];
+                Float64 newNoteTime = 0.0;
+                NSLog(@"noteTime: %lf, startTimeCode: %lf", noteTime, clipTime);
+                if (noteTime < clipTime) { // Then they probably didn't have the right timecode when they made the note... Let's just adjust it...
+                    newNoteTime = noteTime + clipTime;
+                    aNote.timeStamp = [self convertSecsToTime:newNoteTime];
+                    NSLog(@"Made a correction to a note timecode. Was %@, now is %@",
+                          [self convertSecsToTime:noteTime],
+                          aNote.timeStamp);
+                }
+                [noteData addObject:aNote];
+            }
+        }
+    }
+    if ([noteData count] > 0)
         NSLog (@"Restored %i downloaded", [noteData count]);
-    } else {
-        [noteData removeAllObjects];
+    else {
         [self.notes setEditing: NO];            
         NSLog (@"No notes to restore");
     }
@@ -2893,6 +2918,25 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     return remoteURL;
 }
 
+// Reusable HTTP Download via GET (Synchronous, sorry)
+-(NSString *) downloadFile: (NSString *) remotePath to: (NSString *) localPath
+{
+    NSLog(@"uploadFile is GETting data from: %@ to local file: %@", remotePath, localPath);
+    NSString *remoteURL = [remotePath stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+    NSURL *url = [NSURL URLWithString:remoteURL];
+    NSError *error = nil;
+    NSURLResponse *response;
+    NSURLRequest *request = [NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:60.0];
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    if (error != nil) {
+        NSLog(@"Problem trying to GET data: %@", error.localizedDescription);
+        return NO;
+    }
+    NSLog(@"Got back this much data: %d writing it to %@", [data length], localPath);
+    [data writeToFile:localPath atomically:YES];
+    return YES;
+}
+
 //
 // Uploads the full HTML Notes to the server
 //
@@ -3141,6 +3185,26 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
     
     return secs;
 }
+
+// Take a float64 and turn it into an NSString in xx:xx:xx:xx format
+// Sometimes inaccurate by 1 frame.
+-(NSString *) convertSecsToTime: (Float64) time
+{
+    float theFPS = (fps != 0.0) ? fps : 24;
+  
+    int minutes = time/60.f;
+    int hours = minutes / 60.f;
+	int seconds = time - (minutes * 60.f);
+	int frames = (time - (seconds + (minutes * 60.f))) * theFPS;
+    
+    NSString *timeStamp = [NSString stringWithFormat:@"%02d:%02d:%02d:%02d",
+                           hours,
+                           minutes-60,
+                           seconds,
+                           frames];
+    return timeStamp;
+}
+
 
 // Format the current date.  The argument says whether to include
 // the time in the format as well
@@ -3668,7 +3732,7 @@ static int saveRate;
     [self showActivity];        // Get the spinner going while we load the movie
 
     if (kBonjourMode) {
-        [self getAllHTTPNotes];
+        [self getAllHTTPNotes:curFileIndex];
     } else { 
         if (!allStills)
             [self loadData: [NSString stringWithFormat: @"%@.%@", 
@@ -4461,7 +4525,7 @@ static int saveRate;
     
 //    UILabel *timeLabel = [[UILabel alloc] init];
 //    timeLabel.frame = CGRectMake(0, 110, tableView.frame.size.width, 20);
-    cell.timeLabel.text = [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode)];
+    cell.timeLabel.text = [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp])];
 //    timeLabel.textColor = [UIColor whiteColor];
 //     timeLabel.shadowColor = [UIColor blackColor];
 //    timeLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
@@ -4490,6 +4554,9 @@ static int saveRate;
         // Seek to the frame indicated by the note
             
         Float64 secs = [self convertTimeToSecs: theNote.timeStamp] - startTimecode;
+        
+        NSLog (@"Note time: %lg, start time: %lg", secs, startTimecode);
+        
         NSLog (@"Seeking to %lg (%@) for Note", secs, theNote.timeStamp);
         
         seekToZeroBeforePlay = NO;
@@ -4645,6 +4712,7 @@ static int saveRate;
     [noteBar release];
     [drawingBar release];
     [notePaths release];
+    [noteURLs release];
     [volLabel release];
         
     [playOutButton release];
