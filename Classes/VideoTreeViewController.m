@@ -70,7 +70,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 @synthesize  stampLabel, stampLabelFull, theAsset, startTimecode, download, clipLabel, runAllMode;
 @synthesize rewindToStartButton, frameBackButton, frameForwardButton, forwardToEndButton, fullScreenButton, rewindButton, fastForwardButton, airPlayMode, remote;
 @synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo, mediaPath;
-@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage, timeCode, curFileIndex;
+@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage, timeCode, curFileIndex, curAssetURLs;
 
 #pragma mark -
 #pragma mark view loading/unloading
@@ -1979,8 +1979,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     for (NSString *noteArchiveURL in [noteURLs objectAtIndex:index]) {
         NSLog(@"This asset has one or more note archives... %@", noteArchiveURL);
         NSString *noteFileName = [noteArchiveURL lastPathComponent]; // blablabla.XXX
-        NSString *archivePathPrefix = [[self archiveFilePath] stringByDeletingLastPathComponent]; // /bla/bla/bla/
-        NSString *archivePath = [NSString stringWithFormat:@"%@/%@", archivePathPrefix, noteFileName];
+        NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *docDir = [dirList objectAtIndex: 0];
+        NSString *archivePath = [docDir stringByAppendingPathComponent:noteFileName];
         NSString *remoteURL = [NSString stringWithFormat:@"%@%@", kHTTPserver, noteArchiveURL];        
         NSLog(@"ARCHIVE PATH: %@ REMOTEPATH: %@", archivePath, remoteURL);    
         // Download it...
@@ -4088,9 +4089,7 @@ static int saveRate;
 -(BOOL) nextClip
 {
     DetailViewController *dc =  [kAppDel rootTvc];
-    
-    NSLog (@"autoplay next clip");
-    return [dc nextClip];
+    [dc nextClip];
 }
 
 // Notiication that a clip is done playing (MPMoviePlayer class)

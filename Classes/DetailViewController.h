@@ -44,8 +44,9 @@
 -(void) iTunesLoad;
 -(void) setTheMoviePath: (NSString *) movie;
 -(void) filesFromJSONFileListing: (NSDictionary *) listing;
-
-
+- (void) setNotesAndTimecodeForAsset: (NSString *) assetURL atIndex:(NSInteger) index;
+- (void)rowSelected:(int)row;
+- (void) playAsset: (NSString *)theMedia;
 
 #ifdef OLDSTUFF
 @property (nonatomic, retain)  NSString        *episode, *date, *tape, *clip;

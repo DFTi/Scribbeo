@@ -176,6 +176,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
     UIImage                     *stillImage;
     BOOL                        allStills;              // Does the folder contain all stills?
     int                         curFileIndex;        // Current index of file browser
+    NSMutableArray *curAssetURLs;   // Current asset URLs for current folder
 }
 
 @property (nonatomic, retain)  NSString                     *showName;
@@ -210,7 +211,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property (nonatomic, retain) NSArray            *markers;
 @property (nonatomic, retain) XMLURL             *XMLURLreader;
 
-@property (nonatomic, retain) NSMutableArray      *allClips;
+@property (nonatomic, retain) NSMutableArray      *allClips, *curAssetURLs;
 @property (nonatomic)        int                clipNumber, skipValue;
 
 @property (nonatomic, retain) NSString           *initials;

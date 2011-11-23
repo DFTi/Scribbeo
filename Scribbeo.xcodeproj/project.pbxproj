@@ -51,7 +51,6 @@
 		02A3068413C686D300E7340D /* fcpChapter.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3062613C686D300E7340D /* fcpChapter.png */; };
 		02A3068513C686D300E7340D /* fcp.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3062713C686D300E7340D /* fcp.png */; };
 		02A3068613C686D300E7340D /* avid.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3062813C686D300E7340D /* avid.png */; };
-		02A3068713C686D300E7340D /* videotree.icns in Resources */ = {isa = PBXBuildFile; fileRef = 02A3062913C686D300E7340D /* videotree.icns */; };
 		02A3068A13C686D300E7340D /* folder.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3063313C686D300E7340D /* folder.png */; };
 		02A3068B13C686D300E7340D /* blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3063413C686D300E7340D /* blue.png */; };
 		02A3068C13C686D300E7340D /* green.png in Resources */ = {isa = PBXBuildFile; fileRef = 02A3063513C686D300E7340D /* green.png */; };
@@ -95,6 +94,9 @@
 		4B078ACE147C66700046D379 /* scribbeo-icon~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B078ACB147C66700046D379 /* scribbeo-icon~ipad.png */; };
 		4B078AD0147C66950046D379 /* scribbeo-app-splash.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B078ACF147C66950046D379 /* scribbeo-app-splash.png */; };
 		7A89B2CC147740D300F172A3 /* FileCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A89B2CB147740D300F172A3 /* FileCell.m */; };
+		BC0E807B147C8626008E4469 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0E807A147C8626008E4469 /* Default-Landscape~ipad.png */; };
+		BC0E8080147C8676008E4469 /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0E807F147C8676008E4469 /* Default-Portrait~ipad.png */; };
+		BC0E8087147C8781008E4469 /* scribbeo.icns in Resources */ = {isa = PBXBuildFile; fileRef = BC0E8086147C8781008E4469 /* scribbeo.icns */; };
 		BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = BCCDB3B61468C8FC008D41B2 /* JSONKit.m */; };
 		BCCDB3C2146BE3B7008D41B2 /* Disconnected.png in Resources */ = {isa = PBXBuildFile; fileRef = BCCDB3C1146BE3B7008D41B2 /* Disconnected.png */; };
 /* End PBXBuildFile section */
@@ -167,7 +169,6 @@
 		02A3062613C686D300E7340D /* fcpChapter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fcpChapter.png; sourceTree = "<group>"; };
 		02A3062713C686D300E7340D /* fcp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = fcp.png; sourceTree = "<group>"; };
 		02A3062813C686D300E7340D /* avid.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = avid.png; sourceTree = "<group>"; };
-		02A3062913C686D300E7340D /* videotree.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = videotree.icns; sourceTree = "<group>"; };
 		02A3063313C686D300E7340D /* folder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = folder.png; sourceTree = "<group>"; };
 		02A3063413C686D300E7340D /* blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blue.png; sourceTree = "<group>"; };
 		02A3063513C686D300E7340D /* green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = green.png; sourceTree = "<group>"; };
@@ -213,6 +214,9 @@
 		4B078ACF147C66950046D379 /* scribbeo-app-splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "scribbeo-app-splash.png"; sourceTree = "<group>"; };
 		7A89B2CA147740D300F172A3 /* FileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCell.h; sourceTree = "<group>"; };
 		7A89B2CB147740D300F172A3 /* FileCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileCell.m; sourceTree = "<group>"; };
+		BC0E807A147C8626008E4469 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
+		BC0E807F147C8676008E4469 /* Default-Portrait~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait~ipad.png"; sourceTree = "<group>"; };
+		BC0E8086147C8781008E4469 /* scribbeo.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = scribbeo.icns; sourceTree = "<group>"; };
 		BCBB9E25143431F600EA4486 /* VideoTree.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = VideoTree.entitlements; sourceTree = "<group>"; };
 		BCCDB3B51468C8FC008D41B2 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
 		BCCDB3B61468C8FC008D41B2 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
@@ -348,6 +352,8 @@
 		02A306CC13C6886100E7340D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				BC0E807F147C8676008E4469 /* Default-Portrait~ipad.png */,
+				BC0E807A147C8626008E4469 /* Default-Landscape~ipad.png */,
 				4B078ACF147C66950046D379 /* scribbeo-app-splash.png */,
 				4B078AC9147C66700046D379 /* scribbeo-icon.png */,
 				4B078ACA147C66700046D379 /* scribbeo-icon@2.png */,
@@ -367,10 +373,10 @@
 				02A3062613C686D300E7340D /* fcpChapter.png */,
 				02A3062713C686D300E7340D /* fcp.png */,
 				02A3062813C686D300E7340D /* avid.png */,
-				02A3062913C686D300E7340D /* videotree.icns */,
 				02A3063313C686D300E7340D /* folder.png */,
 				02A3063E13C686D300E7340D /* fcpXML.png */,
 				02A3063F13C686D300E7340D /* cameraRoll.png */,
+				BC0E8086147C8781008E4469 /* scribbeo.icns */,
 				02A3064113C686D300E7340D /* bg.png */,
 				02A3064213C686D300E7340D /* Default.png */,
 				02A3064713C686D300E7340D /* dvd-icon.png */,
@@ -500,7 +506,6 @@
 				02A3068413C686D300E7340D /* fcpChapter.png in Resources */,
 				02A3068513C686D300E7340D /* fcp.png in Resources */,
 				02A3068613C686D300E7340D /* avid.png in Resources */,
-				02A3068713C686D300E7340D /* videotree.icns in Resources */,
 				02A3068A13C686D300E7340D /* folder.png in Resources */,
 				02A3068B13C686D300E7340D /* blue.png in Resources */,
 				02A3068C13C686D300E7340D /* green.png in Resources */,
@@ -545,6 +550,9 @@
 				4B078ACD147C66700046D379 /* scribbeo-icon@2.png in Resources */,
 				4B078ACE147C66700046D379 /* scribbeo-icon~ipad.png in Resources */,
 				4B078AD0147C66950046D379 /* scribbeo-app-splash.png in Resources */,
+				BC0E807B147C8626008E4469 /* Default-Landscape~ipad.png in Resources */,
+				BC0E8080147C8676008E4469 /* Default-Portrait~ipad.png in Resources */,
+				BC0E8087147C8781008E4469 /* scribbeo.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -586,8 +594,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: sazeer kader (96693546A8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: sazeer kader (96693546A8)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -599,8 +607,8 @@
 				"INSTALL_PATH[sdk=*]" = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DDEBUG";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "F6BFA379-132D-4311-9A80-7EF1E0D19C78";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F6BFA379-132D-4311-9A80-7EF1E0D19C78";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -610,16 +618,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: sazeer kader (96693546A8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: sazeer kader (96693546A8)";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "F6BFA379-132D-4311-9A80-7EF1E0D19C78";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F6BFA379-132D-4311-9A80-7EF1E0D19C78";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -629,8 +637,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Zach Thayer (4MDT5J2SFV)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: sazeer kader (96693546A8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: sazeer kader (96693546A8)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -644,8 +652,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = Scribbeo;
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B5E41B13-86A6-4E6E-8F02-4F7218FDBA81";
+				PROVISIONING_PROFILE = "F6BFA379-132D-4311-9A80-7EF1E0D19C78";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F6BFA379-132D-4311-9A80-7EF1E0D19C78";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
@@ -656,8 +664,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: sazeer kader (96693546A8)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: sazeer kader (96693546A8)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -670,8 +678,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = Scribbeo;
-				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				PROVISIONING_PROFILE = "F6BFA379-132D-4311-9A80-7EF1E0D19C78";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "F6BFA379-132D-4311-9A80-7EF1E0D19C78";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;

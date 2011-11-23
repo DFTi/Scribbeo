@@ -212,8 +212,8 @@
             NSLog(@"Could not get data from the URL");
             return;
         }
+        NSLog(@"Got data... Filling the file list");
         [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
-        NSLog(list);
         NSDictionary *fileDict = [list objectFromJSONString];
         // Now we need to populate the files array using our nice JSON list
         [self filesFromJSONFileListing:fileDict];       
@@ -252,31 +252,52 @@
         NSString *fileName = [dict objectForKey:@"name"];
         NSString *fileExt = [dict objectForKey:@"ext"];
         NSString *assetURL = [dict objectForKey:@"asset_url"]; // URL by which to retreive this asset
-        NSString *timeCode = [dict objectForKey:@"timecode"];
-        NSArray *noteArchiveURLs = [dict objectForKey:@"notes"]; // Array holding URLs to note archives for this asset
-        NSLog(@"JSON OF NOTE ARCHIVE URLS: %@", [noteArchiveURLs JSONString]);
         NSLog(@"See a file named: %@", fileName);
-        NSLog(@"File was assigned a start timecode of: %@", timeCode);
         NSLog(@"Asset located at: %@", assetURL);
         [files addObject:fileName];
         [fileTypes addObject:[NSNumber numberWithInt: 8]];
         [assetURLs addObject:assetURL];
-        [timeCodes addObject:timeCode];
-        [[[kAppDel viewController] noteURLs] addObject:noteArchiveURLs];
+        [timeCodes addObject:@""]; // gets populated elsewhere
+        [[[kAppDel viewController] noteURLs] addObject:[NSArray array]]; // gets populated elsewhere.
         // If we have any clips, this folder isn't all stills.
         if kIsMovie(fileExt) allStills = NO;
     }
     NSLog(@"from with JSON File Listing... AssetURLs has %d items", [assetURLs count] );
-    NSLog(@"timeCodes has %d items", [timeCodes count] );
 
-    [self.tableView reloadData];
-    [self finishLoad];
+    [self.tableView reloadData]; // reloads file listing
+    [self finishLoad]; // reloads file listing... again...
 }
 
+// This method will fill the noteURLs array. Called when you select a clip.
+// Then loadMovie or loadStill will call the getAllHTTPNotes method that actually fills the noteData array. 
+// Oh and also timecode...
+- (void) setNotesAndTimecodeForAsset: (NSString *) assetURL atIndex:(NSInteger) index
+{
+    NSLog(@"Updating notes & timecode for asset %@ at index: %d from %@", assetURL, index, [kAppDel HTTPserver]);
 
+    // Prep the urls
+    NSString *notesFetchURLstr = [[NSString stringWithFormat:@"%@/notes%@", [kAppDel HTTPserver], assetURL] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+    NSString *tcFetchURLstr = [[NSString stringWithFormat:@"%@/timecode%@", [kAppDel HTTPserver], assetURL] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
 
-
-
+    // Fetch the notes
+    NSURL *notesFetchURL = [NSURL URLWithString:notesFetchURLstr];
+    NSString *noteURLjsonString = [NSString stringWithContentsOfURL:notesFetchURL encoding:NSASCIIStringEncoding error:nil];
+    if (!noteURLjsonString) {
+        NSLog(@"Could not get data from the URL");
+        return;
+    }
+    [[[kAppDel viewController] noteURLs] replaceObjectAtIndex:(NSUInteger)index withObject:[noteURLjsonString objectFromJSONString]];
+    
+    // Fetch the timecode
+    NSURL *tcFetchURL = [NSURL URLWithString:tcFetchURLstr];
+    NSString *tc = [NSString stringWithContentsOfURL:tcFetchURL encoding:NSASCIIStringEncoding error:nil];
+    if (!tc) {
+        NSLog(@"Could not get data from the URL");
+        [[kAppDel viewController] setTimeCode:@"00:00:00:00"];
+        return;
+    }
+    [[kAppDel viewController] setTimeCode:tc];
+}
 
 
 //
@@ -580,25 +601,42 @@
 
 -(BOOL) nextClip
 {
-    while (++currentClip < [files count]) {
-        int fileType = [[fileTypes objectAtIndex: currentClip] intValue];
-    
-        if (fileType != kDirectory) {
-            @try  {
-                NSIndexPath *indexP = [NSIndexPath indexPathForRow: currentClip inSection:0];
-                [self tableView: nil didSelectRowAtIndexPath: indexP];
-                [self.tableView selectRowAtIndexPath: indexP animated: YES scrollPosition: UITableViewScrollPositionTop];
-            }
-            @catch (NSException *exception) {
-                NSLog (@"Couldn't select next clip!");
-                break;
-            }
+    if (!kBonjourMode) {
+        while (++currentClip < [files count]) {
+            int fileType = [[fileTypes objectAtIndex: currentClip] intValue];
+        
+            if (fileType != kDirectory) {
+                @try  {
+                    NSIndexPath *indexP = [NSIndexPath indexPathForRow: currentClip inSection:0];
+                    [self tableView: nil didSelectRowAtIndexPath: indexP];
+                    [self.tableView selectRowAtIndexPath: indexP animated: YES scrollPosition: UITableViewScrollPositionTop];
+                }
+                @catch (NSException *exception) {
+                    NSLog (@"Couldn't select next clip!");
+                    break;
+                }
 
-            return YES;
+                return YES;
+            }
         }
+        
+        return NO;
+    } else {
+
+        VideoTreeViewController *vc = [kAppDel viewController];
+        
+        int nextIndex = [vc curFileIndex] + 1;        
+        if ([[vc curAssetURLs] count] <= nextIndex)
+            return NO; // we're at the end.
+
+        [vc setCurFileIndex:nextIndex];
+        NSString *theMedia = [[vc curAssetURLs] objectAtIndex:nextIndex];
+        [self setNotesAndTimecodeForAsset:theMedia atIndex:nextIndex];
+        [[vc notes] reloadData];      
+        [self playAsset:theMedia];
+        return YES;
     }
-    
-    return NO;
+
 }
 
 //
@@ -607,8 +645,12 @@
            
 -(void) setTheMoviePath: (NSString *) theMovie
 {
+    NSLog(@"setTheMoviePath");
+    NSLog(@"setTheMoviePath sees theMovie at %@", theMovie);
     if (kBonjourMode) {
-        self.moviePath = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], theMovie];
+        NSString *thePath = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], theMovie];
+        NSLog(thePath);
+        self.moviePath = thePath;
     } else {
         NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *docDir = [dirList objectAtIndex: 0];
@@ -621,20 +663,21 @@
     return (kBonjourMode) ? NO : YES;
 }
 
+#pragma mark -
+#pragma clip/still/asset selection
+
 // 
 // A row was selected from the table
 // If it's a directory, we want to drill down
 // Otherwise, it must be a movie clip so we'll go ahead and play it
 //
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    VideoTreeAppDelegate *appDel = kAppDel;
-    VideoTreeViewController *vc = [appDel viewController];
-    appDel.tvc = self;
-  
-    currentClip = indexPath.row;
+- (void)rowSelected:(int)row {
+    VideoTreeViewController *vc = [kAppDel viewController];
+
+    currentClip = row; // old shite
     
-    int fileType = [[fileTypes objectAtIndex: indexPath.row] intValue];
+    int fileType = [[fileTypes objectAtIndex: row] intValue];
     
     // If a folder gets selected, we need to drill down
     
@@ -643,11 +686,10 @@
         // Create another controller to display the contents of the selected folder
         // Note we push the same controller type here (i.e., we stay in this code)
         //
-        
         DetailViewController *detailViewController = [[DetailViewController alloc] init];        
-        detailViewController.title = [files objectAtIndex: indexPath.row];
+        detailViewController.title = [files objectAtIndex: row];
         detailViewController.currentPath = [[NSString stringWithFormat: @"%@/%@", 
-                currentPath, [files objectAtIndex: indexPath.row]] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+                                             currentPath, [files objectAtIndex: row]] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
         NSLog (@"currentPath is %@", detailViewController.currentPath); 
         
         [self.navigationController pushViewController: detailViewController animated:YES];
@@ -655,48 +697,57 @@
     }
     else {   
         // Play the selected movie or display the selected still
-
+        
         if (vc.runAllMode) {
             [vc airPlay];
             vc.runAllMode = NO;
         }
         
         NSString *theMedia;
-
+        
         if (kBonjourMode) {
-            // Loading the URL to the asset, originally stored in assetURLs during /list/
-            theMedia = [assetURLs objectAtIndex:indexPath.row];
-            [vc setCurFileIndex:indexPath.row];
-            // Trying to set the timecode based on the stored timecode 
-            // from the JSON data returned by the /list/
-            vc.timeCode = @"";
-            vc.timeCode = [timeCodes objectAtIndex:indexPath.row];
+            [vc setCurAssetURLs:assetURLs]; // need to do this so the list persists for use in nextClip (autoplay)
+            NSLog(@"ViewController's AssetURLs = %@", [vc curAssetURLs]);
+            theMedia = [assetURLs objectAtIndex:row];
+            NSLog(@"theMedia = %@", theMedia);
+            [vc setCurFileIndex:row];
+            [self setNotesAndTimecodeForAsset:theMedia atIndex:row];
             NSLog(@"User tapped, loading the movie, the timecode is: %@ It will be converted to float and set in loadMovie shortly.", vc.timeCode);
-            // We need to set the timecode within loadMovie           
         }
         else
             theMedia = [NSString stringWithFormat: @"%@/%@", currentPath, 
-                    [files objectAtIndex: indexPath.row]];
+                        [files objectAtIndex: row]];
+
+        [self playAsset:theMedia];
         
-        NSLog (@"The movie/still = %@", theMedia);
-        
-        [self setTheMoviePath: theMedia];  // Get the correct path to the selected movie
-        
-        vc.clip =  theMedia;
-        vc.clipPath = theMedia;
-        vc.allStills = allStills;
-        
-        NSString *extension = [[files objectAtIndex: indexPath.row] pathExtension];
-        
-        vc.noteTableSelected = NO;
-        
-        NSLog(@"Now will try loading the movie or still at: %@", moviePath);
-        
-        if ( kIsMovie (extension) )
-            [vc loadMovie: moviePath];
-        else
-            [vc loadStill: moviePath];
     }
+}
+
+- (void) playAsset: (NSString *)theMedia {
+    VideoTreeViewController *vc = [kAppDel viewController];
+
+    NSLog (@"The movie/still = %@", theMedia);
+    
+    [self setTheMoviePath: theMedia];  // Get the correct path to the selected movie
+    
+    vc.clip =  theMedia;
+    vc.clipPath = theMedia;
+    vc.allStills = allStills;
+    
+    NSString *extension = [theMedia pathExtension];
+    
+    vc.noteTableSelected = NO;
+    
+    NSLog(@"Now will try loading the movie or still at: %@", moviePath);
+    
+    if ( kIsMovie (extension) )
+        [vc loadMovie: moviePath];
+    else
+        [vc loadStill: moviePath];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [self rowSelected:indexPath.row];
 }
 
 #pragma mark -
