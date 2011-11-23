@@ -629,6 +629,14 @@
         if ([[vc curAssetURLs] count] <= nextIndex)
             return NO; // we're at the end.
 
+        NSLog(@"Doing table selection...");
+        NSIndexPath *indexP = [NSIndexPath indexPathForRow: nextIndex inSection:0];
+        UITableView *tv = [[[[self navigationController] viewControllers] lastObject] tableView]; // really. I know... shh
+        [tv selectRowAtIndexPath:indexP animated:YES scrollPosition:UITableViewScrollPositionTop];
+            // Looks like that was only cosmetic--actually play the damn thing now:
+        
+        NSLog(@"Done table selection!");        
+        
         [vc setCurFileIndex:nextIndex];
         NSString *theMedia = [[vc curAssetURLs] objectAtIndex:nextIndex];
         [self setNotesAndTimecodeForAsset:theMedia atIndex:nextIndex];
@@ -747,6 +755,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"didSelectRowAtIndexPath!");
     [self rowSelected:indexPath.row];
 }
 
