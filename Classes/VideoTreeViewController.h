@@ -29,6 +29,7 @@
 #import "HelpScreenController.h"
 #import "UIImageView+Scaling.h"
 #import "FileCell.h"
+#import "IASKAppSettingsViewController.h"
 
 void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, int currentY);
 
@@ -38,7 +39,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @interface VideoTreeViewController : UIViewController <UITableViewDelegate, UITableViewDataSource,
             UITextFieldDelegate, MFMailComposeViewControllerDelegate, 
-            UIWebViewDelegate, UIPrintInteractionControllerDelegate>  {
+            UIWebViewDelegate, UIPrintInteractionControllerDelegate, IASKSettingsDelegate>  {
     NSMutableArray              *noteData;                  // The table of notes
     UITextView                  *newNote;                   // The area where the text of a note is displayed
     UITableView                 *notes;                     // The table of notes
@@ -393,6 +394,9 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(NSURL *) getTheURL: (NSString *) thePath;   // Used by loadMovie: and loadStill:
 
 -(void) directlySetStartTimecode: (NSString *) timeCodeStr;
+
+
+@property (nonatomic, retain) IASKAppSettingsViewController *appSettingsViewController;
 
 
 @end
