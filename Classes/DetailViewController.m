@@ -783,6 +783,7 @@
 
 - (void)dealloc {
     NSLog (@"dealloc of Detail View Controller");
+    [[[kAppDel viewController] curAssetURLs] removeAllObjects]; // this will stop the autoplay too
     [moviePath release];
     
     [currentPath release];
