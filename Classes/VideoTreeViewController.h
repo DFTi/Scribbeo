@@ -319,7 +319,6 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 -(void) makeSettings;
 -(Float64) convertTimeToSecs: (NSString *) timeStamp;
--(NSString *) convertSecsToTime: (Float64) secs;
 -(void) updateTimeLabel;
 -(NSString *) formatDate: (BOOL) includeTime;
 -(void) timeStats;

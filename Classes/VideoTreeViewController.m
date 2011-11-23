@@ -1991,10 +1991,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         if ([fm fileExistsAtPath: archivePath]) {
             NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
             for (Note *aNote in noteArray) {
-                NSLog(@"Got a note with a timestamp of %@, in float: %f, timestamp again: %@",
-                      aNote.timeStamp,
-                      [self convertTimeToSecs:aNote.timeStamp],
-                      [self convertSecsToTime:[self convertTimeToSecs:aNote.timeStamp]]);
                 // timestampCorrection, an attempt to get notes that were made
                 // prior to a timestamp correction (or when running on windows or something)
                 // to work fine logically...
@@ -2006,10 +2002,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                 NSLog(@"noteTime: %lf, startTimeCode: %lf", noteTime, clipTime);
                 if (noteTime < clipTime) { // Then they probably didn't have the right timecode when they made the note... Let's just adjust it...
                     newNoteTime = noteTime + clipTime;
-                    aNote.timeStamp = [self convertSecsToTime:newNoteTime];
-                    NSLog(@"Made a correction to a note timecode. Was %@, now is %@",
-                          [self convertSecsToTime:noteTime],
-                          aNote.timeStamp);
+                    aNote.timeStamp = [self timeFormat:kCMTimeMakeWithSeconds (newNoteTime)];
                 }
                 [noteData addObject:aNote];
             }
@@ -3186,26 +3179,6 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
     
     return secs;
 }
-
-// Take a float64 and turn it into an NSString in xx:xx:xx:xx format
-// Sometimes inaccurate by 1 frame.
--(NSString *) convertSecsToTime: (Float64) time
-{
-    float theFPS = (fps != 0.0) ? fps : 24;
-  
-    int minutes = time/60.f;
-    int hours = minutes / 60.f;
-	int seconds = time - (minutes * 60.f);
-	int frames = (time - (seconds + (minutes * 60.f))) * theFPS;
-    
-    NSString *timeStamp = [NSString stringWithFormat:@"%02d:%02d:%02d:%02d",
-                           hours,
-                           minutes-60,
-                           seconds,
-                           frames];
-    return timeStamp;
-}
-
 
 // Format the current date.  The argument says whether to include
 // the time in the format as well
@@ -4525,6 +4498,7 @@ static int saveRate;
 //    UILabel *timeLabel = [[UILabel alloc] init];
 //    timeLabel.frame = CGRectMake(0, 110, tableView.frame.size.width, 20);
     cell.timeLabel.text = [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp])];
+    
 //    timeLabel.textColor = [UIColor whiteColor];
 //     timeLabel.shadowColor = [UIColor blackColor];
 //    timeLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
