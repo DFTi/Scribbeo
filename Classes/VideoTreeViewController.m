@@ -4498,7 +4498,8 @@ static int saveRate;
 //    UILabel *timeLabel = [[UILabel alloc] init];
 //    timeLabel.frame = CGRectMake(0, 110, tableView.frame.size.width, 20);
     cell.timeLabel.text = [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp])];
-    
+    cell.dateLabel.text = theNote.date;
+    cell.initialsLabel.text = theNote.initials;
 //    timeLabel.textColor = [UIColor whiteColor];
 //     timeLabel.shadowColor = [UIColor blackColor];
 //    timeLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
