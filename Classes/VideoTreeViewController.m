@@ -1788,8 +1788,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     @try 
     {
-        [notes scrollToRowAtIndexPath: indexP 
-                     atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+        // [notes scrollToRowAtIndexPath: indexP 
+        //           atScrollPosition: UITableViewScrollPositionBottom animated: YES];
     }
     @catch (NSException * e)
     {
@@ -3371,7 +3371,7 @@ static int saveRate;
         NSIndexPath *indexP = [NSIndexPath indexPathForRow: row inSection:0];
         
         @try  {
-            [notes selectRowAtIndexPath: indexP animated: YES scrollPosition: UITableViewScrollPositionTop];
+            [notes selectRowAtIndexPath: indexP animated: NO scrollPosition: UITableViewScrollPositionNone];
         }
         @catch (NSException *exception) {
             NSLog (@"race condition with tableview");
