@@ -229,7 +229,6 @@
 // This method will fill the files array from the JSON received from the py bonjour webserver
 - (void) filesFromJSONFileListing: (NSDictionary *) listing
 {
-    [[[kAppDel viewController] noteURLs] removeAllObjects];
     NSLog (@"filesFromJSONFileListing");
     allStills = YES; // For album mode. This will become NO if there's non-stills here.
     
@@ -245,7 +244,6 @@
         NSString *listURL = [dict objectForKey:@"list_url"]; // URL by which to retreive this asset
         [assetURLs addObject:listURL]; // Dir has no asset retrieval URL, instead use assetURL for traversal
         [timeCodes addObject:@""]; // Empty
-        [[[kAppDel viewController] noteURLs] addObject:[NSArray array]]; // Empty
     }
     // Now the files...
     for (NSDictionary *dict in fileList) {
@@ -258,7 +256,6 @@
         [fileTypes addObject:[NSNumber numberWithInt: 8]];
         [assetURLs addObject:assetURL];
         [timeCodes addObject:@""]; // gets populated elsewhere
-        [[[kAppDel viewController] noteURLs] addObject:[NSArray array]]; // gets populated elsewhere.
         // If we have any clips, this folder isn't all stills.
         if kIsMovie(fileExt) allStills = NO;
     }
@@ -286,7 +283,10 @@
         NSLog(@"Could not get data from the URL");
         return;
     }
-    [[[kAppDel viewController] noteURLs] replaceObjectAtIndex:(NSUInteger)index withObject:[noteURLjsonString objectFromJSONString]];
+
+//    [[[kAppDel viewController] noteURLs] replaceObjectAtIndex:(NSUInteger)index withObject:[noteURLjsonString objectFromJSONString]];
+  
+    [[kAppDel viewController] setNoteURLs:[noteURLjsonString objectFromJSONString]];
     
     // Fetch the timecode
     NSURL *tcFetchURL = [NSURL URLWithString:tcFetchURLstr];
@@ -702,6 +702,7 @@
         
         [self.navigationController pushViewController: detailViewController animated:YES];
         [detailViewController release];
+        [self makeList]; // update our location...
     }
     else {   
         // Play the selected movie or display the selected still

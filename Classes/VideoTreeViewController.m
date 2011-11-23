@@ -1976,7 +1976,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSLog(@"We are about to getAllHTTPNotes at index %d", index);
     [self noteShowActivity];
     [noteData removeAllObjects];
-    for (NSString *noteArchiveURL in [noteURLs objectAtIndex:index]) {
+    for (NSString *noteArchiveURL in noteURLs) {
         NSLog(@"This asset has one or more note archives... %@", noteArchiveURL);
         NSString *noteFileName = [noteArchiveURL lastPathComponent]; // blablabla.XXX
         NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
