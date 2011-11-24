@@ -28,7 +28,7 @@
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 		</dict>
-        <dict>
+		<dict>
 			<key>DefaultValue</key>
 			<false/>
 			<key>Key</key>
@@ -48,7 +48,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
-        <dict>
+		<dict>
 			<key>DefaultValue</key>
 			<string>5</string>
 			<key>Key</key>
@@ -68,7 +68,7 @@
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 		</dict>
-        <dict>
+		<dict>
 			<key>DefaultValue</key>
 			<false/>
 			<key>Key</key>
@@ -79,23 +79,23 @@
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
 		<dict>
-            <key>Type</key>
-			<string>PSMultiValueSpecifier</string>
-            <key>Title</key>
-			<string>Time Display Format</string>
 			<key>DefaultValue</key>
 			<string>Timecode</string>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>Time Display Format</string>
 			<key>Key</key>
 			<string>Timecode</string>
-            <key>Values</key>
+			<key>Values</key>
 			<array>
-                <string>1</string>
-                <string>0</string>
+				<string>1</string>
+				<string>0</string>
 			</array>
 			<key>Titles</key>
 			<array>
-                <string>Frame number</string>
-                <string>Timecode</string>
+				<string>Frame number</string>
+				<string>Timecode</string>
 			</array>
 		</dict>
 		<dict>
@@ -105,10 +105,10 @@
 			<string>PSGroupSpecifier</string>
 		</dict>
 		<dict>
-            <key>Type</key>
-			<string>PSMultiValueSpecifier</string>
 			<key>DefaultValue</key>
 			<string>HTML</string>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
 			<key>Key</key>
 			<string>emailPDF</string>
 			<key>Title</key>
@@ -118,7 +118,6 @@
 				<string>HTML</string>
 				<string>PDF</string>
 			</array>
-
 			<key>Values</key>
 			<array>
 				<integer>0</integer>
@@ -145,7 +144,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
-        <dict>
+		<dict>
 			<key>Title</key>
 			<string>Bonjour Server Settings</string>
 			<key>Type</key>
@@ -161,7 +160,7 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
-        <dict>
+		<dict>
 			<key>DefaultValue</key>
 			<false/>
 			<key>Key</key>
@@ -173,29 +172,28 @@
 		</dict>
 		<dict>
 			<key>DefaultValue</key>
-            <false/>
+			<string></string>
 			<key>Key</key>
 			<string>ServerIP</string>
 			<key>Title</key>
 			<string>Manual IP</string>
-            <key>KeyboardType</key>
-            <string>NumbersAndPunctuation</string>
+			<key>KeyboardType</key>
+			<string>NumbersAndPunctuation</string>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 		</dict>
-        <dict>
+		<dict>
 			<key>DefaultValue</key>
-            <false/>
+			<string></string>
 			<key>Key</key>
 			<string>ServerPort</string>
 			<key>Title</key>
 			<string>Manual Port</string>
-            <key>KeyboardType</key>
-            <string>NumbersAndPunctuation</string>
+			<key>KeyboardType</key>
+			<string>NumbersAndPunctuation</string>
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 		</dict>
-        
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>

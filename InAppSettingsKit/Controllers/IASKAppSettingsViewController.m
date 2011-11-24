@@ -590,7 +590,7 @@ CGRect IASKCGRectSwap(CGRect rect);
     }
     else if ([[specifier type] isEqualToString:kIASKPSTextFieldSpecifier]) {
 		IASKPSTextFieldSpecifierViewCell *textFieldCell = (id)[tableView cellForRowAtIndexPath:indexPath];
-		[textFieldCell.textField becomeFirstResponder];
+		//[textFieldCell.textField becomeFirstResponder];
     }
     else if ([[specifier type] isEqualToString:kIASKPSChildPaneSpecifier]) {
 

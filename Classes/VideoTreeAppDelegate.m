@@ -215,7 +215,7 @@ static int tryOne = 0;
     viewController.filenameView.hidden = NO;
      
     [viewController.view bringSubviewToFront: viewController.filenameView];
-    [viewController.saveFilename becomeFirstResponder];
+    //[viewController.saveFilename becomeFirstResponder];
 }
 
 // A file name has been entered for local clip storage.  Make sure the file

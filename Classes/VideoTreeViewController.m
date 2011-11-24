@@ -308,7 +308,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     // So you can use the headphones to pause/start playback...
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-    [self becomeFirstResponder];
+   // [self becomeFirstResponder];
 }
 
 // Only observe time changes when the view controller's view is visible.
@@ -4713,6 +4713,11 @@ static int saveRate;
     self.appSettingsViewController.showDoneButton = YES;
     [self presentModalViewController:aNavController animated:YES];
     [aNavController release];
+    
+    //[self.appSettingsViewController becomeFirstResponder];
+    
+    //[[UIApplication sharedApplication] becomeFirstResponder];
+    //[[UIApplication sharedApplication] resignFirstResponder];
 }
 
 #pragma mark -
@@ -4720,6 +4725,10 @@ static int saveRate;
 - (void)settingsViewControllerDidEnd:(IASKAppSettingsViewController*)sender {
     [self dismissModalViewControllerAnimated:YES];
 	
+    //[sender becomeFirstResponder];
+    
+   // [[UIApplication sharedApplication] becomeFirstResponder];
+    //[[UIApplication sharedApplication] resignFirstResponder];
     
     [self makeSettings];
     [[[UIApplication sharedApplication] delegate] applicationDidBecomeActive:[UIApplication sharedApplication]];
