@@ -239,6 +239,12 @@
 								<int key="IBUIStyle">1</int>
 								<reference key="IBUIToolbar" ref="192450752"/>
 							</object>
+							<object class="IBUIBarButtonItem" id="692331212">
+								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
+								<float key="IBUIWidth">48</float>
+								<reference key="IBUIToolbar" ref="192450752"/>
+								<int key="IBUISystemItemIdentifier">6</int>
+							</object>
 							<object class="IBUIBarButtonItem" id="465835671">
 								<object class="NSCustomResource" key="IBUIImage">
 									<string key="NSClassName">NSImage</string>
@@ -250,12 +256,6 @@
 							</object>
 							<object class="IBUIBarButtonItem" id="146216654">
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
-								<reference key="IBUIToolbar" ref="192450752"/>
-								<int key="IBUISystemItemIdentifier">6</int>
-							</object>
-							<object class="IBUIBarButtonItem" id="692331212">
-								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
-								<float key="IBUIWidth">48</float>
 								<reference key="IBUIToolbar" ref="192450752"/>
 								<int key="IBUISystemItemIdentifier">6</int>
 							</object>
@@ -1031,7 +1031,6 @@
 								<string key="NSFrame">{{674, 417}, {80, 21}}</string>
 								<reference key="NSSuperview" ref="371440629"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:327</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>

@@ -4720,6 +4720,10 @@ static int saveRate;
 - (void)settingsViewControllerDidEnd:(IASKAppSettingsViewController*)sender {
     [self dismissModalViewControllerAnimated:YES];
 	
+    
+    [self makeSettings];
+    [[[UIApplication sharedApplication] delegate] applicationDidBecomeActive:[UIApplication sharedApplication]];
+    //[self
 	// your code here to reconfigure the app for changed settings
 }
 
