@@ -114,6 +114,7 @@
 		4B68B25D147D955B00AB8576 /* IASKPSTextFieldSpecifierViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B68B248147D955B00AB8576 /* IASKPSTextFieldSpecifierViewCell.xib */; };
 		4B68B25E147D955B00AB8576 /* IASKPSToggleSwitchSpecifierViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B68B249147D955B00AB8576 /* IASKPSToggleSwitchSpecifierViewCell.xib */; };
 		4B68B25F147D955B00AB8576 /* IASKSpecifierValuesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B68B24A147D955B00AB8576 /* IASKSpecifierValuesView.xib */; };
+		4BCF15F2148705C90008C2E0 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 4BCF15F1148705C90008C2E0 /* settings.png */; };
 		7A89B2CC147740D300F172A3 /* FileCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A89B2CB147740D300F172A3 /* FileCell.m */; };
 		BC0E807B147C8626008E4469 /* Default-Landscape~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0E807A147C8626008E4469 /* Default-Landscape~ipad.png */; };
 		BC0E8080147C8676008E4469 /* Default-Portrait~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = BC0E807F147C8676008E4469 /* Default-Portrait~ipad.png */; };
@@ -269,6 +270,7 @@
 		4B68B248147D955B00AB8576 /* IASKPSTextFieldSpecifierViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKPSTextFieldSpecifierViewCell.xib; sourceTree = "<group>"; };
 		4B68B249147D955B00AB8576 /* IASKPSToggleSwitchSpecifierViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKPSToggleSwitchSpecifierViewCell.xib; sourceTree = "<group>"; };
 		4B68B24A147D955B00AB8576 /* IASKSpecifierValuesView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKSpecifierValuesView.xib; sourceTree = "<group>"; };
+		4BCF15F1148705C90008C2E0 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
 		7A89B2CA147740D300F172A3 /* FileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCell.h; sourceTree = "<group>"; };
 		7A89B2CB147740D300F172A3 /* FileCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileCell.m; sourceTree = "<group>"; };
 		BC0E807A147C8626008E4469 /* Default-Landscape~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Landscape~ipad.png"; sourceTree = "<group>"; };
@@ -410,6 +412,7 @@
 		02A306CC13C6886100E7340D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				4BCF15F1148705C90008C2E0 /* settings.png */,
 				BC0E807F147C8676008E4469 /* Default-Portrait~ipad.png */,
 				BC0E807A147C8626008E4469 /* Default-Landscape~ipad.png */,
 				4B078ACF147C66950046D379 /* scribbeo-app-splash.png */,
@@ -692,6 +695,7 @@
 				4B68B25D147D955B00AB8576 /* IASKPSTextFieldSpecifierViewCell.xib in Resources */,
 				4B68B25E147D955B00AB8576 /* IASKPSToggleSwitchSpecifierViewCell.xib in Resources */,
 				4B68B25F147D955B00AB8576 /* IASKSpecifierValuesView.xib in Resources */,
+				4BCF15F2148705C90008C2E0 /* settings.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
