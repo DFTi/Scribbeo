@@ -146,7 +146,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>Bonjour Server Settings</string>
+			<string>Server Settings</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
@@ -156,7 +156,7 @@
 			<key>Key</key>
 			<string>Bonjour</string>
 			<key>Title</key>
-			<string>Network Mode</string>
+			<string>Auto Discovery</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
@@ -166,7 +166,7 @@
 			<key>Key</key>
 			<string>UseManualServerDetails</string>
 			<key>Title</key>
-			<string>Manual Override</string>
+			<string>Use Manual Settings</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>
@@ -176,7 +176,7 @@
 			<key>Key</key>
 			<string>ServerIP</string>
 			<key>Title</key>
-			<string>Manual IP</string>
+			<string>IP Address</string>
 			<key>KeyboardType</key>
 			<string>NumbersAndPunctuation</string>
 			<key>Type</key>
@@ -188,7 +188,7 @@
 			<key>Key</key>
 			<string>ServerPort</string>
 			<key>Title</key>
-			<string>Manual Port</string>
+			<string>Port Number</string>
 			<key>KeyboardType</key>
 			<string>NumbersAndPunctuation</string>
 			<key>Type</key>
