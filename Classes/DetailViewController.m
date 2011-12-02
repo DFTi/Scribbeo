@@ -361,6 +361,7 @@
 #pragma mark -
 #pragma mark Select video from camera roll
 
+//LMFAO WTF is this S define?
 #define S (NSString *)
 
 //
@@ -411,8 +412,11 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
+    VideoTreeViewController *vc = [kAppDel viewController];
+
+    
     if (iPHONE) {
-        [[picker parentViewController] dismissModalViewControllerAnimated:YES];
+        [vc dismissModalViewControllerAnimated:YES];
     }
     else
         [popoverController dismissPopoverAnimated: YES];
@@ -435,8 +439,11 @@
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
+    
+    VideoTreeViewController *vc = [kAppDel viewController];
+
     if (iPHONE ) {
-        [[picker parentViewController] dismissModalViewControllerAnimated:YES];
+        [vc dismissModalViewControllerAnimated:YES];
     }
     else
         [popoverController dismissPopoverAnimated: YES];
