@@ -1976,37 +1976,54 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSLog(@"We are about to getAllHTTPNotes at index %d", index);
     [self noteShowActivity];
     [noteData removeAllObjects];
-    for (NSString *noteArchiveURL in noteURLs) {
+    for (NSInteger i=0; i<[noteURLs count]; i++) {
+        NSString *noteArchiveURL = [noteURLs objectAtIndex:i];
+    //}
+    //for (NSString *noteArchiveURL in noteURLs) {
         NSLog(@"This asset has one or more note archives... %@", noteArchiveURL);
         NSString *noteFileName = [noteArchiveURL lastPathComponent]; // blablabla.XXX
         NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
         NSString *docDir = [dirList objectAtIndex: 0];
         NSString *archivePath = [docDir stringByAppendingPathComponent:noteFileName];
-        NSString *remoteURL = [NSString stringWithFormat:@"%@%@", kHTTPserver, noteArchiveURL];        
+        NSString *remoteURL = [[NSString stringWithFormat:@"%@%@", kHTTPserver, noteArchiveURL] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];   
         NSLog(@"ARCHIVE PATH: %@ REMOTEPATH: %@", archivePath, remoteURL);    
         // Download it...
-        [self downloadFile:remoteURL to:archivePath];
+        // change downloadFile to async
+        //[self downloadFile:remoteURL to:archivePath];
         // Restore it...
-        NSLog(@"Downloaded the note archive, attempting to restore...");
-        if ([fm fileExistsAtPath: archivePath]) {
-            NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
-            for (Note *aNote in noteArray) {
-                // timestampCorrection, an attempt to get notes that were made
-                // prior to a timestamp correction (or when running on windows or something)
-                // to work fine logically...
-                NSLog(@"Clip has start timecode %@, in float: %f", timeCode, [self convertTimeToSecs:timeCode]);
-                // correc ttimecode
-                Float64 noteTime = [self convertTimeToSecs:aNote.timeStamp];
-                Float64 clipTime = [self convertTimeToSecs:timeCode];
-                Float64 newNoteTime = 0.0;
-                NSLog(@"noteTime: %lf, startTimeCode: %lf", noteTime, clipTime);
-                if (noteTime < clipTime) { // Then they probably didn't have the right timecode when they made the note... Let's just adjust it...
-                    newNoteTime = noteTime + clipTime;
-                    aNote.timeStamp = [self timeFormat:kCMTimeMakeWithSeconds (newNoteTime)];
-                }
-                [noteData addObject:aNote];
-            }
-        }
+        [SVHTTPRequest GET:remoteURL
+                parameters:nil
+                completion:^(NSObject *response) {
+                    //NSLog(@"SVHTTPREQUEST to %@, response was: %@", remoteURL, (NSData *)response);
+                    if (response) {
+                        NSData *data = [NSData dataWithData:(NSData*)response];
+                        [data writeToFile:archivePath atomically:YES];
+                        NSLog(@"Downloaded the note archive, attempting to restore...");
+                        if ([fm fileExistsAtPath: archivePath]) {
+                            NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
+                            for (Note *aNote in noteArray) {
+                                // timestampCorrection, an attempt to get notes that were made
+                                // prior to a timestamp correction (or when running on windows or something)
+                                // to work fine logically...
+                                NSLog(@"Clip has start timecode %@, in float: %f", timeCode, [self convertTimeToSecs:timeCode]);
+                                // correc ttimecode
+                                Float64 noteTime = [self convertTimeToSecs:aNote.timeStamp];
+                                Float64 clipTime = [self convertTimeToSecs:timeCode];
+                                Float64 newNoteTime = 0.0;
+                                NSLog(@"noteTime: %lf, startTimeCode: %lf", noteTime, clipTime);
+                                if (noteTime < clipTime) { // Then they probably didn't have the right timecode when they made the note... Let's just adjust it...
+                                    newNoteTime = noteTime + clipTime;
+                                    aNote.timeStamp = [self timeFormat:kCMTimeMakeWithSeconds (newNoteTime)];
+                                }
+                                [noteData addObject:aNote];
+                            }
+                        }   
+                    }
+                    if (i == [noteURLs count]-1) { // last one. let's reload the note table now.
+                        [self noteStopActivity];
+                        [notes reloadData];
+                    }
+                }];
     }
     if ([noteData count] > 0)
         NSLog (@"Restored %i downloaded", [noteData count]);
@@ -2014,8 +2031,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         [self.notes setEditing: NO];            
         NSLog (@"No notes to restore");
     }
-    [self noteStopActivity];
-    [notes reloadData];
 }
 #define CONTAINS(x,y) ([x rangeOfString: y].location != NSNotFound)
 

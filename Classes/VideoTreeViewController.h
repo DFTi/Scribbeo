@@ -30,6 +30,7 @@
 #import "UIImageView+Scaling.h"
 #import "FileCell.h"
 #import "IASKAppSettingsViewController.h"
+#import "SVHTTPRequest.h"
 
 void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, int currentY);
 
