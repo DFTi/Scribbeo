@@ -463,13 +463,15 @@ static int tryOne = 0;
     static int count = 1;
     NSLog (@"makeSettings: %i", count++);
     
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
     // Load the user settings
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     // Bonjour support
     
     BonjourMode = [defaults boolForKey: @"Bonjour"];
-    UseManualServerDetails = [defaults boolForKey:@"UseManualServerDetails"];
+    UseManualServerDetails = ![defaults boolForKey:@"AutoDiscovery"];
     
     if (!BonjourMode) BonjourMode = NO;
     if (!UseManualServerDetails) UseManualServerDetails = NO;
@@ -494,7 +496,7 @@ static int tryOne = 0;
             if (error != nil) {
                 NSLog(@"%@", error.localizedDescription);
                 [UIAlertView doAlert:  @"Connection Error" 
-                         withMsg: [NSString stringWithFormat:@"Cannot find a Scribbeo Server at %@. Please disable the manual server or network mode in Settings.", manualServer]];
+                         withMsg: [NSString stringWithFormat:@"Cannot find a Scribbeo Server at the specified URL. Please enter a valid IP and Port, otherwise enable Auto Discovery.", manualServer]];
                 NSLog(@"Failed to connect to manually entered server %@", manualServer);
             } else {
                 NSLog(@"Got back this much data: %d", [data length]);   
