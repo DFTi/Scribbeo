@@ -828,6 +828,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     }
     
     [player play];
+    pausePlayButton.image = pauseImage;
+
 }
 
 -(void) noteStopActivity
