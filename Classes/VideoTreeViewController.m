@@ -926,6 +926,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                     
 -(void) makeSettings
 {
+    [[NSUserDefaults standardUserDefaults] synchronize];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     // User's initials
@@ -958,6 +959,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // Autoplay clips on or off
     
     autoPlay = (BOOL) [defaults boolForKey: @"AutoPlay"];
+    NSLog(@"MAKESETTINGS THINKS AUTOPLAY IS %@", (autoPlay ? @"True" : @"False"));
     
     NSLog (@"Setting autoplay to %i", autoPlay);
     
@@ -4290,6 +4292,7 @@ static int saveRate;
     seekToZeroBeforePlay = YES;
     
     if (autoPlay) {
+        NSLog(@"Autoplay is on");
         if (! [self nextClip] && fullScreenMode)
             [self leaveFullScreen: nil];
     }
