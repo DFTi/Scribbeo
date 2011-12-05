@@ -39,7 +39,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @interface VideoTreeViewController : UIViewController <UITableViewDelegate, UITableViewDataSource,
             UITextFieldDelegate, MFMailComposeViewControllerDelegate, 
-            UIWebViewDelegate, UIPrintInteractionControllerDelegate, IASKSettingsDelegate>  {
+            UIWebViewDelegate, UIPrintInteractionControllerDelegate, IASKSettingsDelegate, UITextViewDelegate>  {
     NSMutableArray              *noteData;                  // The table of notes
     UITextView                  *newNote;                   // The area where the text of a note is displayed
     UITableView                 *notes;                     // The table of notes

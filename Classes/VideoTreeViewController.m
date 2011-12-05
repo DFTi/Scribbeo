@@ -96,6 +96,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         self.editButton = nil;
     }
     
+    newNote.delegate = self;
+    
     NSLog (@"Allocating drawView frame");
     self.drawView = [[[DrawView alloc] initWithFrame: 
                       playerLayerView.layer.bounds] autorelease];
@@ -821,9 +823,11 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         
         pausePlayButton.image = pauseImage;
 
-        if (! airPlayMode) 
-            [player play];
+       // if (! airPlayMode) 
+            //[player play];
     }
+    
+    [player play];
 }
 
 -(void) noteStopActivity
@@ -3735,8 +3739,13 @@ static int saveRate;
             self.playerItem = [AVPlayerItem playerItemWithURL: movieURL]; 
         else 
             self.playerItem = [AVPlayerItem playerItemWithAsset: theAsset];
+         
+        [self.player pause];
+        [self.player release];
             
         self.player = [AVPlayer playerWithPlayerItem:playerItem];
+         
+         
          
         // Do we have a player now and something to play?
 
@@ -3784,6 +3793,11 @@ static int saveRate;
             
             // Let's add the drawView and make sure it's on top
 
+            
+            if (autoPlay) {
+                [self.player play];
+            }
+            
             drawView.frame = playerLayer.frame;
             [playerLayerView addSubview: drawView];
             [self.view bringSubviewToFront: drawView];
@@ -4734,6 +4748,13 @@ static int saveRate;
     [[[UIApplication sharedApplication] delegate] applicationDidBecomeActive:[UIApplication sharedApplication]];
     //[self
 	// your code here to reconfigure the app for changed settings
+}
+
+- (void)textViewDidBeginEditing:(UITextView *)textView
+{
+    
+    [player pause];
+    
 }
 
 @end
