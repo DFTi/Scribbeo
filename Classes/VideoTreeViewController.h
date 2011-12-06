@@ -38,10 +38,13 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
 
 enum downloadType { kNotes, kTimecode, kAvidTXT };
 
+
 @interface VideoTreeViewController : UIViewController <UITableViewDelegate, UITableViewDataSource,
             UITextFieldDelegate, MFMailComposeViewControllerDelegate, 
             UIWebViewDelegate, UIPrintInteractionControllerDelegate, IASKSettingsDelegate, UITextViewDelegate>  {
     NSMutableArray              *noteData;                  // The table of notes
+    NSMutableArray *activeAsyncRequests; // Store requests here so we can cancel them.
+
     UITextView                  *newNote;                   // The area where the text of a note is displayed
     UITableView                 *notes;                     // The table of notes
     UIImage                     *newThumb;                  // a new thumbnail
@@ -209,6 +212,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @property (nonatomic, retain) NSMutableArray     *notePaths;
 @property (nonatomic, retain) NSMutableArray     *noteURLs;
+@property (nonatomic, retain) NSMutableArray     *activeAsyncRequests;
 @property (nonatomic, retain) NSMutableArray     *xmlPaths, *txtPaths;
 @property (nonatomic, retain) NSArray            *markers;
 @property (nonatomic, retain) XMLURL             *XMLURLreader;

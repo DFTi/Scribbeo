@@ -70,7 +70,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 @synthesize  stampLabel, stampLabelFull, theAsset, startTimecode, download, clipLabel, runAllMode;
 @synthesize rewindToStartButton, frameBackButton, frameForwardButton, forwardToEndButton, fullScreenButton, rewindButton, fastForwardButton, airPlayMode, remote;
 @synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo, mediaPath;
-@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage, timeCode, curFileIndex, curAssetURLs;
+@synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage, timeCode, curFileIndex, curAssetURLs, activeAsyncRequests;
 
 #pragma mark -
 #pragma mark view loading/unloading
@@ -250,6 +250,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // The table of notes used to populate the note table
                     
     self.noteData = [NSMutableArray array];
+    self.activeAsyncRequests = [NSMutableArray array];
                     
     voiceMemo = [[VoiceMemo alloc] init];
     recording.hidden = YES;
@@ -1984,6 +1985,10 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSLog(@"We are about to getAllHTTPNotes at index %d", index);
     [self noteShowActivity];
     [noteData removeAllObjects];
+    for (SVHTTPRequest *req in activeAsyncRequests) {
+        [req cancel];
+    }
+    [activeAsyncRequests removeAllObjects];
     if ([noteURLs count] == 0) {
         [self noteStopActivity];
         [notes reloadData];
@@ -1997,7 +2002,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         NSString *archivePath = [docDir stringByAppendingPathComponent:noteFileName];
         NSString *remoteURL = [[NSString stringWithFormat:@"%@%@", kHTTPserver, noteArchiveURL] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];   
         NSLog(@"ARCHIVE PATH: %@ REMOTEPATH: %@", archivePath, remoteURL);    
-        [SVHTTPRequest GET:remoteURL
+        [activeAsyncRequests addObject:[SVHTTPRequest GET:remoteURL
                 parameters:nil
                 completion:^(NSObject *response) {
                     if (response) {
@@ -2034,7 +2039,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                         } 
                         
                     }
-                }];
+                }]];
     }
 }
 #define CONTAINS(x,y) ([x rangeOfString: y].location != NSNotFound)
@@ -3756,9 +3761,11 @@ static int saveRate;
         else 
             self.playerItem = [AVPlayerItem playerItemWithAsset: theAsset];
          
-        [self.player pause];
-        [self.player release];
-            
+         if (self.player) {
+             [self.player pause];
+             [self.player release];
+         }
+
         self.player = [AVPlayer playerWithPlayerItem:playerItem];
          
          
@@ -4682,6 +4689,7 @@ static int saveRate;
     
     [theAsset release];
     [noteData release];
+    [activeAsyncRequests release];
     [notes release];
     [currentlyPlaying release];
     [newThumb release];
