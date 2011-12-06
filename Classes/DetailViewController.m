@@ -493,7 +493,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if (iPHONE) {
-        tableView.backgroundColor = [UIColor colorWithRed: .3 green: .3 blue: .3 alpha: .4];
+        tableView.backgroundColor = [UIColor colorWithRed: .3 green: .3 blue: .3 alpha: 1];
         tableView.separatorColor  = [UIColor grayColor];
     }
     else

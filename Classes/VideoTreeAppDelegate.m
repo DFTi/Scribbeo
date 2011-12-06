@@ -533,8 +533,8 @@ static int tryOne = 0;
         theSize = (CGSize) {206, 344};
     }
     else {
-        theOrigin =  (CGPoint) {0, 7};
-        theSize = (CGSize) {170, 250}; 
+        theOrigin =  (CGPoint) {0, 2};
+        theSize = (CGSize) {145, 275}; 
     }
     
     CGRect theFrame = {theOrigin, theSize};

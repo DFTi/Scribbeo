@@ -83,4 +83,45 @@
     
 }
 
+- (void)layoutSubviews
+{
+    
+    [super layoutSubviews];
+    
+    CGRect timeLabelRect = timeLabel.frame;
+    timeLabelRect.origin.y = self.frame.size.height - 20;
+    timeLabelRect.size.width = self.frame.size.width;
+    self.timeLabel.frame = timeLabelRect;
+    
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
+    {
+        
+        CGRect dateLabelRect = dateLabel.frame;
+        dateLabelRect.size.width = self.frame.size.width/2;
+        self.dateLabel.frame = dateLabelRect;
+        
+        CGRect initialsLabelRect = initialsLabel.frame;
+        initialsLabelRect.size.width = self.frame.size.width/2;
+        self.initialsLabel.frame = initialsLabelRect;
+        
+    }
+    else
+    {
+        
+        CGRect dateLabelRect = dateLabel.frame;
+        dateLabelRect.size.width = 0;
+        self.dateLabel.frame = dateLabelRect;
+        
+        CGRect initialsLabelRect = initialsLabel.frame;
+        initialsLabelRect.size.width = self.frame.size.width;
+        initialsLabelRect.origin.x = 0;
+        self.initialsLabel.frame = initialsLabelRect;
+        
+    }    
+    
+    
+    
+}
+
 @end
