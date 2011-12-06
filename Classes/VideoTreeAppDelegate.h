@@ -79,6 +79,7 @@
 -(void) animateTransition: (BOOL) start;
 
 -(void) makeDetailTableViewController;
+-(void)setupDefaults;
 
 @end
 

@@ -926,8 +926,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                     
 -(void) makeSettings
 {
-    [[NSUserDefaults standardUserDefaults] synchronize];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+//    [[NSUserDefaults standardUserDefaults] synchronize];
     
     // User's initials
     

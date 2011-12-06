@@ -164,9 +164,9 @@
 			<key>DefaultValue</key>
 			<true/>
 			<key>Key</key>
-			<string>AutoDiscovery</string>
+			<string>AutoDiscover</string>
 			<key>Title</key>
-			<string>Auto Discovery</string>
+			<string>Auto Discover</string>
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 		</dict>

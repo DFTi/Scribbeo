@@ -56,6 +56,8 @@ static int tryOne = 0;
     removeLogFile ();
     newLogFile ();
 #endif
+
+    [self setupDefaults];
     
     [window makeKeyAndVisible];
 
@@ -96,6 +98,7 @@ static int tryOne = 0;
     NSLog (@"app did become active");
     
     [[NSUserDefaults standardUserDefaults] synchronize];
+    //[[NSUserDefaults standardUserDefaults] synchronize];
 
     BOOL wasBonjourMode = BonjourMode;
     BOOL wasUsingManualServerDetails = UseManualServerDetails;
@@ -151,7 +154,7 @@ static int tryOne = 0;
     // Force the server into local mode; as we don't want to deal with
     // where to store the notes or where to play the clips from
     
-    [defaults setBool: NO forKey: @"BonjourMode"];
+    [defaults setBool: NO forKey: @"Bonjour"];
     BonjourMode = NO;
 
     [defaults synchronize];
@@ -463,15 +466,14 @@ static int tryOne = 0;
     static int count = 1;
     NSLog (@"makeSettings: %i", count++);
     
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
     // Load the user settings
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+ //   [[NSUserDefaults standardUserDefaults] synchronize];
 
     // Bonjour support
     
     BonjourMode = [defaults boolForKey: @"Bonjour"];
-    UseManualServerDetails = ![defaults boolForKey:@"AutoDiscovery"];
+    UseManualServerDetails = ![defaults boolForKey:@"AutoDiscover"];
     
     if (!BonjourMode) BonjourMode = NO;
     if (!UseManualServerDetails) UseManualServerDetails = NO;
@@ -601,6 +603,39 @@ static int tryOne = 0;
     [clipList release];
     [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
     [super dealloc];
+}
+
+- (void)setupDefaults {
+    //get the plist location from the settings bundle
+    NSString *settingsPath = [[[NSBundle mainBundle] bundlePath] stringByAppendingPathComponent:@"Settings.bundle"];
+    NSString *plistPath = [settingsPath stringByAppendingPathComponent:@"Root.plist"];
+    
+    //get the preference specifiers array which contains the settings
+    NSDictionary *settingsDictionary = [NSDictionary dictionaryWithContentsOfFile:plistPath];
+    NSArray *preferencesArray = [settingsDictionary objectForKey:@"PreferenceSpecifiers"];
+    
+    //use the shared defaults object
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    
+    //for each preference item, set its default if there is no value set
+    for(NSDictionary *item in preferencesArray) {
+        
+        //get the item key, if there is no key then we can skip it
+        NSString *key = [item objectForKey:@"Key"];
+        if (key) {
+            
+            //check to see if the value and default value are set
+            //if a default value exists and the value is not set, use the default
+            id value = [defaults objectForKey:key];
+            id defaultValue = [item objectForKey:@"DefaultValue"];
+            if(defaultValue && !value) {
+                [defaults setObject:defaultValue forKey:key];
+            }
+        }
+    }
+    
+    //write the changes to disk
+    [defaults synchronize];
 }
 
 @end
