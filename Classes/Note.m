@@ -25,6 +25,8 @@
     [encoder  encodeFloat: frameHeight forKey: @"NoteFrameHeight"];
     [encoder  encodeObject: imageName forKey: @"NoteImageName"];
     [encoder  encodeInt: rotation forKey: @"NoteRotation"];
+    
+
 }
 
 // The method used to unarchive a note
