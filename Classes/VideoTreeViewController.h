@@ -399,7 +399,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(NSURL *) getTheURL: (NSString *) thePath;   // Used by loadMovie: and loadStill:
 
 -(void) directlySetStartTimecode: (NSString *) timeCodeStr;
-
+- (IBAction)clearNewNote:(id)sender;
 
 @property (nonatomic, retain) IASKAppSettingsViewController *appSettingsViewController;
 
