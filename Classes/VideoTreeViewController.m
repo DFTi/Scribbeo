@@ -1984,10 +1984,12 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSLog(@"We are about to getAllHTTPNotes at index %d", index);
     [self noteShowActivity];
     [noteData removeAllObjects];
-    for (NSInteger i=0; i<[noteURLs count]; i++) {
-        NSString *noteArchiveURL = [noteURLs objectAtIndex:i];
-    //}
-    //for (NSString *noteArchiveURL in noteURLs) {
+    if ([noteURLs count] == 0) {
+        [self noteStopActivity];
+        [notes reloadData];
+        [self.notes setEditing: NO]; 
+    }
+    for (NSString *noteArchiveURL in noteURLs) {
         NSLog(@"This asset has one or more note archives... %@", noteArchiveURL);
         NSString *noteFileName = [noteArchiveURL lastPathComponent]; // blablabla.XXX
         NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -1995,10 +1997,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         NSString *archivePath = [docDir stringByAppendingPathComponent:noteFileName];
         NSString *remoteURL = [[NSString stringWithFormat:@"%@%@", kHTTPserver, noteArchiveURL] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];   
         NSLog(@"ARCHIVE PATH: %@ REMOTEPATH: %@", archivePath, remoteURL);    
-        // Download it...
-        // change downloadFile to async
-        //[self downloadFile:remoteURL to:archivePath];
-        // Restore it...
         [SVHTTPRequest GET:remoteURL
                 parameters:nil
                 completion:^(NSObject *response) {
@@ -2008,7 +2006,14 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                         [data writeToFile:archivePath atomically:YES];
                         NSLog(@"Downloaded the note archive, attempting to restore...");
                         if ([fm fileExistsAtPath: archivePath]) {
-                            NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
+                            NSArray *noteArray;
+                            @try {
+                                noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: archivePath];
+                            }
+                            @catch (NSException *exception) {
+                                NSLog(@"Exception was thrown when trying to unarchive %@ -- bail!", exception);
+                                return;
+                            }
                             for (Note *aNote in noteArray) {
                                 // timestampCorrection, an attempt to get notes that were made
                                 // prior to a timestamp correction (or when running on windows or something)
@@ -2027,15 +2032,10 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                             }
                             [self noteStopActivity];
                             [notes reloadData];
-                        }   
+                        } 
+                        
                     }
                 }];
-    }
-    if ([noteData count] > 0)
-        NSLog (@"Restored %i downloaded", [noteData count]);
-    else {
-        [self.notes setEditing: NO];            
-        NSLog (@"No notes to restore");
     }
 }
 #define CONTAINS(x,y) ([x rangeOfString: y].location != NSNotFound)

@@ -97,9 +97,6 @@ static int tryOne = 0;
     
     NSLog (@"app did become active");
     
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    //[[NSUserDefaults standardUserDefaults] synchronize];
-
     BOOL wasBonjourMode = BonjourMode;
     BOOL wasUsingManualServerDetails = UseManualServerDetails;
     [self makeSettings]; // Get any new setting changes.
