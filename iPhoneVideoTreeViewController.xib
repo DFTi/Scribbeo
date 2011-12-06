@@ -292,7 +292,7 @@
 								<string key="NSFrame">{{284, 8}, {102, 30}}</string>
 								<reference key="NSSuperview" ref="636354384"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
+								<reference key="NSNextKeyView" ref="188207310"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								<int key="IBSegmentControlStyle">2</int>
@@ -447,7 +447,7 @@
 						<string key="NSFrame">{{6, 42}, {130, 85}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="251591089"/>
+						<reference key="NSNextKeyView" ref="241529372"/>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">1</int>
 							<bytes key="NSRGB">MC45Nzg3MTc3NTk2IDAuOTIxMTM3ODgzNSAwLjk5MjQ2NjM5MDEAA</bytes>
@@ -1030,6 +1030,34 @@
 						<float key="IBUIAlpha">0.80000001192092896</float>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
+					<object class="IBUIButton" id="241529372">
+						<reference key="NSNextResponder" ref="191373211"/>
+						<int key="NSvFlags">292</int>
+						<string key="NSFrame">{{115, 105}, {21, 21}}</string>
+						<reference key="NSSuperview" ref="191373211"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView" ref="251591089"/>
+						<string key="NSReuseIdentifierKey">_NS:225</string>
+						<bool key="IBUIOpaque">NO</bool>
+						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+						<int key="IBUIContentHorizontalAlignment">0</int>
+						<int key="IBUIContentVerticalAlignment">0</int>
+						<reference key="IBUIHighlightedTitleColor" ref="207456710"/>
+						<object class="NSColor" key="IBUINormalTitleColor">
+							<int key="NSColorSpace">1</int>
+							<bytes key="NSRGB">MC4xOTYwNzg0MzQ2IDAuMzA5ODAzOTMyOSAwLjUyMTU2ODY1NgA</bytes>
+						</object>
+						<reference key="IBUINormalTitleShadowColor" ref="880214162"/>
+						<object class="NSCustomResource" key="IBUINormalImage">
+							<string key="NSClassName">NSImage</string>
+							<string key="NSResourceName">cancelicon.png</string>
+						</object>
+						<object class="IBUIFontDescription" key="IBUIFontDescription">
+							<int key="type">2</int>
+							<double key="pointSize">15</double>
+						</object>
+						<reference key="IBUIFont" ref="118266715"/>
+					</object>
 				</object>
 				<string key="NSFrameSize">{480, 319}</string>
 				<reference key="NSSuperview"/>
@@ -1496,6 +1524,15 @@
 					</object>
 					<int key="connectionID">195</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">clearNewNote:</string>
+						<reference key="source" ref="241529372"/>
+						<reference key="destination" ref="372490531"/>
+						<int key="IBEventType">7</int>
+					</object>
+					<int key="connectionID">197</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1527,6 +1564,7 @@
 							<reference ref="659495254"/>
 							<reference ref="667256905"/>
 							<reference ref="789978037"/>
+							<reference ref="241529372"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -1927,6 +1965,11 @@
 						<reference key="object" ref="650098183"/>
 						<reference key="parent" ref="636354384"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">196</int>
+						<reference key="object" ref="241529372"/>
+						<reference key="parent" ref="191373211"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -1969,6 +2012,7 @@
 					<string>189.IBPluginDependency</string>
 					<string>19.IBPluginDependency</string>
 					<string>193.IBPluginDependency</string>
+					<string>196.IBPluginDependency</string>
 					<string>20.IBPluginDependency</string>
 					<string>21.IBPluginDependency</string>
 					<string>22.IBPluginDependency</string>
@@ -2073,6 +2117,7 @@
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -2087,7 +2132,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">195</int>
+			<int key="maxID">197</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2109,6 +2154,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>airPlay</string>
 							<string>backFrame</string>
+							<string>clearNewNote:</string>
 							<string>color:</string>
 							<string>editNotesTable:</string>
 							<string>emailNotes</string>
@@ -2131,6 +2177,7 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>UISegmentedControl</string>
@@ -2160,6 +2207,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>airPlay</string>
 							<string>backFrame</string>
+							<string>clearNewNote:</string>
 							<string>color:</string>
 							<string>editNotesTable:</string>
 							<string>emailNotes</string>
@@ -2188,6 +2236,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">backFrame</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">clearNewNote:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2561,6 +2613,7 @@
 				<string>airplay.png</string>
 				<string>back.png</string>
 				<string>blue.png</string>
+				<string>cancelicon.png</string>
 				<string>forward.png</string>
 				<string>forwardToEnd.png</string>
 				<string>forwardframe.png</string>
@@ -2582,6 +2635,7 @@
 				<string>{813, 447}</string>
 				<string>{50, 50}</string>
 				<string>{30, 30}</string>
+				<string>{128, 128}</string>
 				<string>{50, 50}</string>
 				<string>{35, 21}</string>
 				<string>{39, 21}</string>

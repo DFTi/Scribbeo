@@ -1819,6 +1819,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 }
 
 // 
+- (IBAction)clearNewNote:(id)sender {
+    newNote.text = @"";
+}
 
 -(void) animateSave {
     // animate frame save
