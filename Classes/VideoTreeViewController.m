@@ -154,7 +154,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     }
     else {
         theOrigin =  (CGPoint) {0, 393};
-        theSize = (CGSize) {208, 355};
+        theSize = (CGSize) {207, 355};
         
         noteBar.clipsToBounds = YES;
 
@@ -2163,6 +2163,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         NSString *remotePath = [NSString stringWithFormat:@"%@/note/%@", kHTTPserver, [archivePath lastPathComponent]];
         [self uploadFile:archivePath to:remotePath];
     }
+    
 }
 
 
