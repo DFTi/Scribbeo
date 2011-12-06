@@ -3644,7 +3644,7 @@ static int saveRate;
 
 -(NSURL *) getTheURL: (NSString *) thePath
 {
-    thePath = [thePath stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+    //thePath = [thePath stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
     NSURL  *theURL = (NSURL *) thePath;
     
     // Generate an NSURL object from the argument if it's a string 
@@ -3668,10 +3668,10 @@ static int saveRate;
         }
         else {
             NSLog (@"Loading movie/still %@ from Internet or camera roll", thePath);
-            theURL = [NSURL URLWithString: thePath];
+            theURL = [NSURL URLWithString: [thePath stringByReplacingOccurrencesOfString:@" " withString:@"%20"]];
         }
     }
-
+    NSLog(@"getTheURL has determined the URL to be: %@", theURL);
     return theURL;
 }
 
