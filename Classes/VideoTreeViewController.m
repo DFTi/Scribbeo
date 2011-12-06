@@ -2000,7 +2000,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         [SVHTTPRequest GET:remoteURL
                 parameters:nil
                 completion:^(NSObject *response) {
-                    //NSLog(@"SVHTTPREQUEST to %@, response was: %@", remoteURL, (NSData *)response);
                     if (response) {
                         NSData *data = [NSData dataWithData:(NSData*)response];
                         [data writeToFile:archivePath atomically:YES];
@@ -2015,11 +2014,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                                 return;
                             }
                             for (Note *aNote in noteArray) {
-                                // timestampCorrection, an attempt to get notes that were made
-                                // prior to a timestamp correction (or when running on windows or something)
-                                // to work fine logically...
+                                /* the following snippet corrects timecode on notes that were made for clips that did not have the right timecode but now do.
+                                 
                                 NSLog(@"Clip has start timecode %@, in float: %f", timeCode, [self convertTimeToSecs:timeCode]);
-                                // correc ttimecode
                                 Float64 noteTime = [self convertTimeToSecs:aNote.timeStamp];
                                 Float64 clipTime = [self convertTimeToSecs:timeCode];
                                 Float64 newNoteTime = 0.0;
@@ -2028,6 +2025,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                                     newNoteTime = noteTime + clipTime;
                                     aNote.timeStamp = [self timeFormat:kCMTimeMakeWithSeconds (newNoteTime)];
                                 }
+                                 
+                                */
                                 [noteData addObject:aNote];
                             }
                             [self noteStopActivity];
