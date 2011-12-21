@@ -52,7 +52,7 @@
     
     if (!dateLabel) {
         dateLabel = [[UILabel alloc] init];
-        dateLabel.frame = CGRectMake(0, 0, 160, 20);
+        dateLabel.frame = CGRectMake(0, 0, 120, 20);
         dateLabel.textColor = [UIColor whiteColor];
         dateLabel.shadowColor = [UIColor blackColor];
         dateLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
@@ -70,7 +70,7 @@
     
     if (!initialsLabel) {
         initialsLabel = [[UILabel alloc] init];
-        initialsLabel.frame = CGRectMake(160, 0, 50, 20);
+        initialsLabel.frame = CGRectMake(120, 0, 50, 20);
         initialsLabel.textColor = [UIColor whiteColor];
         initialsLabel.shadowColor = [UIColor blackColor];
         initialsLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
