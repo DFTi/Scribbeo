@@ -270,7 +270,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // We put a custom red color behined the scrubber cause it looks purdy!
                     
     movieTimeControl.backgroundColor = [UIColor clearColor];	
-    UIImage *stetchLeftTrack = [[UIImage imageNamed:@"redhi.png"] stretchableImageWithLeftCapWidth:10.0 topCapHeight:0.0];
+    UIImage *stetchLeftTrack = [[UIImage imageNamed:@"scrubleft.png"] stretchableImageWithLeftCapWidth:6.0 topCapHeight:0.0];
     [movieTimeControl setMinimumTrackImage:stetchLeftTrack forState: UIControlStateNormal];
     
     // This is for the dialog for an "Open in.." or the camera roll
