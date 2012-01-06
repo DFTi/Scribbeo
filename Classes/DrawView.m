@@ -241,13 +241,14 @@
     
     // Look at the start of the method to interpret the tap count
     
-    if (taps == 3) {
-        [[kAppDel viewController] erase];
-        [self showDebugAlert];
-        
-        return;
-    }
-    else if (taps == 2) {
+//    if (taps == 3) {
+//        [[kAppDel viewController] erase];
+//        [self showDebugAlert];
+//        
+//        return;
+//    }
+//    else
+    if (taps == 2) {
         [[kAppDel viewController] playPauseButtonPressed: nil];
         return;
     }
