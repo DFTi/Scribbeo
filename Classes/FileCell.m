@@ -10,7 +10,7 @@
 
 @implementation FileCell
 
-@synthesize timeLabel, dateLabel, initialsLabel;
+@synthesize timeLabel, dateLabel, initialsLabel, commentLabel;
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
@@ -34,11 +34,12 @@
 
     if (!timeLabel) {
         timeLabel = [[UILabel alloc] init];
-        timeLabel.frame = CGRectMake(0, 110, 210, 20);
+        timeLabel.frame = CGRectMake(60, 0, 100, 20);
+//        CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat height#>)
         timeLabel.textColor = [UIColor whiteColor];
         timeLabel.shadowColor = [UIColor blackColor];
         timeLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-        timeLabel.textAlignment = UITextAlignmentCenter;
+        timeLabel.textAlignment = UITextAlignmentLeft;
         
         [self addSubview:timeLabel];
     }
@@ -56,7 +57,7 @@
         dateLabel.textColor = [UIColor whiteColor];
         dateLabel.shadowColor = [UIColor blackColor];
         dateLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-        dateLabel.textAlignment = UITextAlignmentCenter;
+        dateLabel.textAlignment = UITextAlignmentLeft;
         
         [self addSubview:dateLabel];
     }
@@ -70,11 +71,11 @@
     
     if (!initialsLabel) {
         initialsLabel = [[UILabel alloc] init];
-        initialsLabel.frame = CGRectMake(120, 0, 50, 20);
+        initialsLabel.frame = CGRectMake(0, 110, 60, 20);
         initialsLabel.textColor = [UIColor whiteColor];
         initialsLabel.shadowColor = [UIColor blackColor];
         initialsLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-        initialsLabel.textAlignment = UITextAlignmentCenter;
+        initialsLabel.textAlignment = UITextAlignmentLeft;
         
         [self addSubview:initialsLabel];
     }
@@ -83,9 +84,27 @@
     
 }
 
-- (void)layoutSubviews
+- (UILabel*)commentLabel
 {
     
+    if (!commentLabel) {
+        commentLabel = [[UILabel alloc] init];
+        commentLabel.frame = CGRectMake(60, 110, 210, 20);
+        commentLabel.textColor = [UIColor whiteColor];
+        commentLabel.shadowColor = [UIColor blackColor];
+        commentLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
+        commentLabel.textAlignment = UITextAlignmentLeft;
+        
+        [self addSubview:commentLabel];
+    }
+    
+    return initialsLabel;
+    
+}
+
+- (void)layoutSubviews
+{
+    return;
     [super layoutSubviews];
     
     CGRect timeLabelRect = timeLabel.frame;

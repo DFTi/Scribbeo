@@ -13,6 +13,7 @@
 @property (nonatomic, retain) UILabel *timeLabel;
 @property (nonatomic, retain) UILabel *dateLabel;
 @property (nonatomic, retain) UILabel *initialsLabel;
+@property (nonatomic, retain) UILabel *commentLabel;
 
 
 @end
