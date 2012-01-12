@@ -249,7 +249,7 @@
     for (NSDictionary *dict in fileList) {
         NSString *fileName = [dict objectForKey:@"name"];
         NSString *fileExt = [dict objectForKey:@"ext"];
-        NSString *assetURL = [dict objectForKey:@"asset_url"]; // URL by which to retreive this asset
+        NSString *assetURL = [dict objectForKey:@"live_transcode"]; // URL by which to retreive this asset
         NSLog(@"See a file named: %@", fileName);
         NSLog(@"Asset located at: %@", assetURL);
         [files addObject:fileName];
@@ -756,7 +756,7 @@
     
     NSLog(@"Now will try loading the movie or still at: %@", moviePath);
     
-    if ( kIsMovie (extension) )
+    if ( !kIsMovie (extension) )
         [vc loadMovie: moviePath];
     else
         [vc loadStill: moviePath];

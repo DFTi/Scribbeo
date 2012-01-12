@@ -3270,7 +3270,7 @@ static int saveRate;
 
 - (void)sliderValueChange
 {
-    Float64 playerTime = movieTimeControl.value * kCVTime ([[[player currentItem] asset] duration]); 
+    Float64 playerTime = movieTimeControl.value * kCVTime ([[player currentItem] duration]); 
     
  	[player seekToTime: kCMTimeMakeWithSeconds(playerTime)];
 }
@@ -3322,6 +3322,8 @@ static int saveRate;
         
         // If we haven't set the frame rate by now, something has gone
         // horribly wrong
+        
+        fps = 24;
         
         if (fps == 0) {
             // FIXME something might be weird here, where is fps getting set?
@@ -3587,7 +3589,9 @@ static int saveRate;
     if (!player)
         return;
     
-    newNote.text = @"";
+    //if (newNote)
+      //  newNote.text = @"";
+    
     [self stopObservingTimeChanges];
 
     [player removeObserver: self forKeyPath:@"rate"];
