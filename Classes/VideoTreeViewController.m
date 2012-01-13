@@ -1634,7 +1634,11 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 // It uses the on-again off-again private UIGetScreenImage function to grab what's on the screen
 // Nice thing about it is we don't have to redraw the markups and it's of course precise
 // (although iOS 5.0 has thankfully resolved the latter problem for us)
-//
+
+// FIX:
+// How To Legally Replace UIGetScreenImage() | CocoaCoder
+// http://cocoacoderblog.com/2011/03/07/how-to-legally-replace-uigetscreenimage/
+
 
 -(void) frameDraw
 {
