@@ -34,11 +34,11 @@
 
     if (!timeLabel) {
         timeLabel = [[UILabel alloc] init];
-        timeLabel.frame = CGRectMake(110, 0, 120, 20);
+        timeLabel.frame = CGRectMake(103, 0, 104, 20);
         timeLabel.textColor = [UIColor whiteColor];
         timeLabel.shadowColor = [UIColor blackColor];
         timeLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-        timeLabel.textAlignment = UITextAlignmentLeft;
+        timeLabel.textAlignment = UITextAlignmentCenter;
         
         [self addSubview:timeLabel];
     }
@@ -56,7 +56,7 @@
         dateLabel.textColor = [UIColor whiteColor];
         dateLabel.shadowColor = [UIColor blackColor];
         dateLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-        dateLabel.textAlignment = UITextAlignmentLeft;
+        dateLabel.textAlignment = UITextAlignmentCenter;
         
         [self addSubview:dateLabel];
     }
@@ -74,7 +74,7 @@
         initialsLabel.textColor = [UIColor whiteColor];
         initialsLabel.shadowColor = [UIColor blackColor];
         initialsLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-        initialsLabel.textAlignment = UITextAlignmentLeft;
+        initialsLabel.textAlignment = UITextAlignmentCenter;
         
         [self addSubview:initialsLabel];
     }
@@ -103,14 +103,7 @@
 
 - (void)layoutSubviews
 {
-    return;
     [super layoutSubviews];
-    
-    CGRect timeLabelRect = timeLabel.frame;
-    timeLabelRect.origin.y = self.frame.size.height - 20;
-    timeLabelRect.size.width = self.frame.size.width;
-    self.timeLabel.frame = timeLabelRect;
-    
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
@@ -119,21 +112,32 @@
         dateLabelRect.size.width = self.frame.size.width/2;
         self.dateLabel.frame = dateLabelRect;
         
-        CGRect initialsLabelRect = initialsLabel.frame;
-        initialsLabelRect.size.width = self.frame.size.width/2;
-        self.initialsLabel.frame = initialsLabelRect;
+        //CGRect initialsLabelRect = initialsLabel.frame;
+        //initialsLabelRect.size.width = self.frame.size.width/2;
+        //self.initialsLabel.frame = initialsLabelRect;
         
     }
     else
     {
+        // top
+        CGRect timeLabelRect = timeLabel.frame;
+        timeLabelRect.origin.x = self.frame.origin.x;
+        timeLabelRect.size.width = self.frame.size.width;
+        self.timeLabel.frame = timeLabelRect;
+        
+        
+        // bottom
         
         CGRect dateLabelRect = dateLabel.frame;
-        dateLabelRect.size.width = 0;
+        dateLabelRect.origin.x = self.frame.origin.x;
+        dateLabelRect.origin.y = self.frame.size.height-20;
+        dateLabelRect.size.width = self.frame.size.width/2;
         self.dateLabel.frame = dateLabelRect;
         
         CGRect initialsLabelRect = initialsLabel.frame;
-        initialsLabelRect.size.width = self.frame.size.width;
-        initialsLabelRect.origin.x = 0;
+        initialsLabelRect.origin.x = dateLabelRect.size.width;
+        initialsLabelRect.origin.y = self.frame.size.height-20;
+        initialsLabelRect.size.width = self.frame.size.width/2;
         self.initialsLabel.frame = initialsLabelRect;
         
     }    
