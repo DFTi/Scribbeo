@@ -103,14 +103,7 @@
 
 - (void)layoutSubviews
 {
-    return;
     [super layoutSubviews];
-    
-    CGRect timeLabelRect = timeLabel.frame;
-    timeLabelRect.origin.y = self.frame.size.height - 20;
-    timeLabelRect.size.width = self.frame.size.width;
-    self.timeLabel.frame = timeLabelRect;
-    
     
     if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad)
     {
@@ -126,14 +119,25 @@
     }
     else
     {
+        // top
+        CGRect timeLabelRect = timeLabel.frame;
+        timeLabelRect.origin.x = self.frame.origin.x;
+        timeLabelRect.size.width = self.frame.size.width;
+        self.timeLabel.frame = timeLabelRect;
+        
+        
+        // bottom
         
         CGRect dateLabelRect = dateLabel.frame;
-        dateLabelRect.size.width = 0;
+        dateLabelRect.origin.x = self.frame.origin.x;
+        dateLabelRect.origin.y = self.frame.size.height-20;
+        dateLabelRect.size.width = self.frame.size.width/2;
         self.dateLabel.frame = dateLabelRect;
         
         CGRect initialsLabelRect = initialsLabel.frame;
-        initialsLabelRect.size.width = self.frame.size.width;
-        initialsLabelRect.origin.x = 0;
+        initialsLabelRect.origin.x = dateLabelRect.size.width;
+        initialsLabelRect.origin.y = self.frame.size.height-20;
+        initialsLabelRect.size.width = self.frame.size.width/2;
         self.initialsLabel.frame = initialsLabelRect;
         
     }    
