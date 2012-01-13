@@ -34,8 +34,7 @@
 
     if (!timeLabel) {
         timeLabel = [[UILabel alloc] init];
-        timeLabel.frame = CGRectMake(60, 0, 100, 20);
-//        CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat height#>)
+        timeLabel.frame = CGRectMake(110, 0, 120, 20);
         timeLabel.textColor = [UIColor whiteColor];
         timeLabel.shadowColor = [UIColor blackColor];
         timeLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
@@ -53,7 +52,7 @@
     
     if (!dateLabel) {
         dateLabel = [[UILabel alloc] init];
-        dateLabel.frame = CGRectMake(0, 0, 120, 20);
+        dateLabel.frame = CGRectMake(0, 0, 110, 20);
         dateLabel.textColor = [UIColor whiteColor];
         dateLabel.shadowColor = [UIColor blackColor];
         dateLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
@@ -71,7 +70,7 @@
     
     if (!initialsLabel) {
         initialsLabel = [[UILabel alloc] init];
-        initialsLabel.frame = CGRectMake(0, 110, 60, 20);
+        initialsLabel.frame = CGRectMake(0, 110, 70, 20);
         initialsLabel.textColor = [UIColor whiteColor];
         initialsLabel.shadowColor = [UIColor blackColor];
         initialsLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
@@ -89,7 +88,7 @@
     
     if (!commentLabel) {
         commentLabel = [[UILabel alloc] init];
-        commentLabel.frame = CGRectMake(60, 110, 210, 20);
+        commentLabel.frame = CGRectMake(70, 110, 200, 20);
         commentLabel.textColor = [UIColor whiteColor];
         commentLabel.shadowColor = [UIColor blackColor];
         commentLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
@@ -98,7 +97,7 @@
         [self addSubview:commentLabel];
     }
     
-    return initialsLabel;
+    return commentLabel;
     
 }
 
