@@ -128,15 +128,16 @@
 -(void) makeList
 {
     NSLog(@"DetailView::makeList called");
-    if (!kBonjourMode) {
+    if (!kBonjourMode) { // local mode
         UIBarButtonItem *cRollButton = 
         [[[UIBarButtonItem alloc] initWithImage: 
                     [UIImage imageNamed: @"cameraRoll.png"]
                         style:  UIBarButtonItemStyleBordered target: self 
                         action: @selector(pickClip)] autorelease]; 
         self.navigationItem.leftBarButtonItem = cRollButton;
+        self.navigationItem.rightBarButtonItem = nil; // no refresh button
     }
-    else {
+    else { // remote mode
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
 
