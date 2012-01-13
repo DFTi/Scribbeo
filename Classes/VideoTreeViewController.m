@@ -410,6 +410,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 -(void) loadStill: (NSString *) link 
 {
     self.movieURL = [self getTheURL: link];
+    NSLog(@"loadStill resuming");
     self.mediaPath = link;
     
     NSData *imageData = [NSData dataWithContentsOfURL: movieURL];
@@ -960,9 +961,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // Autoplay clips on or off
     
     autoPlay = (BOOL) [defaults boolForKey: @"AutoPlay"];
-    NSLog(@"MAKESETTINGS THINKS AUTOPLAY IS %@", (autoPlay ? @"True" : @"False"));
-    
-    NSLog (@"Setting autoplay to %i", autoPlay);
+    NSLog(@"Autoplay %@", (autoPlay ? @"True" : @"False"));
     
     // emailPDF on or off
     
@@ -3720,6 +3719,7 @@ static int saveRate;
 
    
     self.movieURL = [self getTheURL: theMovie];
+    NSLog(@"loadMovie will now resume");
     self.mediaPath = theMovie;
     
 #if 0

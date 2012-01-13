@@ -34,6 +34,7 @@
     NSMutableArray          *clipList;
     NSString                *HTTPserver, *serverBase;
     BOOL                    iPhone;         // Running on an iPhone
+    BOOL                    LiveTranscode;
     BOOL                    BonjourMode;
     BOOL                    UseManualServerDetails;
     BOOL                    demoView;
@@ -60,7 +61,7 @@
 @property (nonatomic, retain)  NSURL                *theURL;
 @property (nonatomic, retain)  NSString             *theExtension, *outputFilename;
 
-@property BOOL  iPhone, BonjourMode, UseManualServerDetails;
+@property BOOL  iPhone, BonjourMode, UseManualServerDetails, LiveTranscode;
 @property (nonatomic, retain)  NSString             *HTTPserver;
 @property (nonatomic, retain)  NSString             *serverBase;
 

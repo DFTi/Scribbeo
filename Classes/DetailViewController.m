@@ -249,7 +249,11 @@
     for (NSDictionary *dict in fileList) {
         NSString *fileName = [dict objectForKey:@"name"];
         NSString *fileExt = [dict objectForKey:@"ext"];
-        NSString *assetURL = [dict objectForKey:@"live_transcode"]; // URL by which to retreive this asset
+        NSString *assetURL = nil;
+        if ([kAppDel LiveTranscode])
+            assetURL = [dict objectForKey:@"live_transcode"];
+        else
+            assetURL = [dict objectForKey:@"asset_url"];
         NSLog(@"See a file named: %@", fileName);
         NSLog(@"Asset located at: %@", assetURL);
         [files addObject:fileName];
@@ -756,10 +760,11 @@
     
     NSLog(@"Now will try loading the movie or still at: %@", moviePath);
     
-    if ( !kIsMovie (extension) )
-        [vc loadMovie: moviePath];
-    else
+    if ( kIsStill (extension) )
         [vc loadStill: moviePath];
+    else
+        [vc loadMovie: moviePath];
+
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

@@ -41,7 +41,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @interface VideoTreeViewController : UIViewController <UITableViewDelegate, UITableViewDataSource,
             UITextFieldDelegate, MFMailComposeViewControllerDelegate, 
-            UIWebViewDelegate, UIPrintInteractionControllerDelegate, IASKSettingsDelegate, UITextViewDelegate>  {
+            UIWebViewDelegate, UIPrintInteractionControllerDelegate, IASKSettingsDelegate, UITextViewDelegate>  {            
     NSMutableArray              *noteData;                  // The table of notes
     NSMutableArray *activeAsyncRequests; // Store requests here so we can cancel them.
 
@@ -118,7 +118,6 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
     BOOL                        isSaving;                   // In the process of saving a note?
     BOOL                        fullScreenMode;             // Are we in full screen mode?
     BOOL                        timecodeFormat;             // Show timecodes or frame numbers
-                
     CMTime                      endOfVid;
                     
     //  Audio Note support

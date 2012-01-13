@@ -22,7 +22,7 @@ int gIOSMajorVersion;
 @synthesize window, demoView;
 @synthesize tvc, nc, clipList, rootTvc;
 @synthesize iPhone, viewController, BonjourMode, UseManualServerDetails;
-@synthesize serverBrowser, server, bonjour, theURL, theExtension, HTTPserver, serverBase, outputFilename;
+@synthesize serverBrowser, server, bonjour, theURL, theExtension, HTTPserver, serverBase, outputFilename, LiveTranscode;
 
 static int tryOne = 0;
 
@@ -99,6 +99,7 @@ static int tryOne = 0;
     
     BOOL wasBonjourMode = BonjourMode;
     BOOL wasUsingManualServerDetails = UseManualServerDetails;
+    BOOL wasUsingLiveTranscode = LiveTranscode;
     [self makeSettings]; // Get any new setting changes.
     [viewController makeSettings]; // Get the lesser changes.    
     [viewController uploadActivityIndicator: NO];
@@ -107,7 +108,11 @@ static int tryOne = 0;
     
     // Restart playback as appropriate
     // But first, check if the user changed any important settings.
-    if ((wasBonjourMode != BonjourMode) || (wasUsingManualServerDetails != UseManualServerDetails)) { 
+    if (
+            (wasUsingLiveTranscode != LiveTranscode) || 
+            (wasBonjourMode != BonjourMode) || 
+            (wasUsingManualServerDetails != UseManualServerDetails)
+        ) { 
         NSLog(@"Mode was changed, cleaning up");
         [viewController cleanup];
     } else {
@@ -121,6 +126,7 @@ static int tryOne = 0;
         }
     }
 
+    NSLog(@"Live Transcode %@", ([self LiveTranscode] ? @"True" : @"False"));
     [viewController showNav];
     
     [self releasemem];
@@ -467,6 +473,11 @@ static int tryOne = 0;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
  //   [[NSUserDefaults standardUserDefaults] synchronize];
 
+    // Live Transcode
+    LiveTranscode = [defaults boolForKey: @"LiveTranscode"];
+    if (!LiveTranscode) LiveTranscode = NO;
+
+    NSLog(@"Live Transcode: ", (LiveTranscode ? @"on" : @"off"));
     // Bonjour support
     
     BonjourMode = [defaults boolForKey: @"Bonjour"];
