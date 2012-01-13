@@ -1636,8 +1636,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 // (although iOS 5.0 has thankfully resolved the latter problem for us)
 
 // FIX:
-// How To Legally Replace UIGetScreenImage() | CocoaCoder
-// http://cocoacoderblog.com/2011/03/07/how-to-legally-replace-uigetscreenimage/
+// https://github.com/cocoacoderorg/Screenshots
 
 
 -(void) frameDraw
