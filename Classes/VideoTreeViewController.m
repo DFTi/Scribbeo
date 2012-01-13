@@ -303,6 +303,35 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     uploadCount = 0;
     
     [stampLabel removeFromSuperview];  // Don't like the way IB places this
+    
+    
+    UISwipeGestureRecognizer *swipeLeftFrame = [[UISwipeGestureRecognizer alloc] init];
+    swipeLeftFrame.numberOfTouchesRequired = 2;
+    [swipeLeftFrame addTarget:self action:@selector(swipedLeft:)];
+    [playerLayerView addGestureRecognizer:swipeLeftFrame];
+    
+    
+    UISwipeGestureRecognizer *swipeRightFrame = [[UISwipeGestureRecognizer alloc] init];
+    swipeRightFrame.numberOfTouchesRequired = 2;
+    [swipeRightFrame addTarget:self action:@selector(swipedRight:)];
+    [playerLayerView addGestureRecognizer:swipeRightFrame];
+}
+
+- (void) swipedLeft:(UISwipeGestureRecognizer*)gesture
+{
+    
+    CMTime newTime = CMTimeAdd(CMTimeMakeWithSeconds(1.f/24.f, 100000), [player currentTime]);
+    
+    [player seekToTime:newTime toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+    
+}
+   
+- (void) swipedRight:(UISwipeGestureRecognizer*)gesture
+{
+ 
+    CMTime newTime = CMTimeSubtract([player currentTime], CMTimeMakeWithSeconds(1.f/24.f, 100000));
+    [player seekToTime:newTime toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+        
 }
 
 - (void) viewDidAppear: (BOOL) animated {

@@ -287,6 +287,9 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @property int curFileIndex;
 
+- (void) swipedLeft:(UISwipeGestureRecognizer*)gesture;
+- (void) swipedRight:(UISwipeGestureRecognizer*)gesture;
+
 // Markup
 
 -(IBAction) erase;
