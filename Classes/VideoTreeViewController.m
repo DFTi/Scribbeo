@@ -1426,9 +1426,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     NSLog (@"image width,height = (%i, %i)", wid, ht);
 
-    ht =  (200. / wid) * ht;
+    ht =  (220. / wid) * ht;
     ht = ht + ht % 8;
-    wid = 200;
+    wid = 220;
     
     NSLog (@"image width,height = (%i, %i)", wid, ht);
 
