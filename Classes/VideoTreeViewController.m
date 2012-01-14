@@ -1428,7 +1428,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
     ht =  (220. / wid) * ht;
     ht = ht + ht % 8;
-    wid = 220;
+    wid = 222;
     
     NSLog (@"image width,height = (%i, %i)", wid, ht);
 
@@ -3339,9 +3339,12 @@ static int saveRate;
         // If we haven't set the frame rate by now, something has gone
         // horribly wrong
         
-        fps = 24;
         
         if (fps == 0) {
+            if ([kAppDel LiveTranscode]) {
+                fps = 24;
+                return;
+            }
             // FIXME something might be weird here, where is fps getting set?
             [self cleanup];
             [UIAlertView doAlert:  @"Error" withMsg:
