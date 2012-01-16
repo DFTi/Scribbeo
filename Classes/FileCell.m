@@ -7,6 +7,7 @@
 //
 
 #import "FileCell.h"
+#import <QuartzCore/QuartzCore.h>
 
 @implementation FileCell
 
@@ -24,8 +25,9 @@
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
-    [super setSelected:selected animated:animated];
-
+    //[super setSelected:selected animated:animated];
+    self.layer.borderColor = [[UIColor yellowColor] CGColor];
+    self.layer.borderWidth = (selected)?2.f:0.f;
     // Configure the view for the selected state
 }
 
