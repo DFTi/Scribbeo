@@ -248,10 +248,10 @@
 //        return;
 //    }
 //    else
-    if (taps == 2) {
-        [[kAppDel viewController] playPauseButtonPressed: nil];
-        return;
-    }
+//    if (taps == 2) {
+//        [[kAppDel viewController] playPauseButtonPressed: nil];
+//        return;
+//    }
     
     if (twoBarMode)
         theX = straightX;

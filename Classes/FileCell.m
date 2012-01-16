@@ -70,7 +70,7 @@
     
     if (!initialsLabel) {
         initialsLabel = [[UILabel alloc] init];
-        initialsLabel.frame = CGRectMake(0, 110, 70, 20);
+        initialsLabel.frame = CGRectMake(0, 110, 40, 20);
         initialsLabel.textColor = [UIColor whiteColor];
         initialsLabel.shadowColor = [UIColor blackColor];
         initialsLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
@@ -88,7 +88,7 @@
     
     if (!commentLabel) {
         commentLabel = [[UILabel alloc] init];
-        commentLabel.frame = CGRectMake(70, 110, 200, 20);
+        commentLabel.frame = CGRectMake(40, 110, 200, 20);
         commentLabel.textColor = [UIColor whiteColor];
         commentLabel.shadowColor = [UIColor blackColor];
         commentLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
