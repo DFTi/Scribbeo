@@ -4188,13 +4188,13 @@ static int saveRate;
     if (!player && !stillShows)
         return;
     
-    if (! iPHONE) {
+    //if (! iPHONE) {
         [[UIApplication sharedApplication] setStatusBarHidden: YES 
                                                 withAnimation: UIStatusBarAnimationFade];
         
         UINavigationController  *nc = [(VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] nc];
         nc.view.hidden = YES;
-    }
+    //}
     
     if (player) 
         [self pauseIt];
