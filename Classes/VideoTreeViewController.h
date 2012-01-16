@@ -404,7 +404,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 - (IBAction)clearNewNote:(id)sender;
 
 @property (nonatomic, retain) IASKAppSettingsViewController *appSettingsViewController;
-- (void) connectionDidFinishLoading:(NSURLConnection *)connection;
+
 
 @end
 

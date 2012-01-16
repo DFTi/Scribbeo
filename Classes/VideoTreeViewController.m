@@ -1678,12 +1678,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 -(IBAction) save
 {
-    if (kBonjourMode && isSaving) {
-        NSLog(@"Already saving!");
-        return;
-    }
-    isSaving = YES;
-
     // Dismiss the keyboard if it's showing
     
     if (keyboardShows)  {
@@ -2948,13 +2942,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     [NSURLConnection connectionWithRequest:request delegate:self];
     [request release];
     return remoteURL;
-}
-
-- (void) connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    NSLog(@"Connection Did Finish Loading");
-    // If we've got this far, we're done saving.
-    isSaving = NO;    
 }
 
 // Reusable HTTP Download via GET (Synchronous, sorry)
