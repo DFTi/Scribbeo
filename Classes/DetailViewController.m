@@ -176,6 +176,16 @@
             self.title = @"Files";
     } else
         self.title = @""; // No title needed in local mode
+      
+    
+    if ([self.title isEqualToString:@"Files"]) {
+        UIBarButtonItem *backBar = [[UIBarButtonItem alloc] initWithTitle:@"Close" style:UIBarButtonItemStylePlain target:self action:@selector(closeOut:)];
+        
+        self.navigationItem.leftBarButtonItem = backBar;
+        
+        [backBar release]; 
+    }
+
     
     [self.tableView reloadData];        // Refresh the table
     
@@ -226,6 +236,12 @@
     
 }
 
+- (void)closeOut:(id)sender{
+    
+    UINavigationController  *nc = [(VideoTreeAppDelegate *) [[UIApplication sharedApplication] delegate] nc];
+    
+    nc.view.hidden = YES;
+}
 
 // This method will fill the files array from the JSON received from the py bonjour webserver
 - (void) filesFromJSONFileListing: (NSDictionary *) listing

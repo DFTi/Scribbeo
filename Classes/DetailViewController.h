@@ -35,18 +35,19 @@
 @property (nonatomic, retain)  UIPopoverController      *popoverController;
 @property int     currentClip;
 
--(void) showDisconnected;
--(void) hideDisconnected;
--(void) showActivity;
--(void) stopActivity;
--(BOOL) nextClip;
--(void) makeList;
--(void) iTunesLoad;
--(void) setTheMoviePath: (NSString *) movie;
--(void) filesFromJSONFileListing: (NSDictionary *) listing;
+- (void) showDisconnected;
+- (void) hideDisconnected;
+- (void) showActivity;
+- (void) stopActivity;
+- (BOOL) nextClip;
+- (void) makeList;
+- (void) iTunesLoad;
+- (void) setTheMoviePath: (NSString *) movie;
+- (void) filesFromJSONFileListing: (NSDictionary *) listing;
 - (void) setNotesAndTimecodeForAsset: (NSString *) assetURL atIndex:(NSInteger) index;
 - (void)rowSelected:(int)row;
 - (void) playAsset: (NSString *)theMedia;
+- (void)closeOut:(id)sender;
 
 #ifdef OLDSTUFF
 @property (nonatomic, retain)  NSString        *episode, *date, *tape, *clip;
