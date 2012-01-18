@@ -196,7 +196,7 @@
 		</dict>
         <dict>
 			<key>Title</key>
-			<string>Experimental (Viewing Only)</string>
+			<string>Viewing only, (No annotation or timecode support)</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
