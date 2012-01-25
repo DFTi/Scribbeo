@@ -133,14 +133,16 @@
         CGRect dateLabelRect = dateLabel.frame;
         dateLabelRect.origin.x = self.frame.origin.x;
         dateLabelRect.origin.y = self.frame.size.height-20;
-        dateLabelRect.size.width = self.frame.size.width/2;
+        dateLabelRect.size.width = self.frame.size.width/2 + 15;
         self.dateLabel.frame = dateLabelRect;
         
         CGRect initialsLabelRect = initialsLabel.frame;
         initialsLabelRect.origin.x = dateLabelRect.size.width;
         initialsLabelRect.origin.y = self.frame.size.height-20;
-        initialsLabelRect.size.width = self.frame.size.width/2;
+        initialsLabelRect.size.width = self.frame.size.width/2 - 15;
         self.initialsLabel.frame = initialsLabelRect;
+        
+        [commentLabel removeFromSuperview];
         
     }    
     

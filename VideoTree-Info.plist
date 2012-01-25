@@ -59,7 +59,6 @@
 	<key>CFBundleIconFiles</key>
 	<array>
 		<string>scribbeo-icon.png</string>
-		<string>scribbeo-icon.png</string>
 		<string>scribbeo-icon@2.png</string>
 		<string>scribbeo-icon~ipad.png</string>
 	</array>
@@ -99,10 +98,6 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>quartzregulardb.ttf</string>
-	</array>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>audio</string>
 	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>

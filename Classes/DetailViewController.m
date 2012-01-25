@@ -178,10 +178,15 @@
         self.title = @""; // No title needed in local mode
       
     
-    if ([self.title isEqualToString:@"Files"] && iPHONE) {
+    if (([self.title isEqualToString:@"Files"] || [self.title isEqualToString:@""]) && iPHONE) {
         UIBarButtonItem *backBar = [[UIBarButtonItem alloc] initWithTitle:@"Close" style:UIBarButtonItemStylePlain target:self action:@selector(closeOut:)];
         
-        self.navigationItem.leftBarButtonItem = backBar;
+        if ([self.title isEqualToString:@""]) {
+            self.navigationItem.rightBarButtonItem = backBar;
+        }else
+        {
+            self.navigationItem.leftBarButtonItem = backBar;
+        }
         
         [backBar release]; 
     }

@@ -106,7 +106,7 @@
 		</dict>
 		<dict>
 			<key>DefaultValue</key>
-			<string>HTML</string>
+			<string>PDF</string>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Key</key>
@@ -174,9 +174,9 @@
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 		</dict>
-        <dict>
+		<dict>
 			<key>Title</key>
-			<string>Viewing only, (No annotation or timecode support)</string>
+			<string>Viewing only. No annotation or timecode support.</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>

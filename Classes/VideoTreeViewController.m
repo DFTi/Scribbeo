@@ -2632,7 +2632,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         NSString *remotePath = [NSString stringWithFormat: @"%@/email/%@", kHTTPserver, saveFileName]; 
         
         emailBody =  [NSString stringWithFormat: 
-                      @"<html>Sent from Scribbeo™ (v%@.%@), \u00A9 2011-2012 by DigitalFilm Tree<br><p>",                         
+                      @"<html>Sent from Scribbeo™ (v%@.%@), \u00A9 2011-2012 by DFTi LLC<br><p>",                         
                       [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],  
                       [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"]];
         
@@ -2916,9 +2916,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     char *text;
     
     if (iPHONE)
-        text = "Created by Scribbeo™ iPhone App.  Copyright \251 2010-2012 by DigitalFilm Tree.";
+        text = "Created by Scribbeo™ iPhone App.  Copyright \251 2010-2012 by DFTi LLC.";
     else
-        text = "Created by Scribbeo™ iPad App.  Copyright \251 2010-2012 by DigitalFilm Tree.";
+        text = "Created by Scribbeo™ iPad App.  Copyright \251 2010-2012 by DFTi LLC.";
 
     CGContextShowTextAtPoint (pdfContext, 25 + CGImageGetWidth (ref) / 5 + 15, .65 inches, text, strlen(text));
 //  text = "VideoTree is a trademark of DFT Software.";
