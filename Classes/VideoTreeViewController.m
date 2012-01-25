@@ -4550,10 +4550,13 @@ static int saveRate;
     
 //    UILabel *timeLabel = [[UILabel alloc] init];
 //    timeLabel.frame = CGRectMake(0, 110, tableView.frame.size.width, 20);
-    cell.timeLabel.text = [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp])];
+    if ([theNote isStill])
+        cell.timeLabel.text = @""; // Still show the dark bar for consistency, but don't print timecode for a still.
+    else
+        cell.timeLabel.text = [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp])];
     cell.dateLabel.text = theNote.date;
     cell.initialsLabel.text = theNote.initials;
-    cell.commentLabel.text = theNote.text;
+    cell.commentLabel.text = theNote.text;   
 //    timeLabel.textColor = [UIColor whiteColor];
 //     timeLabel.shadowColor = [UIColor blackColor];
 //    timeLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];

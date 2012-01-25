@@ -65,4 +65,9 @@
     [super dealloc];
 }
 
+-(BOOL) isStill
+{   // If it has an imagename, it is a still.
+    return ([self.imageName length] > 0);
+}
+
 @end
