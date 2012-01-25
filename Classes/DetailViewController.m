@@ -135,19 +135,28 @@
                         style:  UIBarButtonItemStyleBordered target: self 
                         action: @selector(pickClip)] autorelease]; 
         self.navigationItem.leftBarButtonItem = cRollButton;
-        self.navigationItem.rightBarButtonItem = nil; // no refresh button
+        //self.navigationItem.rightBarButtonItem = nil; // no refresh button
+        // We want a refresh button in Local Mode now so that when we add something in using
+        // iTunes, we can refresh and see the new files without restarting the app.
+        
+        
     }
     else { // remote mode
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
 
-        if (! iPHONE) {
-            UIBarButtonItem *refresh =  [[[UIBarButtonItem alloc] initWithImage: 
-          [UIImage imageNamed: @"Refresh.png"]
-                  style: UIBarButtonItemStylePlain target: self action: @selector(makeList)] autorelease];  
-            self.navigationItem.rightBarButtonItem = refresh;
-        }
+//        if (! iPHONE) {
+//            UIBarButtonItem *refresh =  [[[UIBarButtonItem alloc] initWithImage: 
+//          [UIImage imageNamed: @"Refresh.png"]
+//                  style: UIBarButtonItemStylePlain target: self action: @selector(makeList)] autorelease];  
+//            self.navigationItem.rightBarButtonItem = refresh;
+//        }
     }
+
+    UIBarButtonItem *refresh =  [[[UIBarButtonItem alloc] initWithImage: 
+                                  [UIImage imageNamed: @"Refresh.png"]
+                                  style: UIBarButtonItemStylePlain target: self action: @selector(makeList)] autorelease];  
+    self.navigationItem.rightBarButtonItem = refresh;
     
     // Create our clip list arrays, or clear if already created
     
