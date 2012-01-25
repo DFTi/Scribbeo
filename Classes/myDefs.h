@@ -32,7 +32,7 @@ extern int gIOSMajorVersion;
 #define kRunningOS5OrGreater  (gIOSMajorVersion >= '5') 
 
 #define kHTTPserver  ([kAppDel HTTPserver])
-#define kVideoTreeWebsite @"http://www.digitalfilmtree.com"
+#define kVideoTreeWebsite @"http://www.scribbeo.com"
 
 
 #define kBonjourMode ([kAppDel BonjourMode])
