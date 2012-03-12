@@ -949,13 +949,13 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     // FCP export on or off
     
-    FCPXML = NO; // [defaults boolForKey: @"FCPXML"];
+    FCPXML = [defaults boolForKey: @"FCPXML"];
     
     NSLog (@"Export XML: %i", FCPXML);
     
     // Avid export on or off
     
-    AvidExport = NO; //[defaults boolForKey: @"AvidExport"];
+    AvidExport = [defaults boolForKey: @"AvidExport"];
     
     NSLog (@"Export Avid: %i", AvidExport);
     
