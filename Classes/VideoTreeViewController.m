@@ -55,11 +55,14 @@ static void *VideoTreeViewControllerStatusObservationContext = @"VideoTreeViewCo
 static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewControllerAirPlayObservationContext";
 
 @implementation VideoTreeViewController
+@synthesize filterButton;
 @synthesize stillView;
 @synthesize airPlayImageView;
 @synthesize playerToolbar;
+@synthesize playerToolbar1;
 @synthesize playOutButton;
 @synthesize allStills;
+@synthesize shareActionButonItem;
 
 @synthesize showName, newNote, fullScreenMode, drawView, movieTimeControl, notes, newThumb, noteBar, drawingBar;
 @synthesize player, seekToZeroBeforePlay, movieURL, playerLayerView, theTime, maxLabel, minLabel, noteData, currentlyPlaying, isSaving, markers;
@@ -71,6 +74,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 @synthesize rewindToStartButton, frameBackButton, frameForwardButton, forwardToEndButton, fullScreenButton, rewindButton, fastForwardButton, airPlayMode, remote;
 @synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo, mediaPath;
 @synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage, timeCode, curFileIndex, curAssetURLs, activeAsyncRequests;
+
+@synthesize filterInitials, filteredNoteData, filterActionSheet;
 
 #pragma mark -
 #pragma mark view loading/unloading
@@ -111,7 +116,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // Add a volume control for Airplay; Add a Route Button if >= iOS5
  
     if (! iPHONE)  {
-        CGRect volFrame = { 580, 165, 300, 50 };
+        CGRect volFrame = { 700, 115, 300, 50 };
     
         myVolumeView = [[MPVolumeView alloc] initWithFrame: volFrame];
         
@@ -119,6 +124,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
             myVolumeView.showsRouteButton = NO;
         
         [self.view addSubview: myVolumeView];
+        [self.view bringSubviewToFront:myVolumeView];
     }
     
 #if 0
@@ -139,8 +145,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     // Makes the note border look a little nicer
     
-    newNote.layer.borderWidth = 2;
-	newNote.layer.borderColor = [[UIColor grayColor] CGColor];
+    //newNote.layer.borderWidth = 1;
+	//newNote.layer.borderColor = [[UIColor darkGrayColor] CGColor];
     
     if (iPHONE)
         newNote.layer.cornerRadius = 8;
@@ -159,7 +165,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         noteBar.clipsToBounds = YES;
 
         // set corner radious
-        noteBar.layer.cornerRadius = 10;
+       // noteBar.layer.cornerRadius = 10;
     }
     
     theFrame = (CGRect) {theOrigin, theSize};
@@ -280,6 +286,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     filenameView.layer.borderWidth = 2;
 	filenameView.layer.borderColor = [[UIColor grayColor] CGColor];
     
+    
     CGPoint center = filenameView.center;
     saveFilename.delegate = self;
     
@@ -303,6 +310,25 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     uploadCount = 0;
     
     [stampLabel removeFromSuperview];  // Don't like the way IB places this
+   
+    
+   // Visualy debug views
+   /*  
+    for (UIView* aView in self.view.subviews)
+    {
+        aView.hidden = NO;
+        aView.layer.borderColor = [[UIColor redColor] CGColor];
+        aView.layer.borderWidth = 2;
+        
+        UILabel *name = [[UILabel alloc] initWithFrame:aView.bounds];
+        name.textColor = [UIColor redColor];
+        name.text = [NSString stringWithFormat:@"%@", aView];
+        
+        [aView addSubview:name];
+        
+    }
+  */ 
+    
     
 }
 
@@ -372,6 +398,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 }
 
 - (void)viewDidUnload {
+    [self setFilterButton:nil];
+    [self setShareActionButonItem:nil];
+    [self setPlayerToolbar1:nil];
     NSLog (@"Viewcontroller view did unload");
     [self setStillView:nil];
     [self setAirPlayImageView:nil];
@@ -567,24 +596,24 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     movieTimeControl.hidden = YES;
     maxLabel.hidden = YES;
     minLabel.hidden = YES;
-    rewindToStartButton.enabled = NO; 
+    /*rewindToStartButton.enabled = NO; 
     frameBackButton.enabled = NO; 
     frameForwardButton.enabled = NO; 
     forwardToEndButton.enabled = NO; 
     rewindButton.enabled = NO;
-    fastForwardButton.enabled = NO;
+    fastForwardButton.enabled = NO;*/
     myVolumeView.hidden = YES;
 
 
     if (autoPlay) {
         pausePlayButton.image = pauseImage;
-        pausePlayButton.enabled = YES;
+        //pausePlayButton.enabled = YES;
     }
-    else
-        pausePlayButton.enabled = NO;
+    else{}
+       // pausePlayButton.enabled = NO;
     
-    skipForwardButton.enabled = NO;
-    skipBackButton.enabled = NO;
+   // skipForwardButton.enabled = NO;
+    //skipBackButton.enabled = NO;
     skipForwardButton.title = @"";
     skipBackButton.title = @"";
     stillShows = YES;
@@ -1058,6 +1087,54 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 -(void) blue
 {
     drawView.color = BLUE;
+}
+
+- (IBAction)filterNotes:(id)sender {
+    
+    self.filterActionSheet = [[UIActionSheet alloc] initWithTitle:@"Filter"
+                                                    delegate:self
+                                           cancelButtonTitle:nil
+                                      destructiveButtonTitle:nil
+                                           otherButtonTitles:nil];
+    self.filterActionSheet.destructiveButtonIndex = [self.filterActionSheet addButtonWithTitle:@"Cancel"];
+    [self.filterActionSheet addButtonWithTitle:@"All"];
+    
+    if (!self.filterInitials)
+    {
+        self.filterInitials = [[NSMutableArray array] retain];
+    }
+    else
+    {
+        [self.filterInitials removeAllObjects];
+    }
+        
+    
+    //Build up notes
+    for (Note* aNote in self.noteData)
+    {
+        [self.filterInitials addObject:aNote.initials];
+        NSInteger i = 0;
+        for (NSString* aString in self.filterInitials)
+        {
+            if ([aString isEqualToString:aNote.initials] && i < [self.filterInitials count] - 1)
+            {
+                [self.filterInitials removeLastObject];
+                break;
+            }
+            i++;
+        }
+        
+    }
+    
+
+    
+    for (NSString* aString in self.filterInitials)
+    {
+        [self.filterActionSheet addButtonWithTitle:aString];
+    }
+        
+    [self.filterActionSheet showFromBarButtonItem:filterButton animated:YES];
+    
 }
 
 //
@@ -1790,12 +1867,17 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSIndexPath *indexP = [NSIndexPath indexPathForRow: row inSection:0];
     NSArray *indexPaths = [[NSArray alloc] initWithObjects: indexP, nil];
     
+    [notes beginUpdates];
+    
     [noteData insertObject: aNewNote atIndex: row];
+    [self.filteredNoteData insertObject:aNewNote atIndex:row];
+
     [aNewNote release];
 
     [notes insertRowsAtIndexPaths:(NSArray *)indexPaths 
                      withRowAnimation:(UITableViewRowAnimation)UITableViewRowAnimationLeft];
 
+    [notes endUpdates];
     // Sometimes this crashes, so we'll do this in an @try block
     
     @try 
@@ -1948,15 +2030,20 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                     NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: [self archiveFilePath]];
                     [noteData release];
                     noteData = [noteArray mutableCopy];
+                    self.filteredNoteData = [noteArray mutableCopy];
                     NSLog (@"Restored %i locally saved notes", [noteData count]);
                 }
                 else {
                     [noteData removeAllObjects];
+                    [self.filteredNoteData release];
+                    self.filteredNoteData = nil;
                     [self.notes setEditing: NO];            
                     NSLog (@"No notes to restore");
                 }
                 [self noteStopActivity];
                 [notes reloadData];
+                
+                        
             });
     }
 }
@@ -1991,6 +2078,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSLog(@"We are about to getAllHTTPNotes at index %d", index);
     [self noteShowActivity];
     [noteData removeAllObjects];
+    //[self.filteredNoteData release];
+    //self.filteredNoteData = nil;
     for (SVHTTPRequest *req in activeAsyncRequests) {
         [req cancel];
     }
@@ -2039,9 +2128,14 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                                  
                                 */
                                 [noteData addObject:aNote];
+                                //[self.filteredNoteData addObject:aNote];
                             }
                             [self noteStopActivity];
+                            
+                            self.filteredNoteData = [noteData mutableCopy];
+                            
                             [notes reloadData];
+                            
                         } 
                         
                     }
@@ -2105,6 +2199,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         // Insert the note into the array and table
             
         [noteData insertObject: XMLNote atIndex: row];
+        [self.filteredNoteData insertObject:XMLNote atIndex:row];
     
         [XMLNote release];
     }
@@ -2176,6 +2271,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 -(void) clearAnyNotes
 {
     [noteData removeAllObjects];
+    [self.filteredNoteData release];
+    self.filteredNoteData = nil;
     [self.notes setEditing: NO];
     [notes reloadData];
 }
@@ -2382,6 +2479,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
             // Insert the note into the array (and table)
             
             [noteData insertObject: AvidNote atIndex: row];
+            [self.filteredNoteData insertObject:AvidNote atIndex:row];
         }
             
         [AvidNote release];
@@ -3898,6 +3996,7 @@ static int saveRate;
          if (airPlayMode) 
              [self airPlayWork];
     } ];
+    
 }
 
 // Make sure the play/pause button matches the current state of playback
@@ -3925,6 +4024,8 @@ static int saveRate;
         pausePlayButton.enabled = NO;
         recordButton.enabled = NO;
     }
+    
+    
 }
 
 //
@@ -4033,7 +4134,7 @@ static int saveRate;
     movieTimeControl.hidden = YES;
     maxLabel.hidden = YES;
     minLabel.hidden = YES;
-    rewindToStartButton.enabled = NO; 
+    /*rewindToStartButton.enabled = NO; 
     frameBackButton.enabled = NO; 
     frameForwardButton.enabled = NO; 
     forwardToEndButton.enabled = NO; 
@@ -4043,7 +4144,7 @@ static int saveRate;
     pausePlayButton.enabled = NO;
 
     skipForwardButton.enabled = NO;
-    skipBackButton.enabled = NO;
+    skipBackButton.enabled = NO;*/
     skipForwardButton.title = @"";
     skipBackButton.title = @"";
     
@@ -4440,7 +4541,7 @@ static int saveRate;
 // The number of rows in the table view.
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [noteData count];
+    return [self.filteredNoteData count];
 }
 
 // The height of each row in the table
@@ -4456,7 +4557,7 @@ static int saveRate;
 // The background color for each row depends on whether it's my note or someone else's
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    Note *theNote = [noteData objectAtIndex: indexPath.row];
+    Note *theNote = [self.filteredNoteData objectAtIndex: indexPath.row];
 
     if ([theNote.initials isEqualToString: initials] )    
         cell.contentView.backgroundColor = MYWHITE;
@@ -4470,7 +4571,7 @@ static int saveRate;
     
     static NSString *CellIdentifier = @"Cell";
     
-    Note *theNote = [noteData objectAtIndex: indexPath.row];
+    Note *theNote = [self.filteredNoteData objectAtIndex: indexPath.row];
 
     
     FileCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -4571,7 +4672,7 @@ static int saveRate;
 // Handle selection of a note from the notes table
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    Note *theNote = [noteData objectAtIndex: indexPath.row];
+    Note *theNote = [self.filteredNoteData objectAtIndex: indexPath.row];
     
     // See if we currently have a clip playing
     
@@ -4660,9 +4761,10 @@ static int saveRate;
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle: (UITableViewCellEditingStyle)editingStyle forRowAtIndexPath: (NSIndexPath *)indexPath
 {
-    if ([((Note *)[noteData objectAtIndex: indexPath.row]).initials isEqualToString: initials]) {
+    if ([((Note *)[self.filteredNoteData objectAtIndex: indexPath.row]).initials isEqualToString: initials]) {
         NSLog (@"Commit editing style called");
         [noteData removeObjectAtIndex: indexPath.row];  // remove the note from the table
+        //[self.filteredNoteData removeObjectAtIndex: indexPath.row];  // remove the note from the table
         [self storeData];                               // update local storage (and the server)
         [notes reloadData];
     }
@@ -4750,6 +4852,9 @@ static int saveRate;
     [playOutButton release];
     [playerToolbar release];
     [airPlayImageView release];
+    [playerToolbar1 release];
+    [shareActionButonItem release];
+    [filterButton release];
     [super dealloc];
 }
 
@@ -4801,4 +4906,74 @@ static int saveRate;
     
 }
 
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex <= 0 || [self.filterInitials count] == 0)
+    {
+        return;
+    }
+    
+    if (actionSheet == self.filterActionSheet)
+    {
+
+        [self.filteredNoteData removeAllObjects];
+        
+        NSString *initial = @"";
+
+        if (buttonIndex > 1)
+        {
+            initial = [self.filterInitials objectAtIndex:buttonIndex-2];
+        }
+        
+        for (Note *aNote in noteData)
+        {
+            if (buttonIndex == 1)
+            {
+                [self.filteredNoteData addObject:aNote];
+            }
+            else if ([aNote.initials isEqualToString:initial])
+            {
+                [self.filteredNoteData addObject:aNote];
+            }
+        }
+        
+        [self.notes reloadData];
+    }
+    else
+    {
+        switch (buttonIndex) {
+            case 1:
+                [self printNotes];
+                break;
+            case 2:
+                [self emailNotes];
+                break;
+                
+            default:
+                break;
+        }
+    }
+    
+}
+
+- (IBAction)shareActionButton:(id)sender {
+    
+    UIActionSheet *shareAction = [[UIActionSheet alloc] initWithTitle:@"Share Annotation Notes"
+                                                             delegate:self
+                                                    cancelButtonTitle:@"Cancel"
+                                               destructiveButtonTitle:@"Cancel"
+                                                    otherButtonTitles:@"Print", @"Email", nil];
+    [shareAction showFromBarButtonItem:shareActionButonItem animated:YES];
+    
+}
+
+- (NSMutableArray*)filteredNoteData
+{
+    if (!filteredNoteData) {
+        filteredNoteData = [NSMutableArray array];
+    }
+    
+    return [filteredNoteData retain];
+}
 @end

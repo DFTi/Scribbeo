@@ -41,8 +41,9 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @interface VideoTreeViewController : UIViewController <UITableViewDelegate, UITableViewDataSource,
             UITextFieldDelegate, MFMailComposeViewControllerDelegate, 
-            UIWebViewDelegate, UIPrintInteractionControllerDelegate, IASKSettingsDelegate, UITextViewDelegate>  {            
+            UIWebViewDelegate, UIPrintInteractionControllerDelegate, IASKSettingsDelegate, UITextViewDelegate, UIActionSheetDelegate>  {            
     NSMutableArray              *noteData;                  // The table of notes
+                NSMutableArray              *filteredNoteData;
     NSMutableArray *activeAsyncRequests; // Store requests here so we can cancel them.
 
     UITextView                  *newNote;                   // The area where the text of a note is displayed
@@ -235,12 +236,15 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property BOOL stillShows;
 @property BOOL noteTableSelected;
 @property BOOL allStills;
+@property (retain, nonatomic) IBOutlet UIBarButtonItem *shareActionButonItem;
+- (IBAction)shareActionButton:(id)sender;
 
 @property (nonatomic, retain)  UIImageView *stillView;
 @property (nonatomic, retain)  UIImage *stillImage;
 
 @property (nonatomic, retain) IBOutlet UITextView *newNote;
 @property (nonatomic, retain) IBOutlet UIToolbar *playerToolbar;
+@property (retain, nonatomic) IBOutlet UIToolbar *playerToolbar1;
 @property (nonatomic, retain) IBOutlet UILabel    *theTime;
 @property (nonatomic, retain) IBOutlet UISlider *movieTimeControl;
 @property (nonatomic, retain) DrawView *drawView;
@@ -264,6 +268,8 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property (nonatomic, retain)  UITableView *notes;
 @property (nonatomic, retain)  UIImage *newThumb;
 @property (nonatomic, retain)  NSMutableArray *noteData;
+@property (nonatomic, retain)  NSMutableArray *filteredNoteData;
+@property (nonatomic, retain) UIActionSheet *filterActionSheet;
 @property (nonatomic, retain)   NSString        *show;
 @property (nonatomic, retain)   NSString        *filmDate;
 @property (nonatomic, retain)   NSString        *tape;
@@ -276,6 +282,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property (nonatomic, retain) NSString *timeCode;
 @property BOOL uploadIndicator;
 @property enum downloadType download;
+@property (retain, nonatomic) IBOutlet UIBarButtonItem *filterButton;
 
 @property Float64 startTimecode;
 
@@ -285,6 +292,8 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property (nonatomic, retain) IBOutlet MPMoviePlayerController *movieController;
 
 @property int curFileIndex;
+
+@property (nonatomic, retain) NSMutableArray* filterInitials;
 
 - (void) swipedLeft:(UISwipeGestureRecognizer*)gesture;
 - (void) swipedRight:(UISwipeGestureRecognizer*)gesture;
@@ -298,6 +307,8 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(void) red;
 -(void) green;
 -(void) blue;
+
+- (IBAction)filterNotes:(id)sender;
 
 // User interaction
 

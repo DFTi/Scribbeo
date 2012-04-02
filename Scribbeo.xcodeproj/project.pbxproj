@@ -817,8 +817,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: sazeer kader (96693546A8)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: sazeer kader (96693546A8)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Zach Thayer (4MDT5J2SFV)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Zach Thayer (4MDT5J2SFV)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -832,6 +832,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = Scribbeo;
+				PROVISIONING_PROFILE = "BEDB368F-11DC-4E0B-ABCF-AF5E6A57DFF5";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "BEDB368F-11DC-4E0B-ABCF-AF5E6A57DFF5";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
@@ -842,8 +844,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: sazeer kader (96693546A8)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: sazeer kader (96693546A8)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Zach Thayer (4MDT5J2SFV)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Zach Thayer (4MDT5J2SFV)";
 				COPY_PHASE_STRIP = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -856,6 +858,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = Scribbeo;
+				PROVISIONING_PROFILE = "BEDB368F-11DC-4E0B-ABCF-AF5E6A57DFF5";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "BEDB368F-11DC-4E0B-ABCF-AF5E6A57DFF5";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
