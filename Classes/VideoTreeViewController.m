@@ -2834,7 +2834,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         noteNumber = 1;
         NSLog (@"emailing %lu notes", [noteData count]);
 
-        for (Note *theNote in noteData) {
+        for (Note *theNote in filteredNoteData) {
             [emailBody appendString: [self noteToHTML: theNote]];
             ++noteNumber;
         }
@@ -2907,7 +2907,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     [self createPDFFile: (NSString *) newFilePath title: (NSString *) pageTitle];
     
-    for (Note *aNote in noteData) {
+    for (Note *aNote in filteredNoteData) {
        if (noteNumber % 4 == 1)
            [self newPDFPage: pageTitle];
 
