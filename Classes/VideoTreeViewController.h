@@ -32,6 +32,8 @@
 #import "IASKAppSettingsViewController.h"
 #import "SVHTTPRequest.h"
 
+#import "CoreMedia_Timecodes.h"
+
 void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, int currentY);
 
 // What type of file are we downloading?

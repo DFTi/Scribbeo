@@ -44,8 +44,8 @@ typedef enum _transitionEffects
 #define MYGRAY [UIColor colorWithRed: .8 green: .8 blue: .9 alpha: 1]
 #define MYWHITE [UIColor colorWithRed: .9 green: .9 blue: .9 alpha: 1]
 
-#define kCMTimeMakeWithSeconds(secs)  CMTimeMakeWithSeconds(secs, NSEC_PER_SEC)
-#define kCVTime(t)   (CMTimeGetSeconds(t) / ((int) (fps + .5) / (long double) fps))
+#define kCMTimeMakeWithSeconds(secs)  CMTimeMakeWithSeconds(secs, 1000000000)
+#define kCVTime(t)   (CMTimeGetSeconds(t) / ceilf(fps)/fps)
 
 static void *VideoTreeViewControllerCommonMetadataObserverContext = @"VideoTreeViewControllerCommonMetadataObserverContext";
 static void *VideoTreeViewControllerTimedMetadataObserverContext = @"VideoTreeViewControllerTimedMetadataObserverContext";
@@ -116,7 +116,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // Add a volume control for Airplay; Add a Route Button if >= iOS5
  
     if (! iPHONE)  {
-        CGRect volFrame = { 700, 115, 300, 50 };
+        CGRect volFrame = { 700, 128, 300, 25 };
     
         myVolumeView = [[MPVolumeView alloc] initWithFrame: volFrame];
         
@@ -125,6 +125,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         
         [self.view addSubview: myVolumeView];
         [self.view bringSubviewToFront:myVolumeView];
+        
+      //  myVolumeView.layer.borderColor = [[UIColor redColor] CGColor];
+       // myVolumeView.layer.borderWidth = 2.f;
     }
     
 #if 0
@@ -858,6 +861,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
        // if (! airPlayMode) 
             //[player play];
     }
+    
+    [notes reloadData];
     
     [player play];
     pausePlayButton.image = pauseImage;
@@ -1794,13 +1799,14 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     CMTime curTime;
     
     if ( !stillShows ) {
-        curTime =  kCMTimeMakeWithSeconds (kCVTime ([player currentTime]) + startTimecode);
+       // curTime =  kCMTimeMakeWithSeconds (kCVTime ([player currentTime]) + startTimecode);
     
         // Always store the time in timecode format
         
         BOOL saveFormat = timecodeFormat;
         timecodeFormat = YES;
-        aNewNote.timeStamp = [self timeFormat: curTime];
+        //aNewNote.timeStamp = [self timeFormat: curTime];
+        aNewNote.timeStamp = NSStringFromCMTimecode( CMTimecodeFromCMTimeWithoutDrop([player currentTime], [self currentTrack].nominalFrameRate));
         timecodeFormat = saveFormat;
         
         // We use this to scale the markups as needed so it
@@ -3256,35 +3262,43 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
 
 // Format the time either in timecode or absolute frame number format
 
+- (AVAssetTrack*)currentTrack
+{
+    
+    //TODO: Sanity checking of objects
+    
+    AVPlayerItem *aPlayerItem = player.currentItem;
+    AVAsset * playerAsset = aPlayerItem.asset;
+    AVAssetTrack *playerAssetTrack = [[playerAsset tracksWithMediaType:AVMediaTypeVideo] lastObject];
+        
+    return playerAssetTrack;
+    
+}
+
 - (NSString *) timeFormat: (CMTime) aTime
 {
-    NSString *time1;
-    Float64 secs = CMTimeGetSeconds (aTime);
-    int theFPS = (fps < .1) ? 24 : (int) (fps + .4999);  // *****
-
-    if (timecodeFormat) {
-        int hours = secs / 3600;
-        int mins = (secs - hours * 3600) / 60;
-        int theSecs = (int) (secs + .0001) % 60;
-        int frames = (int) ((secs - (int) secs) * theFPS + .01) % theFPS;
+    
+    CMTimecode theStartTimecode = CMTimecodeFromCMTimeWithoutDrop(CMTimeMakeWithSeconds(startTimecode, 1000000), [self currentTrack].nominalFrameRate);
+    
+    if (timecodeFormat)
+    {
+        CMTimecode timecode = CMTimecodeFromCMTime(aTime, [self currentTrack].nominalFrameRate);
         
-        if (mins < 0)
-            return (@"00:00:00:00");
-                                
-        time1 = [NSString stringWithFormat: @"%.2i:%.2i:%.2i:%.2i", hours, mins, theSecs, frames];
+        CMTimecode adjustedTimecode = CMTimecodeAdd(timecode, theStartTimecode);
+        
+        return NSStringFromCMTimecode(adjustedTimecode);
     }
-    else {
-        long frames  =  secs * theFPS + .4999;   // round up?
-                        
-        if (frames <= 0)
-            time1 = @"0";
-        else {
-            time1 = [NSString stringWithFormat: @"%li", frames];
-            // 1NSLog (@"time = %g, frame = %@, fps = %i", secs, time1, theFPS);
-        }
+    else
+    {
+        CMTimecode timecode = CMTimecodeFromCMTime(aTime, [self currentTrack].nominalFrameRate);
+    
+        CMTimecode adjustedTimecode = CMTimecodeAdd(timecode, theStartTimecode);
+        
+        return [NSString stringWithFormat:@"%f",adjustedTimecode.realSeconds * [self currentTrack].nominalFrameRate];
+        
     }
     
-    return time1;
+    
 }
 
 // Take an NSString in xx:xx:xx:xx format and convert it to a floating
@@ -3292,22 +3306,9 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
 
 -(Float64) convertTimeToSecs: (NSString *) timeStamp
 {
-    Float64 secs = NAN;
-    NSArray *timeSpot = [timeStamp componentsSeparatedByString:@":"];
-    float theFPS = (fps != 0.0) ? fps : 24;
-
-    if ([timeSpot count] == 3) {
-        secs = [[timeSpot objectAtIndex:0] floatValue] * 60 + 
-        [[timeSpot objectAtIndex:1] floatValue] + 
-        [[timeSpot objectAtIndex:2] floatValue] / theFPS;
-    }
-    else if ([timeSpot count] == 4){
-        secs = [[timeSpot objectAtIndex:0] floatValue] * 3600 + 
-        [[timeSpot objectAtIndex:1] floatValue] * 60 + [[timeSpot objectAtIndex:2] floatValue] +
-            [[timeSpot objectAtIndex:3] floatValue] / theFPS;
-    }
+    CMTimecode timecode = CMTimecodeFromNSString(timeStamp, [self currentTrack].nominalFrameRate);
     
-    return secs;
+    return timecode.realSeconds;
 }
 
 // Format the current date.  The argument says whether to include
@@ -3332,11 +3333,11 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
 
 - (void)updateTimeLabel
 {
-    Float64 curtime = (timecodeFormat) ?
-        kCVTime ([player currentTime]) + startTimecode :
-        kCVTime ([player currentTime]);
+    //Float64 curtime = CMTimeGetSeconds([player currentTime]);//(timecodeFormat) ?
+       // kCVTime ([player currentTime]) + startTimecode :
+       // kCVTime ([player currentTime]);
     
-    theTime.text = [self timeFormat: kCMTimeMakeWithSeconds (curtime)];
+    theTime.text = [self timeFormat: [player currentTime]];
 }
 
 static int saveRate;
@@ -3371,7 +3372,7 @@ static int saveRate;
 
 - (void)sliderValueChange
 {
-    Float64 playerTime = movieTimeControl.value * kCVTime ([[player currentItem] duration]); 
+    Float64 playerTime = movieTimeControl.value * CMTimeGetSeconds ([[player currentItem] duration]); 
     
  	[player seekToTime: kCMTimeMakeWithSeconds(playerTime)];
 }
@@ -3449,30 +3450,33 @@ static int saveRate;
         
         Float64 theEnd = duration + startTimecode;
         
-        if (timecodeFormat)
-            duration += startTimecode;
+        //if (timecodeFormat)
+          //  duration += startTimecode;
 
-        NSLog(@"UpdateTimeControl has incremented the duration (%f) by the startTimecode (%f)", theEnd, startTimecode);
+        NSLog(@"UpdateTimeControl has incremented the duration (%f) by the startTimecode (%f)", endOfVid, startTimecode);
         
         // If we have a meaningful duration set, set the min/max times at the ends of the scrubber
         
-        if (isfinite(duration))
-        {
-            if (!maxLabelSet) {
-                maxLabel.text = [self timeFormat: kCMTimeMakeWithSeconds(theEnd)];
-             NSLog (@"Setting duration to %@ (duration = %@ - %@ %lg, end = %lg)", maxLabel.text, 
-                [self timeFormat: kCMTimeMakeWithSeconds(duration)],  [self timeFormat: endOfVid], duration, theEnd);
+      //  if (isfinite(duration))
+       // {
+            //if (!maxLabelSet) {
+                
+               // NSLog(@"Start:%f, Duration:%f",CMTimeGetSeconds([self currentTrack].timeRange.start),CMTimeGetSeconds([self currentTrack].timeRange.duration));
+                
+                Float64 d = CMTimeGetSeconds([self currentTrack].timeRange.duration) + startTimecode;
+                
+                maxLabel.text = NSStringFromCMTimecode(CMTimecodeFromCMTimeWithoutDrop(kCMTimeMakeWithSeconds(d), [self currentTrack].nominalFrameRate));
                 
                 if (timecodeFormat)
-                    minLabel.text = [self timeFormat: kCMTimeMakeWithSeconds(startTimecode)];
+                    minLabel.text = NSStringFromCMTimecode(CMTimecodeFromCMTimeWithoutDrop(kCMTimeMakeWithSeconds(startTimecode), [self currentTrack].nominalFrameRate));
                 else
                     minLabel.text = @"1";
                 
-                maxLabelSet = YES;
-            }
+                maxLabelSet = NO;
+            //}
             
-            durationSet = YES;
-        }
+            durationSet = NO;
+        //}
     }
     else
         duration = kCVTime (endOfVid);
@@ -3496,13 +3500,13 @@ static int saveRate;
     
     int row = 0;
     
-    for (Note *theNote in noteData) {
+    for (Note *theNote in filteredNoteData) {
         if ([self convertTimeToSecs: theNote.timeStamp] > now)
             break;
         ++row;
     }
     
-    if (row < [noteData count]) {
+    if (row < [filteredNoteData count]) {
         NSIndexPath *indexP = [NSIndexPath indexPathForRow: row inSection:0];
         
         @try  {
@@ -3543,8 +3547,25 @@ static int saveRate;
     // Set up a reader to read the track
         
     NSError *error;
+    
+    AVPlayerItem *item = player.currentItem;
+    
+    AVAsset* asset = item.asset;
+    
+    if (!asset) {
+        return 0.0;
+    }
+    
+    AVAssetReader *assetReader;
+    
+    @try {
+        assetReader = [[AVAssetReader alloc] initWithAsset: asset error: &error];
+    }
+    @catch (NSException *exception) {
+        return 0.0;
+    }
 
-    AVAssetReader *assetReader = [[AVAssetReader alloc] initWithAsset: player.currentItem.asset error: &error];
+
     
     if (error) {
         NSLog (@"error initializing AVAssetReader: %@", error);
@@ -4685,14 +4706,14 @@ static int saveRate;
         
         // Seek to the frame indicated by the note
             
-        Float64 secs = [self convertTimeToSecs: theNote.timeStamp] - startTimecode;
+        Float64 secs = [self convertTimeToSecs: theNote.timeStamp];// - startTimecode;
         
         NSLog (@"Note time: %lg, start time: %lg", secs, startTimecode);
         
         NSLog (@"Seeking to %lg (%@) for Note", secs, theNote.timeStamp);
         
         seekToZeroBeforePlay = NO;
-        [player seekToTime: kCMTimeMakeWithSeconds(secs * ((int)(fps + .50000001) / fps)) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+        [player seekToTime: kCMTimeMakeWithSeconds(secs) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
     }
 
     newNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];

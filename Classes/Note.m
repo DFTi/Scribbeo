@@ -8,7 +8,7 @@
 #import "Note.h"
 
 @implementation Note
-@synthesize thumb, text, timeStamp, drawing, colors, date, initials, voiceMemo, frameWidth, frameHeight, imageName, rotation;
+@synthesize thumb, text, timeStamp, drawing, colors, date, initials, voiceMemo, frameWidth, frameHeight, imageName, rotation, framerate;
 
 // The method used to archive a note
 
