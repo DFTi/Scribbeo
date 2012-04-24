@@ -272,6 +272,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property (nonatomic, retain)  NSMutableArray *noteData;
 @property (nonatomic, retain)  NSMutableArray *filteredNoteData;
 @property (nonatomic, retain) UIActionSheet *filterActionSheet;
+@property (nonatomic, retain) UIActionSheet *shareActionSheet;
 @property (nonatomic, retain)   NSString        *show;
 @property (nonatomic, retain)   NSString        *filmDate;
 @property (nonatomic, retain)   NSString        *tape;

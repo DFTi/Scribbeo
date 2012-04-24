@@ -75,7 +75,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 @synthesize allClips, clipNumber, autoPlay, watermark, episodeLabel, dateLabel, tapeLabel, voiceMemo, mediaPath;
 @synthesize recordButton, recording, skipForwardButton, skipBackButton, isPrinting, notePaper, uploadActivityIndicator, uploadActivityIndicatorView, uploadCount, keyboardShows, madeRecording, backgroundLabel, skipValue, uploadIndicator, FCPImage, AvidImage, FCPChapterImage, XMLURLreader, saveFilename, filenameView, stillShows, stillImage, timeCode, curFileIndex, curAssetURLs, activeAsyncRequests;
 
-@synthesize filterInitials, filteredNoteData, filterActionSheet;
+@synthesize filterInitials, filteredNoteData, filterActionSheet, shareActionSheet;
 
 #pragma mark -
 #pragma mark view loading/unloading
@@ -1095,6 +1095,16 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 }
 
 - (IBAction)filterNotes:(id)sender {
+    
+    if (self.filterActionSheet.visible)
+    {
+        return;
+    }
+    
+    if (self.filterActionSheet)
+    {
+        self.filterActionSheet = nil;
+    }
     
     self.filterActionSheet = [[UIActionSheet alloc] initWithTitle:@"Filter"
                                                     delegate:self
@@ -2577,7 +2587,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         
         // Take it away...
         
-        [pic presentAnimated:YES completionHandler: completionHandler];
+        //[pic presentAnimated:YES completionHandler: completionHandler];
+        
+        [pic presentFromBarButtonItem:shareActionButonItem animated:YES completionHandler:completionHandler];
     }
 	
     isPrinting = NO;
@@ -3794,9 +3806,9 @@ static int saveRate;
         if (network.location == NSNotFound) {
             NSLog (@"Loading movie/still %@", thePath);
             
-            if ([thePath rangeOfString: @"Simulator"].location != NSNotFound)
-                theURL = [[NSURL alloc] initFileURLWithPath: [[NSBundle mainBundle] pathForResource: @"31-1A" ofType:@"m4v"]];
-            else
+            //if ([thePath rangeOfString: @"Simulator"].location != NSNotFound)
+              //  theURL = [[NSURL alloc] initFileURLWithPath: [[NSBundle mainBundle] pathForResource: @"31-1A" ofType:@"m4v"]];
+            //else
                 theURL = [[NSURL alloc] initFileURLWithPath: thePath];
         }
         else {
@@ -4785,7 +4797,7 @@ static int saveRate;
     if ([((Note *)[self.filteredNoteData objectAtIndex: indexPath.row]).initials isEqualToString: initials]) {
         NSLog (@"Commit editing style called");
         [noteData removeObjectAtIndex: indexPath.row];  // remove the note from the table
-        //[self.filteredNoteData removeObjectAtIndex: indexPath.row];  // remove the note from the table
+        [self.filteredNoteData removeObjectAtIndex: indexPath.row];  // remove the note from the table
         [self storeData];                               // update local storage (and the server)
         [notes reloadData];
     }
@@ -4930,7 +4942,7 @@ static int saveRate;
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if (buttonIndex <= 0 || [self.filterInitials count] == 0)
+    if (buttonIndex <= 0 )
     {
         return;
     }
@@ -4938,6 +4950,11 @@ static int saveRate;
     if (actionSheet == self.filterActionSheet)
     {
 
+        if ([self.filterInitials count] == 0) 
+        {
+            return;
+        }
+        
         [self.filteredNoteData removeAllObjects];
         
         NSString *initial = @"";
@@ -4963,7 +4980,9 @@ static int saveRate;
     }
     else
     {
-        switch (buttonIndex) {
+        
+        switch (buttonIndex)
+        {
             case 1:
                 [self printNotes];
                 break;
@@ -4978,14 +4997,25 @@ static int saveRate;
     
 }
 
-- (IBAction)shareActionButton:(id)sender {
+- (IBAction)shareActionButton:(id)sender
+{
     
-    UIActionSheet *shareAction = [[UIActionSheet alloc] initWithTitle:@"Share Annotation Notes"
-                                                             delegate:self
-                                                    cancelButtonTitle:@"Cancel"
-                                               destructiveButtonTitle:@"Cancel"
-                                                    otherButtonTitles:@"Print", @"Email", nil];
-    [shareAction showFromBarButtonItem:shareActionButonItem animated:YES];
+    if (self.shareActionSheet.visible)
+    {
+        return;
+    }
+    
+    
+    if (!self.shareActionSheet)
+    {
+        self.shareActionSheet = [[UIActionSheet alloc] initWithTitle:@"Share Annotation Notes"
+                                                       delegate:self
+                                              cancelButtonTitle:@"Cancel"
+                                         destructiveButtonTitle:@"Cancel"
+                                              otherButtonTitles:@"Print", @"Email", nil];
+    }
+    
+    [self.shareActionSheet showFromBarButtonItem:shareActionButonItem animated:YES];
     
 }
 
