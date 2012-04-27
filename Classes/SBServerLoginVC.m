@@ -101,6 +101,7 @@ typedef void (^CanceledBlock)(NSString*);
     self.serverInputView.layer.cornerRadius = 8.f;
     self.serverInputView.clipsToBounds = YES;
     
+    
     self.loginInputView.layer.cornerRadius = 8.f;
     self.loginInputView.clipsToBounds = YES;
     

@@ -241,6 +241,7 @@
         NSOperationQueue* queue = [[NSOperationQueue alloc] init];
         
         __block DetailViewController* blockSelf = self;
+        __block VideoTreeViewController *vc = [kAppDel viewController];
         
        // [self showActivity];
         
@@ -254,13 +255,13 @@
                         [self makeList];//Retry
                         
                         //is this legal?
-                        [blockSelf dismissModalViewControllerAnimated:YES];
+                        [vc dismissModalViewControllerAnimated:YES];
                         //blockSelf.serverLogin = nil;
                     } 
                     canceled:^(NSString* reason){
                         
                         //is this legal?
-                        [blockSelf dismissModalViewControllerAnimated:YES];
+                        [vc dismissModalViewControllerAnimated:YES];
                         //blockSelf.serverLogin = nil;
                     }];
                     
@@ -270,7 +271,7 @@
                     blockSelf.serverLogin.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
                     blockSelf.serverLogin.serverPortInput.text = [defaults stringForKey:@"ServerPort"];
 
-                    [self presentModalViewController:serverLogin animated:YES];
+                    [vc presentModalViewController:serverLogin animated:YES];
                     
 
                 }
