@@ -263,6 +263,12 @@
                         [blockSelf dismissModalViewControllerAnimated:YES];
                         //blockSelf.serverLogin = nil;
                     }];
+                    
+                    
+                    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                    
+                    blockSelf.serverLogin.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
+                    blockSelf.serverLogin.serverPortInput.text = [defaults stringForKey:@"ServerPort"];
 
                     [self presentModalViewController:serverLogin animated:YES];
                     
