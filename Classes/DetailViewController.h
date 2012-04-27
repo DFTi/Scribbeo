@@ -12,6 +12,7 @@
 #import <UIKit/UIKit.h>
 #import "myDefs.h"
 #import "JSONKit.h"
+#import "SBServerLoginVC.h"
 
 @interface DetailViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource, UIPopoverControllerDelegate, UINavigationControllerDelegate,
     UIImagePickerControllerDelegate> {
@@ -34,6 +35,8 @@
 @property (nonatomic, retain) UIActivityIndicatorView   *activityIndicator;
 @property (nonatomic, retain)  UIPopoverController      *popoverController;
 @property int     currentClip;
+
+@property (nonatomic) SBServerLoginVC* serverLogin;
 
 - (void) showDisconnected;
 - (void) hideDisconnected;

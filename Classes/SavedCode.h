@@ -744,7 +744,7 @@ dc.navigationItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithImage:
         for (NSString *theClip in clips) {
             NSString *theMovie = [self pathForShow: showName episode: episode date: date tape: aTape file: theClip];
             
-            if ([theMovie rangeOfString: @"http://"].location == NSNotFound  && 
+            if ([theMovie rangeOfString: @"https://"].location == NSNotFound  && 
                 [theMovie rangeOfString: @"https://"].location == NSNotFound) {
                 theMovie = [theMovie stringByReplacingOccurrencesOfString: @":" withString: @","];
                 

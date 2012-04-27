@@ -94,6 +94,9 @@
 		4B078ACE147C66700046D379 /* scribbeo-icon~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B078ACB147C66700046D379 /* scribbeo-icon~ipad.png */; };
 		4B078AD0147C66950046D379 /* scribbeo-app-splash.png in Resources */ = {isa = PBXBuildFile; fileRef = 4B078ACF147C66950046D379 /* scribbeo-app-splash.png */; };
 		4B35E869152E236000B0BDBB /* CoreMedia_Timecodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B35E868152E236000B0BDBB /* CoreMedia_Timecodes.m */; };
+		4B3F51561549BAFF00B7B09A /* SBServerLoginVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F51541549BAFE00B7B09A /* SBServerLoginVC.m */; };
+		4B3F51571549BAFF00B7B09A /* SBServerLoginVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4B3F51551549BAFF00B7B09A /* SBServerLoginVC.xib */; };
+		4B3F515B1549BB0500B7B09A /* NSURLConnection+BlockPatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F515A1549BB0500B7B09A /* NSURLConnection+BlockPatch.m */; };
 		4B68B24B147D955B00AB8576 /* IASKAppSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B68B225147D955B00AB8576 /* IASKAppSettingsViewController.m */; };
 		4B68B24C147D955B00AB8576 /* IASKAppSettingsWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B68B227147D955B00AB8576 /* IASKAppSettingsWebViewController.m */; };
 		4B68B24D147D955B00AB8576 /* IASKSpecifierValuesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B68B229147D955B00AB8576 /* IASKSpecifierValuesViewController.m */; };
@@ -241,6 +244,11 @@
 		4B078ACF147C66950046D379 /* scribbeo-app-splash.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "scribbeo-app-splash.png"; sourceTree = "<group>"; };
 		4B35E867152E236000B0BDBB /* CoreMedia_Timecodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreMedia_Timecodes.h; sourceTree = "<group>"; };
 		4B35E868152E236000B0BDBB /* CoreMedia_Timecodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreMedia_Timecodes.m; sourceTree = "<group>"; };
+		4B3F51531549BAFE00B7B09A /* SBServerLoginVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBServerLoginVC.h; sourceTree = "<group>"; };
+		4B3F51541549BAFE00B7B09A /* SBServerLoginVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBServerLoginVC.m; sourceTree = "<group>"; };
+		4B3F51551549BAFF00B7B09A /* SBServerLoginVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SBServerLoginVC.xib; sourceTree = "<group>"; };
+		4B3F51591549BB0500B7B09A /* NSURLConnection+BlockPatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLConnection+BlockPatch.h"; sourceTree = "<group>"; };
+		4B3F515A1549BB0500B7B09A /* NSURLConnection+BlockPatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLConnection+BlockPatch.m"; sourceTree = "<group>"; };
 		4B68B224147D955B00AB8576 /* IASKAppSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IASKAppSettingsViewController.h; sourceTree = "<group>"; };
 		4B68B225147D955B00AB8576 /* IASKAppSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IASKAppSettingsViewController.m; sourceTree = "<group>"; };
 		4B68B226147D955B00AB8576 /* IASKAppSettingsWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IASKAppSettingsWebViewController.h; sourceTree = "<group>"; };
@@ -358,6 +366,11 @@
 		02A305EF13C686D300E7340D /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				4B3F51591549BB0500B7B09A /* NSURLConnection+BlockPatch.h */,
+				4B3F515A1549BB0500B7B09A /* NSURLConnection+BlockPatch.m */,
+				4B3F51531549BAFE00B7B09A /* SBServerLoginVC.h */,
+				4B3F51541549BAFE00B7B09A /* SBServerLoginVC.m */,
+				4B3F51551549BAFF00B7B09A /* SBServerLoginVC.xib */,
 				4B35E867152E236000B0BDBB /* CoreMedia_Timecodes.h */,
 				4B35E868152E236000B0BDBB /* CoreMedia_Timecodes.m */,
 				7A6AA8A4148D6BE000F2B351 /* SVHTTPRequest */,
@@ -726,6 +739,7 @@
 				7AF062F0148EC77500910B45 /* cancelicon.png in Resources */,
 				7AD9DE2614B702D300CAA858 /* scrubleft.png in Resources */,
 				7A515A7814C4D90000DEA048 /* home.png in Resources */,
+				4B3F51571549BAFF00B7B09A /* SBServerLoginVC.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -774,6 +788,8 @@
 				4B68B259147D955B00AB8576 /* IASKTextField.m in Sources */,
 				7A6AA8A2148D6BD800F2B351 /* SVHTTPRequest.m in Sources */,
 				4B35E869152E236000B0BDBB /* CoreMedia_Timecodes.m in Sources */,
+				4B3F51561549BAFF00B7B09A /* SBServerLoginVC.m in Sources */,
+				4B3F515B1549BB0500B7B09A /* NSURLConnection+BlockPatch.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

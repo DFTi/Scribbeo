@@ -8,12 +8,14 @@
 
 #import "DetailViewController.h"
 #import "VideoTreeViewController.h"
+#import "NSURLConnection+BlockPatch.h"
 
 @implementation DetailViewController
 
 @synthesize currentClip, popoverController, moviePath;
 @synthesize currentPath, files, fileTypes, assetURLs, timeCodes;
 @synthesize progressView, activityIndicator;
+@synthesize serverLogin;
 
 #pragma mark -
 #pragma mark View Loading
@@ -232,16 +234,80 @@
         NSString *urlstr = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], currentPath];
         NSLog(@"Making list for BonjourMode. Querying: %@", urlstr);
         NSURL *url = [NSURL URLWithString:urlstr];
-        NSString *list = [NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:nil];
-        if (!list) {
-            NSLog(@"Could not get data from the URL");
+        //NSError* error = nil;
+        __block NSString *list = nil;//[NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:&error];
+        
+        NSURLRequest* request = [NSURLRequest requestWithURL:url];
+        NSOperationQueue* queue = [[NSOperationQueue alloc] init];
+        
+        __block DetailViewController* blockSelf = self;
+        
+       // [self showActivity];
+        
+        [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse* response, NSData* data, NSError* error){
+            if (error)
+            {
+                
+                if (error.code == -1012)
+                {
+                    blockSelf.serverLogin = [SBServerLoginVC serverLoginVCAccepted:^{
+                        [self makeList];//Retry
+                        
+                        //is this legal?
+                        [blockSelf dismissModalViewControllerAnimated:YES];
+                        //blockSelf.serverLogin = nil;
+                    } 
+                    canceled:^(NSString* reason){
+                        
+                        //is this legal?
+                        [blockSelf dismissModalViewControllerAnimated:YES];
+                        //blockSelf.serverLogin = nil;
+                    }];
+
+                    [self presentModalViewController:serverLogin animated:YES];
+                    
+
+                }
+            }
+            
+            else {
+                list = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                NSLog(@"Got data... Filling the file list");
+                [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
+                [self stopActivity];
+                NSDictionary *fileDict = [list objectFromJSONString];
+                // Now we need to populate the files array using our nice JSON list
+                [self filesFromJSONFileListing:fileDict];
+            }
+        }];
+        
+        
+        /*if (!list || (error && error.code == -1012)) 
+        {
+            NSLog(@"Could not get data from the URL: %@", error.localizedDescription);
+            
+            serverLogin = [SBServerLoginVC serverLoginVCAccepted:^{
+                [self makeList];//Retry
+                
+                [blockSelf dismissModalViewControllerAnimated:YES];
+                //is this legal?
+                //self.serverLogin = nil;
+            } 
+            canceled:^(NSString* reason){
+                [blockSelf dismissModalViewControllerAnimated:YES];
+                //is this legal?
+                //self.serverLogin = nil;
+            }];
+            
+            [self presentModalViewController:serverLogin animated:YES];
+            
             return;
-        }
-        NSLog(@"Got data... Filling the file list");
-        [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
-        NSDictionary *fileDict = [list objectFromJSONString];
+        }*/
+       // NSLog(@"Got data... Filling the file list");
+       // [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
+       // NSDictionary *fileDict = [list objectFromJSONString];
         // Now we need to populate the files array using our nice JSON list
-        [self filesFromJSONFileListing:fileDict];       
+       // [self filesFromJSONFileListing:fileDict];       
     } else if (kBonjourMode && (!kHTTPserver)) {
         NSLog(@"In bonjour mode, but the http server has not been set yet.");
         [[kAppDel serverBrowser] stop];

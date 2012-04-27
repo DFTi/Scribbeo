@@ -496,7 +496,7 @@ static int tryOne = 0;
             [self setHTTPserver:nil];
             NSString *manualIP = [defaults stringForKey:@"ServerIP"];
             NSString *manualPort = [defaults stringForKey:@"ServerPort"];            
-            NSString *manualServer = [NSString stringWithFormat:@"http://%@:%@", manualIP, manualPort];
+            NSString *manualServer = [NSString stringWithFormat:@"https://%@:%@", manualIP, manualPort];
             NSLog(@"Manual override requested, will not do bonjour discovery.");
             NSLog(@"Checking for valid Scribbeo server: %@", manualServer);
             NSError *error = nil;
