@@ -254,14 +254,18 @@
                     blockSelf.serverLogin = [SBServerLoginVC serverLoginVCAccepted:^{
                         [self makeList];//Retry
                         
-                        //is this legal?
-                        [vc dismissModalViewControllerAnimated:YES];
+                        // UI needs to be on the main thread.
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [vc dismissModalViewControllerAnimated:YES];
+                        });
                         //blockSelf.serverLogin = nil;
                     } 
                     canceled:^(NSString* reason){
                         
-                        //is this legal?
-                        [vc dismissModalViewControllerAnimated:YES];
+                        // UI needs to be on the main thread.
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [vc dismissModalViewControllerAnimated:YES];
+                        });
                         //blockSelf.serverLogin = nil;
                     }];
                     
@@ -271,20 +275,30 @@
                     blockSelf.serverLogin.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
                     blockSelf.serverLogin.serverPortInput.text = [defaults stringForKey:@"ServerPort"];
 
-                    [vc presentModalViewController:serverLogin animated:YES];
+                    // UI needs to be on the main thread.
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [vc presentModalViewController:blockSelf.serverLogin animated:YES];
+                    });
+                    
                     
 
                 }
             }
             
             else {
-                list = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                NSLog(@"Got data... Filling the file list");
-                [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
-                [self stopActivity];
-                NSDictionary *fileDict = [list objectFromJSONString];
-                // Now we need to populate the files array using our nice JSON list
-                [self filesFromJSONFileListing:fileDict];
+                
+                // Resync main thread with new data
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    
+                    list = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                    NSLog(@"Got data... Filling the file list");
+                    [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
+                    [self stopActivity];
+                    NSDictionary *fileDict = [list objectFromJSONString];
+                    // Now we need to populate the files array using our nice JSON list
+                    [self filesFromJSONFileListing:fileDict];
+                    
+                });
             }
         }];
         

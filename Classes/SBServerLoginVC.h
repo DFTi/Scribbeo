@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SBServerLoginVC : UIViewController<NSURLConnectionDelegate>
+@interface SBServerLoginVC : UIViewController<NSURLConnectionDelegate, UITextFieldDelegate>
 
 @property (strong, nonatomic) IBOutlet UIView       *serverInputView;
 @property (strong, nonatomic) IBOutlet UITextField  *serverIPInput;

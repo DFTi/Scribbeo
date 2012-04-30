@@ -126,13 +126,28 @@ typedef void (^CanceledBlock)(NSString*);
     // e.g. self.myOutlet = nil;
 }
 
-- (void)viewDidAppear:(BOOL)animated
+- (void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    [super viewDidAppear:animated];
+    if (textField == self.usernameInput || textField == self.passwordInput) 
+    {
+        
+    }
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
     
     [usernameInput becomeFirstResponder];
     
 }
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+}
+
+
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
 {
