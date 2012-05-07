@@ -10,6 +10,20 @@
 
 #define APPSTORE
 
+
+
+#define DEBUG YES
+#ifdef DEBUG
+@implementation NSURLRequest (IgnoreSSL)
+
++ (BOOL)allowsAnyHTTPSCertificateForHost:(NSString *)host
+{
+    return YES;
+}
+
+@end
+#endif
+
 extern int gIOSMajorVersion;
 
 #define kNoteDelimiter   @"+"

@@ -28,12 +28,12 @@ typedef void (^CanceledBlock)(NSString*);
 @end
 
 
-#ifdef DEBUG
-@interface NSURLRequest (DummyInterface)
-+ (BOOL)allowsAnyHTTPSCertificateForHost:(NSString*)host;
-+ (void)setAllowsAnyHTTPSCertificate:(BOOL)allow forHost:(NSString*)host;
-@end
-#endif
+//#ifdef DEBUG
+//@interface NSURLRequest (DummyInterface)
+//+ (BOOL)allowsAnyHTTPSCertificateForHost:(NSString*)host;
+//+ (void)setAllowsAnyHTTPSCertificate:(BOOL)allow forHost:(NSString*)host;
+//@end
+//#endif
 
 @implementation SBServerLoginVC
 
