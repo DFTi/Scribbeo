@@ -1816,7 +1816,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         BOOL saveFormat = timecodeFormat;
         timecodeFormat = YES;
         //aNewNote.timeStamp = [self timeFormat: curTime];
-        aNewNote.timeStamp = NSStringFromCMTimecode( CMTimecodeFromCMTimeWithoutDrop([player currentTime], [self currentTrack].nominalFrameRate));
+        aNewNote.timeStamp = theTime.text;
+        
+        // NSStringFromCMTimecode( CMTimecodeFromCMTimeWithoutDrop([player currentTime], [self currentTrack].nominalFrameRate));
         timecodeFormat = saveFormat;
         
         // We use this to scale the markups as needed so it
@@ -2882,8 +2884,10 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // output the note
     
     if (! theNote.imageName ) {
-        NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
-        [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
+        // NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
+        //[self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
+        
+        NSString *timeFormat = theNote.timeStamp;
         
         [emailBody appendString: [NSString stringWithFormat: @"<td valign=top>%@&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;&nbsp;%@&nbsp;&nbsp;&nbsp;<p></p>%@", 
                     timeFormat, theNote.date, theNote.initials, comment]];
@@ -3129,9 +3133,11 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 -(void) noteToPDF: (Note *) aNote {
     const char *noteText = [[aNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""] UTF8String];
     
-    NSString *timeFormat = (timecodeFormat) ? aNote.timeStamp :
-        [self timeFormat: 
-           kCMTimeMakeWithSeconds ([self convertTimeToSecs: aNote.timeStamp] - startTimecode) ];
+//    NSString *timeFormat = (timecodeFormat) ? aNote.timeStamp :
+//        [self timeFormat: 
+//           kCMTimeMakeWithSeconds ([self convertTimeToSecs: aNote.timeStamp] - startTimecode) ];
+
+    NSString *timeFormat = aNote.timeStamp;
     
     const char *noteTime = [timeFormat UTF8String];
     char date [100];
@@ -4687,7 +4693,9 @@ static int saveRate;
     if ([theNote isStill])
         cell.timeLabel.text = @""; // Still show the dark bar for consistency, but don't print timecode for a still.
     else
-        cell.timeLabel.text = [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp])];
+        cell.timeLabel.text = theTime.text;
+                    //theNote.timeStamp;
+        // [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp])];
     cell.dateLabel.text = theNote.date;
     cell.initialsLabel.text = theNote.initials;
     cell.commentLabel.text = theNote.text;   

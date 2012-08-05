@@ -78,8 +78,8 @@ typedef void (^CanceledBlock)(NSString*);
     
 #if DEBUG
     
-    self.serverIPInput.text = @"dft.mdx.la";
-    self.serverPortInput.text = @"443";
+    self.serverIPInput.text = @"app.scribbeo.com";
+    self.serverPortInput.text = @"44301";
     
 #endif
     
