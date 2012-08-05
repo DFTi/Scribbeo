@@ -4693,7 +4693,8 @@ static int saveRate;
     if ([theNote isStill])
         cell.timeLabel.text = @""; // Still show the dark bar for consistency, but don't print timecode for a still.
     else
-        cell.timeLabel.text = theTime.text;
+        cell.timeLabel.text = theNote.timeStamp;
+        //theTime.text;
                     //theNote.timeStamp;
         // [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp])];
     cell.dateLabel.text = theNote.date;
