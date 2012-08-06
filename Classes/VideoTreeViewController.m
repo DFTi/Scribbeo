@@ -4731,10 +4731,10 @@ static int saveRate;
         
         NSLog (@"Note time: %lg, start time: %lg", secs, startTimecode);
         
-        NSLog (@"Seeking to %lg (%@) for Note", secs, theNote.timeStamp);
+        NSLog (@"!!! Seeking to %lg (%@) for Note", (secs-startTimecode), theNote.timeStamp);
         
         seekToZeroBeforePlay = NO;
-        [player seekToTime: kCMTimeMakeWithSeconds(secs) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+        [player seekToTime: kCMTimeMakeWithSeconds(secs-startTimecode) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
     }
 
     newNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];

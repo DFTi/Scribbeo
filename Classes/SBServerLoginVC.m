@@ -79,7 +79,9 @@ typedef void (^CanceledBlock)(NSString*);
 #if DEBUG
     
     self.serverIPInput.text = @"app.scribbeo.com";
-    self.serverPortInput.text = @"44301";
+    self.serverPortInput.text = @"44310";
+    self.usernameInput.text = @"jon";
+    self.passwordInput.text = @"asdf";
     
 #endif
     
