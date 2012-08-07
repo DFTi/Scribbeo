@@ -76,14 +76,9 @@ typedef void (^CanceledBlock)(NSString*);
 {
     [super viewDidLoad];
     
-#if DEBUG
-    
-    self.serverIPInput.text = @"app.scribbeo.com";
-    self.serverPortInput.text = @"44310";
-    self.usernameInput.text = @"jon";
-    self.passwordInput.text = @"asdf";
-    
-#endif
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    self.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
+    self.serverPortInput.text = [defaults stringForKey:@"ServerPort"];
     
     self.title = @"Server login";
         
