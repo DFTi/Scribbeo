@@ -115,8 +115,8 @@
 			<string>Email Format</string>
 			<key>Titles</key>
 			<array>
-				<string>HTML</string>
 				<string>PDF</string>
+				<string>HTML</string>
 			</array>
 			<key>Values</key>
 			<array>

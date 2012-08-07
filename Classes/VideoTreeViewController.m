@@ -1000,7 +1000,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     // emailPDF on or off
     
-    emailPDF = (BOOL) [defaults boolForKey: @"emailPDF"];
+    emailPDF = !((BOOL) [defaults boolForKey: @"emailPDF"]);
+    
+    // emailPDF = (emailPDF == nil ? YES : NO);
     
     NSLog (@"Setting emailPDF to %i", emailPDF);
     
