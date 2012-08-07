@@ -1869,8 +1869,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     if ( !stillShows ) {
         // Find where to put the note in the table (sorted in timecode order)
+        NSLog(@"I SORTED!!!");
         
-        Float64 now = CMTimeGetSeconds(curTime);
+        Float64 now = [self convertTimeToSecs: theTime.text];
                                              
         row = 0;
         for (Note *theNote in noteData) {

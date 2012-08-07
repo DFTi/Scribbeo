@@ -80,6 +80,12 @@ typedef void (^CanceledBlock)(NSString*);
     self.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
     self.serverPortInput.text = [defaults stringForKey:@"ServerPort"];
     
+    #ifdef DEBUG
+    self.usernameInput.text = @"jon";
+    self.passwordInput.text = @"jon";
+    #endif
+    
+    
     self.title = @"Server login";
         
     self.navItem = [[UINavigationItem alloc] initWithTitle:@"Server Login"];
