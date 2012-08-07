@@ -1806,7 +1806,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // Capture any text typed into the note pad area
     
     aNewNote.text = newNote.text;
-    CMTime curTime;
+    //CMTime curTime;
     
     if ( !stillShows ) {
        // curTime =  kCMTimeMakeWithSeconds (kCVTime ([player currentTime]) + startTimecode);
