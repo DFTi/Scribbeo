@@ -110,12 +110,15 @@ CMTimecode CMTimecodeFromCMTime(CMTime time, float framerate)
 CMTimecode CMTimecodeFromCMTimeWithoutDrop(CMTime time, float framerate)
 {
     
-#ifdef DEBUG
-    NSLog(@"CMTimecodeFromCMTimeWithoutDrop time: framerate:%f ", framerate);
-#endif
-    
+
     // Get input in seconds
     Float64 seconds = CMTimeGetSeconds(time);
+    
+#ifdef DEBUG
+    NSLog(@"CMTimecodeFromCMTimeWithoutDrop time: %f framerate:%f ", seconds, framerate);
+#endif
+    
+    
     Float64 realSeconds = seconds;
     
     //Round up
@@ -255,10 +258,10 @@ NSString * NSStringFromCMTimecode(CMTimecode timecode)
 CMTimecode CMTimecodeFromNSString(NSString* timecode, float framerate)
 {
     
-    if (framerate <= 0.f)
-    {// LOL!
-        framerate = 23.97;
-    }
+//    if (framerate <= 0.f)
+//    {// LOL!
+//        framerate = 23.97;
+//    }
     
 #ifdef DEBUG
     NSLog(@"CMTimecodeFromNSString timecode:%@ framerate:%f", timecode, framerate);

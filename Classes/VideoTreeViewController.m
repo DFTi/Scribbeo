@@ -3474,12 +3474,12 @@ static int saveRate;
         endOfVid = player.currentItem.asset.duration; // [asset duration];
 	    duration = kCVTime (endOfVid);
         
-        Float64 theEnd = duration + startTimecode;
+        // Float64 theEnd = duration + startTimecode;
         
         //if (timecodeFormat)
           //  duration += startTimecode;
 
-        NSLog(@"UpdateTimeControl has incremented the duration (%f) by the startTimecode (%f)", endOfVid, startTimecode);
+        //NSLog(@"UpdateTimeControl has incremented the duration (%f) by the startTimecode (%f)", endOfVid, startTimecode);
         
         // If we have a meaningful duration set, set the min/max times at the ends of the scrubber
         
@@ -4737,12 +4737,14 @@ static int saveRate;
             
         Float64 secs = [self convertTimeToSecs: theNote.timeStamp] - startTimecode;
         
+        
+        
         NSLog (@"Note time: %lg, start time: %lg", secs, startTimecode);
         
-        NSLog (@"!!! Seeking to %lg (%@) for Note", (secs), theNote.timeStamp);
+         NSLog (@"!!! Seeking to %lg (%@) for Note", (secs), theNote.timeStamp);
         
-        seekToZeroBeforePlay = NO;
-        [player seekToTime: kCMTimeMakeWithSeconds(secs) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+        // seekToZeroBeforePlay = NO;
+        [player seekToTime: CMTimeMakeWithSeconds(secs, 600)];
     }
 
     newNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
