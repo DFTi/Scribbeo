@@ -4744,7 +4744,7 @@ static int saveRate;
          NSLog (@"!!! Seeking to %lg (%@) for Note", (secs), theNote.timeStamp);
         
         // seekToZeroBeforePlay = NO;
-        [player seekToTime: CMTimeMakeWithSeconds(secs, 600)];
+        [player seekToTime: CMTimeMakeWithSeconds(secs, 30)];
     }
 
     newNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
