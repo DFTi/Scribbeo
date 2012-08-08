@@ -150,7 +150,7 @@
     }
 
     scaleWidth = scaleHeight = 1.0;
-	[myDrawing addObject:[[NSMutableArray alloc] initWithCapacity:4]];
+	[myDrawing addObject:[[[NSMutableArray alloc] initWithCapacity:4] autorelease]];
     
 #ifdef TWOBAR
     if (twoBarMode) 
@@ -237,7 +237,7 @@
     
     // Here we can check the number of taps
     
-    int taps = [[touches anyObject] tapCount];
+    // int taps = [[touches anyObject] tapCount];
     
     // Look at the start of the method to interpret the tap count
     

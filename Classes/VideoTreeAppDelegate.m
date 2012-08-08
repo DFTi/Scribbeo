@@ -451,7 +451,7 @@ static int tryOne = 0;
     if (serverBrowser) 
         [serverBrowser stop];
     else {
-        self.serverBrowser = [[ServerBrowser alloc] init];
+        self.serverBrowser = [[[ServerBrowser alloc] init] autorelease];
         serverBrowser.delegate = self;
     }
 

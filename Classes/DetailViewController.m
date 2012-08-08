@@ -238,7 +238,7 @@
         __block NSString *list = nil;//[NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:&error];
         
         NSURLRequest* request = [NSURLRequest requestWithURL:url];
-        NSOperationQueue* queue = [[NSOperationQueue alloc] init];
+        NSOperationQueue* queue = [[[NSOperationQueue alloc] init] autorelease];
         
         __block DetailViewController* blockSelf = self;
         __block VideoTreeViewController *vc = [kAppDel viewController];
@@ -553,6 +553,7 @@
         NSURL *moviePicked = [info objectForKey: UIImagePickerControllerMediaURL];
         [kAppDel copyVideoOrImageIntoApp: moviePicked]; 
     }
+    [thePhoto autorelease];
 }
 
 //
@@ -662,7 +663,7 @@
 
         if (!iPHONE) {
             CGRect theFrame = cell.selectedBackgroundView.frame;
-            UIView *theBG = [[UIView alloc] initWithFrame: theFrame];
+            UIView *theBG = [[[UIView alloc] initWithFrame: theFrame] autorelease];
             theBG.backgroundColor =  [UIColor colorWithRed: .5 green: .5 blue: .5 alpha: .7];
             cell.selectedBackgroundView = theBG;
         }

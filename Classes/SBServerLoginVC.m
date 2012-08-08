@@ -88,13 +88,13 @@ typedef void (^CanceledBlock)(NSString*);
     
     self.title = @"Server login";
         
-    self.navItem = [[UINavigationItem alloc] initWithTitle:@"Server Login"];
+    self.navItem = [[[UINavigationItem alloc] initWithTitle:@"Server Login"] autorelease];
     
     [self.navBar pushNavigationItem:navItem animated:YES];
     
-    self.navItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(serverLoginCanceled:)];
+    self.navItem.leftBarButtonItem = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(serverLoginCanceled:)] autorelease];
         
-    self.navItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Login" style:UIBarButtonItemStyleDone target:self action:@selector(serverLoginAttempt:)];
+    self.navItem.rightBarButtonItem = [[[UIBarButtonItem alloc] initWithTitle:@"Login" style:UIBarButtonItemStyleDone target:self action:@selector(serverLoginAttempt:)] autorelease];
     
     //make post default
     self.HTTPMethod = @"POST";
@@ -184,12 +184,7 @@ typedef void (^CanceledBlock)(NSString*);
     
     NSLog(@"\n%@\nUser:%@\nPass:%@", requestURL, self.usernameInput.text, self.passwordInput.text);
     
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    
-#ifdef DEBUG
-    [NSURLRequest setAllowsAnyHTTPSCertificate:YES
-                  forHost:[requestURL host]];
-#endif
+    NSOperationQueue *queue = [[[NSOperationQueue alloc] init] autorelease];
     
     [NSURLConnection sendAsynchronousRequest:urlRequest queue:queue completionHandler:
      ^(NSURLResponse* response, NSData* data, NSError* error)
@@ -217,11 +212,12 @@ typedef void (^CanceledBlock)(NSString*);
             
             NSLog(@"ErrorCode:%i", error.code);
             
-            UIAlertView *loginAlert = [[UIAlertView alloc] initWithTitle:@"Server Login Alert" message:error.localizedDescription delegate:nil cancelButtonTitle:@"Dismiss" otherButtonTitles:nil];
+            UIAlertView *loginAlert = [[[UIAlertView alloc] initWithTitle:@"Server Login Alert" message:error.localizedDescription delegate:nil cancelButtonTitle:@"Dismiss" otherButtonTitles:nil] autorelease];
             loginAlert.alertViewStyle = UIAlertViewStyleDefault;
             [loginAlert show]; 
             
             __block SBServerLoginVC *blockSelf = self;
+            
             
             dispatch_async(dispatch_get_main_queue(), ^(){
                 

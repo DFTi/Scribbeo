@@ -122,7 +122,7 @@ void MyNSLog (NSString *fmt, ...)
     
     va_start(args, fmt);
     NSString *fmt2 = [fmt stringByAppendingString: @"\n"];
-    NSString *s = [[NSString alloc] initWithFormat:fmt2 arguments:args];
+    NSString *s = [[[NSString alloc] initWithFormat:fmt2 arguments:args] autorelease];
     va_end(args);
     
     buffer = [s dataUsingEncoding:NSASCIIStringEncoding];

@@ -19,7 +19,7 @@
 // on a large screen (e.g., through an HDMI port
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-    NSLog2 (@"My hit test");
+    /// NSLog2 (@"My hit test");
     
     // Only do this stuff if Demo Mode was selected from the Settings menu
     
@@ -27,7 +27,7 @@
         if (! spotView) {
             UIImage *spot = [UIImage imageNamed:@"spot.png"];
             
-            self.spotView = [[UIImageView alloc] initWithImage: spot]; 
+            self.spotView = [[[UIImageView alloc] initWithImage: spot] autorelease];
             spotView.userInteractionEnabled = NO;
             [self addSubview: spotView];
             spotView.alpha = 0;

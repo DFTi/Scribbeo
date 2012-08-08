@@ -92,7 +92,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     [super viewDidLoad];
     
-    CGPoint theOrigin = {0, 0};
+    CGPoint theOrigin;
+    //= {0, 0};
     CGSize theSize;
     CGRect theFrame;
     
@@ -1108,17 +1109,17 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         self.filterActionSheet = nil;
     }
     
-    self.filterActionSheet = [[UIActionSheet alloc] initWithTitle:@"Filter"
+    self.filterActionSheet = [[[UIActionSheet alloc] initWithTitle:@"Filter"
                                                     delegate:self
                                            cancelButtonTitle:nil
                                       destructiveButtonTitle:nil
-                                           otherButtonTitles:nil];
+                                           otherButtonTitles:nil] autorelease];
     self.filterActionSheet.destructiveButtonIndex = [self.filterActionSheet addButtonWithTitle:@"Cancel"];
     [self.filterActionSheet addButtonWithTitle:@"All"];
     
     if (!self.filterInitials)
     {
-        self.filterInitials = [[NSMutableArray array] retain];
+        self.filterInitials = [NSMutableArray array];
     }
     else
     {
@@ -1161,7 +1162,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 -(IBAction) erase
 {
-    NSLog2 (@"Erase");
+//    NSLog2 (@"Erase");
     [drawView cancelDrawing];
     [audioPlayer stop];
 }
@@ -1597,8 +1598,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 -(void) frameDraw
 {    
-    AVAssetImageGenerator *imageGen = [[AVAssetImageGenerator alloc] initWithAsset: 
-                    [[player currentItem] asset]];
+    AVAssetImageGenerator *imageGen = [[[AVAssetImageGenerator alloc] initWithAsset:
+                    [[player currentItem] asset]] autorelease];
  
     if (!imageGen) {
         NSLog (@"AVAssetImageGenerator failed!");  // Hopefully this never happens
@@ -1628,12 +1629,14 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     CMTime request = [player currentTime];   // kCMTimeMakeWithSeconds (kCVTime([player currentTime]));
 
     CGImageRef image = [imageGen copyCGImageAtTime: request actualTime: &actual error: &error];
+    [(id)image autorelease];
+    
     NSLog (@"Request for frame at %@, actual = %@ (fps = %f)", [self timeFormat: request], [self timeFormat: actual], fps);
     
-    if (error)  {   // Oops!  We couldn't grab the frame
-        NSLog (@"Error trying to capture image: %@ at time: %@", [error localizedDescription], [self timeFormat: request]);
-        return;
-    }
+    //if (error)  {   // Oops!  We couldn't grab the frame
+        //NSLog (@"Error trying to capture image: %@ at time: %@", [error localizedDescription], [self timeFormat: request]);
+    //    return;
+    //}
     
     // Asynchronous frame capture -- we really don't need this; the video is paused anyway
    
@@ -1650,7 +1653,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 #endif
     
     self.newThumb = [self scaleImage: image andRotate: 0.0];
-    [imageGen release];
+    
+    // [imageGen release];
 }
 
 #else
@@ -2051,12 +2055,12 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                     NSArray *noteArray = [NSKeyedUnarchiver unarchiveObjectWithFile: [self archiveFilePath]];
                     [noteData release];
                     noteData = [noteArray mutableCopy];
-                    self.filteredNoteData = [noteArray mutableCopy];
+                    self.filteredNoteData = [[noteArray mutableCopy] autorelease];
                     NSLog (@"Restored %i locally saved notes", [noteData count]);
                 }
                 else {
                     [noteData removeAllObjects];
-                    [self.filteredNoteData release];
+                    //[self.filteredNoteData release];
                     self.filteredNoteData = nil;
                     [self.notes setEditing: NO];            
                     NSLog (@"No notes to restore");
@@ -2228,34 +2232,35 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     [notes reloadData];
 }
 
-// Parse FCP XML marker file
--(void) getXML: (NSString *) file
-{
-    NSLog (@"processing XML file %@", file);
-    
-    file = [file stringByReplacingOccurrencesOfString: @" " withString:@"%20"];
-    
-    if (!XMLURLreader)
-		XMLURLreader = [[XMLURL alloc] init];
-
-    NSString *url;
-    if (kBonjourMode) {
-        url = [NSString stringWithFormat: @"/xml/%@", kHTTPserver, file];
-    }
-
-    NSLog(@"Getting FCP XML marker file at: %@", url);
-    // This is the guy that will parse the XML.  The XMLDone: method will get called when
-    // the parsing has been completed
-	
-	[XMLURLreader parseXMLURL: url atEndDoSelector: @selector (XMLDone:) withObject: self];
-}
+// CRUFT
+//// Parse FCP XML marker file
+//-(void) getXML: (NSString *) file
+//{
+//    NSLog (@"processing XML file %@", file);
+//    
+//    file = [file stringByReplacingOccurrencesOfString: @" " withString:@"%20"];
+//    
+//    if (!XMLURLreader)
+//		XMLURLreader = [[XMLURL alloc] init];
+//
+//    NSString *url;
+//    if (kBonjourMode) {
+//        url = [NSString stringWithFormat: @"/xml/%@", kHTTPserver, file];
+//    }
+//
+//    NSLog(@"Getting FCP XML marker file at: %@", url);
+//    // This is the guy that will parse the XML.  The XMLDone: method will get called when
+//    // the parsing has been completed
+//	
+//	[XMLURLreader parseXMLURL: url atEndDoSelector: @selector (XMLDone:) withObject: self];
+//}
 
 // Look at all the notes in the noteData array and just get mine to archive and upload
 // to the server or store locally
 
 -(NSMutableArray *) getMyNotes
 {
-    NSMutableArray *myNotes = [[NSMutableArray alloc] init];
+    NSMutableArray *myNotes = [[[NSMutableArray alloc] init] autorelease];
     
     for (Note *aNote in noteData) 
         if (allStills) {
@@ -2276,12 +2281,12 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         
     // Write the notes to a local archive file first
     if ([NSKeyedArchiver archiveRootObject: myNotes toFile: archivePath] == NO) {
-        [myNotes release];
+        //[myNotes release];
         [UIAlertView doAlert: @"Notes" 
                      withMsg: @"Couldn't save your notes locally!"];
         NSLog (@"Save failed");
     } else if (kBonjourMode) { // Upload the notes with HTTP
-        [myNotes release];
+        //[myNotes release];
         NSString *remotePath = [NSString stringWithFormat:@"%@/note/%@", kHTTPserver, [archivePath lastPathComponent]];
         [self uploadFile:archivePath to:remotePath];
     }
@@ -2292,7 +2297,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 -(void) clearAnyNotes
 {
     [noteData removeAllObjects];
-    [self.filteredNoteData release];
+    //[self.filteredNoteData release];
     self.filteredNoteData = nil;
     [self.notes setEditing: NO];
     [notes reloadData];
@@ -2778,28 +2783,28 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error 
 {
-	NSString *message = @"";
-    
-	// Notifies users about errors associated with the interface
-    
-	switch (result)
-	{
-		case MFMailComposeResultCancelled:
-			// message = @"Email request canceled";
-			break;
-		case MFMailComposeResultSaved:
-			message = @"Your email has been saved";
-			break;
-		case MFMailComposeResultSent:
-			message = @"Your email was sent";
-			break;
-		case MFMailComposeResultFailed:
-			message = @"Your email was not sent";
-			break;
-		default:
-			message = @"Your email was not sent";
-			break;
-	}
+//	NSString *message = @"";
+//    
+//	// Notifies users about errors associated with the interface
+//    
+//	switch (result)
+//	{
+//		case MFMailComposeResultCancelled:
+//			// message = @"Email request canceled";
+//			break;
+//		case MFMailComposeResultSaved:
+//			message = @"Your email has been saved";
+//			break;
+//		case MFMailComposeResultSent:
+//			message = @"Your email was sent";
+//			break;
+//		case MFMailComposeResultFailed:
+//			message = @"Your email was not sent";
+//			break;
+//		default:
+//			message = @"Your email was not sent";
+//			break;
+//	}
     
     // display message to user here (note: we're not doing that!)
     
@@ -3818,7 +3823,7 @@ static int saveRate;
             //if ([thePath rangeOfString: @"Simulator"].location != NSNotFound)
               //  theURL = [[NSURL alloc] initFileURLWithPath: [[NSBundle mainBundle] pathForResource: @"31-1A" ofType:@"m4v"]];
             //else
-                theURL = [[NSURL alloc] initFileURLWithPath: thePath];
+                theURL = [[[NSURL alloc] initFileURLWithPath: thePath] autorelease];
         }
         else {
             NSLog (@"Loading movie/still %@ from Internet or camera roll", thePath);
@@ -3906,7 +3911,7 @@ static int saveRate;
     
     [theAsset loadValuesAsynchronouslyForKeys:[NSArray arrayWithObject:tracksKey] completionHandler:
      ^{ 
-        NSLog2 (@"completion handler");
+        //NSLog2 (@"completion handler");
         NSError *error = nil; 
 
         AVKeyValueStatus status = [theAsset statusOfValueForKey:tracksKey error:&error];
@@ -3918,7 +3923,7 @@ static int saveRate;
          
          if (self.player) {
              [self.player pause];
-             [self.player release];
+             //[self.player release];
          }
 
         self.player = [AVPlayer playerWithPlayerItem:playerItem];
@@ -4373,9 +4378,9 @@ static int saveRate;
     
     if (watermark && !stampLabelFull) {
         CGRect stampFrame = playerLayerView.frame;
-        self.stampLabelFull = [[UILabel alloc] initWithFrame: 
+        self.stampLabelFull = [[[UILabel alloc] initWithFrame:
                 CGRectMake (stampFrame.size.width - 70, stampFrame.size.height - 
-                            ((iPHONE) ? 80 : 140), 50, 50)];
+                            ((iPHONE) ? 80 : 140), 50, 50)] autorelease];
         stampLabelFull.text = initials;
         stampLabelFull.backgroundColor = [UIColor clearColor];
         stampLabelFull.textColor = [UIColor whiteColor];
@@ -4629,7 +4634,7 @@ static int saveRate;
         tableView.backgroundColor = [UIColor colorWithRed: .8 green: .8 blue: .9 alpha: 1];
         
         CGRect theFrame = cell.selectedBackgroundView.frame;
-        UIView *theBG = [[UIView alloc] initWithFrame: theFrame];
+        UIView *theBG = [[[UIView alloc] initWithFrame: theFrame] autorelease];
         theBG.backgroundColor =  [UIColor colorWithRed: 0 green: 0 blue: 0 alpha: .7];;
         cell.selectedBackgroundView = theBG;
         cell.imageView.layer.masksToBounds = YES;
@@ -4715,7 +4720,7 @@ static int saveRate;
 }
 
 // Handle selection of a note from the notes table
-
+// FIXME: OFF BY -1 FRAME AT kCMTimeMakeWithSeconds
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     Note *theNote = [self.filteredNoteData objectAtIndex: indexPath.row];
     
@@ -4730,14 +4735,14 @@ static int saveRate;
         
         // Seek to the frame indicated by the note
             
-        Float64 secs = [self convertTimeToSecs: theNote.timeStamp];// - startTimecode;
+        Float64 secs = [self convertTimeToSecs: theNote.timeStamp] - startTimecode;
         
         NSLog (@"Note time: %lg, start time: %lg", secs, startTimecode);
         
-        NSLog (@"!!! Seeking to %lg (%@) for Note", (secs-startTimecode), theNote.timeStamp);
+        NSLog (@"!!! Seeking to %lg (%@) for Note", (secs), theNote.timeStamp);
         
         seekToZeroBeforePlay = NO;
-        [player seekToTime: kCMTimeMakeWithSeconds(secs-startTimecode) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+        [player seekToTime: kCMTimeMakeWithSeconds(secs) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
     }
 
     newNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
@@ -5020,11 +5025,11 @@ static int saveRate;
     
     if (!self.shareActionSheet)
     {
-        self.shareActionSheet = [[UIActionSheet alloc] initWithTitle:@"Share Annotation Notes"
+        self.shareActionSheet = [[[UIActionSheet alloc] initWithTitle:@"Share Annotation Notes"
                                                        delegate:self
                                               cancelButtonTitle:@"Cancel"
                                          destructiveButtonTitle:@"Cancel"
-                                              otherButtonTitles:@"Print", @"Email", nil];
+                                              otherButtonTitles:@"Print", @"Email", nil] autorelease];
     }
     
     [self.shareActionSheet showFromBarButtonItem:shareActionButonItem animated:YES];
