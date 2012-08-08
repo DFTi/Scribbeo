@@ -19,7 +19,7 @@
 	
 	markers = [[NSMutableArray alloc] init];
     
-	NSLog2 (@"Trying to parse XML stored at %@", URL);
+	// NSLog2 (@"Trying to parse XML stored at %@", URL);
     
     // You must then convert the path to a proper NSURL or it won't work
     
@@ -69,7 +69,7 @@
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict{			
  
-    NSLog2(@"found this element: %@", elementName);
+    // NSLog2(@"found this element: %@", elementName);
 	currentElement = [elementName copy];
 
 	if ([elementName isEqualToString:@"marker"]) {
@@ -89,7 +89,7 @@
 }
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName{     
-    NSLog2 (@"ended element: %@", elementName);
+    // NSLog2 (@"ended element: %@", elementName);
 	if ([elementName isEqualToString:@"marker"]) {
 		// save values to an item, then store that item into the array...
         
@@ -120,7 +120,7 @@
 // and pass it the markers array as argument to the method
 
 - (void)parserDidEndDocument:(NSXMLParser *)parser {
-	NSLog2 (@"all done!");
+	// NSLog2 (@"all done!");
 	NSLog(@"markers array has %d items", [markers count]);
 	[endObject performSelector: endMethod withObject: markers];
 }

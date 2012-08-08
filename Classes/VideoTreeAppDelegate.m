@@ -31,11 +31,11 @@ static int tryOne = 0;
 #pragma mark Application lifecycle
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {   
-    NSLog (@"****** Begin execution of Scribbeo v%@.%@ (free mem = %.2f MB)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],  
-           [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], ([self freemem]/ (1024. * 1024.)));
+    //NSLog (@"****** Begin execution of Scribbeo v%@.%@ (free mem = %.2f MB)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
+    //       [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], ([self freemem]/ (1024. * 1024.)));
     
     gIOSMajorVersion = [[[UIDevice currentDevice] systemVersion] characterAtIndex: 0];
-    NSLog (@"Running %@ version (IOS version %c) ", iPhone ? @"iPhone" : @"iPad", gIOSMajorVersion);
+    // NSLog (@"Running %@ version (IOS version %c) ", iPhone ? @"iPhone" : @"iPad", gIOSMajorVersion);
 
     iPhone = [[UIScreen mainScreen] applicationFrame].size.height < 1000;
     
@@ -238,7 +238,7 @@ static int tryOne = 0;
     
     self.outputFilename =  [NSString stringWithFormat: @"%@.%@", 
         [docDir stringByAppendingPathComponent: viewController.saveFilename.text], theExtension];
-    NSLog2 (@"Output file name = %@", outputFilename);
+    // NSLog2 (@"Output file name = %@", outputFilename);
     
     NSURL *toURL = [NSURL fileURLWithPath: outputFilename];
     

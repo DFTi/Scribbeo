@@ -3423,7 +3423,7 @@ static int saveRate;
     if (fps < 0.001) {
         NSArray *tracks = [asset tracks];
         
-        NSLog2 (@"[tracks count] == %i, %@", [tracks count], tracks);
+        // NSLog2 (@"[tracks count] == %i, %@", [tracks count], tracks);
 
         if ([tracks count] > 0) {
             NSArray *tracks = [asset tracksWithMediaType: AVMediaTypeVideo];
@@ -4007,33 +4007,33 @@ static int saveRate;
         else
             NSLog (@"Failed to initiliaze the movie player!");
  
-#if 0
+//#if 0
          // Lots of cool info about the video clip
+//         
+//        NSLog2 (@"playLayerView frame origin = (%g, %g), drawView frame origin = (%g, %g)",
+//               playerLayerView.frame.origin.x, playerLayerView.frame.origin.y,
+//               drawView.frame.origin.x, drawView.frame.origin.y);
+//        NSLog2 (@"playLayerView wid, ht = (%g, %g), drawView wid, ht = (%g, %g)",
+//               playerLayerView.frame.size.width, playerLayerView.frame.size.height,
+//               drawView.frame.size.width, drawView.frame.size.height);
+//        
+//        NSLog2 (@"playLayerView bounds origin = (%g, %g), drawView bounds origin = (%g, %g)",
+//               playerLayerView.bounds.origin.x, playerLayerView.bounds.origin.y,
+//               drawView.bounds.origin.x, drawView.bounds.origin.y);
+//        NSLog2 (@"playLayerView  bounds wid, ht = (%g, %g), drawView  bounds wid, ht = (%g, %g)",
+//               playerLayerView.bounds.size.width, playerLayerView.bounds.size.height,
+//               drawView.bounds.size.width, drawView.bounds.size.height);
+//        NSLog2 (@"common metadata formats = %@", player.currentItem.asset.availableMetadataFormats);
+//        NSLog2 (@"common metadata = %@", player.currentItem.asset.commonMetadata);
          
-        NSLog2 (@"playLayerView frame origin = (%g, %g), drawView frame origin = (%g, %g)",
-               playerLayerView.frame.origin.x, playerLayerView.frame.origin.y,
-               drawView.frame.origin.x, drawView.frame.origin.y);
-        NSLog2 (@"playLayerView wid, ht = (%g, %g), drawView wid, ht = (%g, %g)",
-               playerLayerView.frame.size.width, playerLayerView.frame.size.height,
-               drawView.frame.size.width, drawView.frame.size.height);
-        
-        NSLog2 (@"playLayerView bounds origin = (%g, %g), drawView bounds origin = (%g, %g)",
-               playerLayerView.bounds.origin.x, playerLayerView.bounds.origin.y,
-               drawView.bounds.origin.x, drawView.bounds.origin.y);
-        NSLog2 (@"playLayerView  bounds wid, ht = (%g, %g), drawView  bounds wid, ht = (%g, %g)",
-               playerLayerView.bounds.size.width, playerLayerView.bounds.size.height,
-               drawView.bounds.size.width, drawView.bounds.size.height);
-        NSLog2 (@"common metadata formats = %@", player.currentItem.asset.availableMetadataFormats);
-        NSLog2 (@"common metadata = %@", player.currentItem.asset.commonMetadata);
-         
-         for (NSString *meta in player.currentItem.asset.availableMetadataFormats) 
-             NSLog2 (@"*** %@", meta, [player.currentItem.asset metadataForFormat: meta]);
-         
-         NSLog2 (@"loaded time ranges = %@", player.currentItem.loadedTimeRanges);  
-         NSLog2 (@"reverse playback end time = %@", [self timeFormat: player.currentItem.reversePlaybackEndTime]); 
-         NSLog2 (@"forward playback end time = %@", [self timeFormat: player.currentItem.forwardPlaybackEndTime]);
-         NSLog2 (@"timed metadata = %@", player.currentItem.timedMetadata); 
-#endif
+//         for (NSString *meta in player.currentItem.asset.availableMetadataFormats) 
+//             NSLog2 (@"*** %@", meta, [player.currentItem.asset metadataForFormat: meta]);
+//         
+//         NSLog2 (@"loaded time ranges = %@", player.currentItem.loadedTimeRanges);  
+//         NSLog2 (@"reverse playback end time = %@", [self timeFormat: player.currentItem.reversePlaybackEndTime]); 
+//         NSLog2 (@"forward playback end time = %@", [self timeFormat: player.currentItem.forwardPlaybackEndTime]);
+//         NSLog2 (@"timed metadata = %@", player.currentItem.timedMetadata); 
+//#endif
 
          NSLog (@"playbackLikelyToKeepUp = %i", player.currentItem.isPlaybackLikelyToKeepUp);
 

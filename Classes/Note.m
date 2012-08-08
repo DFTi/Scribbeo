@@ -46,7 +46,7 @@
     imageName = [[decoder  decodeObjectForKey: @"NoteImageName"] retain];
     rotation = [decoder  decodeIntForKey: @"NoteRotation"];
  
-    NSLog2 (@"Restored one note, timeStamp = %@", timeStamp);
+    // NSLog2 (@"Restored one note, timeStamp = %@", timeStamp);
     return self;
 }
 

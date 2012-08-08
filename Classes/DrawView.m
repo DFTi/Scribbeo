@@ -133,7 +133,7 @@
         return;
         
     if ([vc keyboardShows])  {                                      // 3
-        [[[kAppDel viewController] newNote] resignFirstResponder];
+        [[[[kAppDel viewController] newNote] autorelease] resignFirstResponder];
         return;
     }
     else if ((player || still) && [vc fullScreenMode]) {            // 4

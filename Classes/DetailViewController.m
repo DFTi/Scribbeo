@@ -713,7 +713,7 @@
     
     NSString *hold = self.moviePath;
     [self setTheMoviePath: file];
-    NSLog2 (@"remove item at path: %@", moviePath);
+    // NSLog2 (@"remove item at path: %@", moviePath);
 
     if (! [[NSFileManager defaultManager] removeItemAtPath: moviePath error: NULL]) 
         [UIAlertView doAlert:  @"" withMsg: @"The file couldn't be deleted!"];
