@@ -79,12 +79,8 @@ typedef void (^CanceledBlock)(NSString*);
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     self.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
     self.serverPortInput.text = [defaults stringForKey:@"ServerPort"];
-    
-    #ifdef DEBUG
-    self.usernameInput.text = @"jon";
-    self.passwordInput.text = @"jon";
-    #endif
-    
+    self.usernameInput.text = [defaults stringForKey:@"Username"]; // ?
+    self.passwordInput.text = [defaults stringForKey:@"Password"];
     
     self.title = @"Server login";
         
@@ -166,6 +162,7 @@ typedef void (^CanceledBlock)(NSString*);
 
 - (void)serverLoginAttempt:(UIBarButtonItem*)barButtonItem
 {
+    NSLog(@"ready to login");
     
     [self becomeFirstResponder];
     [self resignFirstResponder];

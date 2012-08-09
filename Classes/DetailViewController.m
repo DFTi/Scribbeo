@@ -255,17 +255,17 @@
                         [self makeList];//Retry
                         
                         // UI needs to be on the main thread.
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [vc dismissModalViewControllerAnimated:YES];
-                        });
+//                        dispatch_async(dispatch_get_main_queue(), ^{
+//                            [vc dismissModalViewControllerAnimated:YES];
+//                        });
                         //blockSelf.serverLogin = nil;
                     } 
                     canceled:^(NSString* reason){
                         
                         // UI needs to be on the main thread.
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [vc dismissModalViewControllerAnimated:YES];
-                        });
+//                        dispatch_async(dispatch_get_main_queue(), ^{
+//                            [vc dismissModalViewControllerAnimated:YES];
+//                        });
                         //blockSelf.serverLogin = nil;
                     }];
                     
@@ -274,13 +274,18 @@
                     
                     blockSelf.serverLogin.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
                     blockSelf.serverLogin.serverPortInput.text = [defaults stringForKey:@"ServerPort"];
+                    blockSelf.serverLogin.usernameInput.text = [defaults stringForKey:@"Username"];
+                    blockSelf.serverLogin.passwordInput.text = [defaults stringForKey:@"Password"];
 
+                    // jon: don't show it to me anymore
                     // UI needs to be on the main thread.
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [vc presentModalViewController:blockSelf.serverLogin animated:YES];
-                    });
+//                    dispatch_async(dispatch_get_main_queue(), ^{
+//                        [vc presentModalViewController:blockSelf.serverLogin animated:YES];
+//                    });
                     
+                    // FIXME: JUST ACCEPT HERE
                     
+                    [blockSelf.serverLogin performSelector:@selector(serverLoginAttempt:)];
 
                 }
             }
