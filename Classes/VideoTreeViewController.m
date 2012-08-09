@@ -1326,6 +1326,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 -(void) advance: (int) secs;
 {
+    
     if (!player || !pausePlayButton.enabled) 
         return;
     
@@ -3312,7 +3313,11 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
         
         CMTimecode adjustedTimecode = CMTimecodeAdd(timecode, theStartTimecode);
         
-        return NSStringFromCMTimecode(adjustedTimecode);
+        NSString *returnMe = NSStringFromCMTimecode(adjustedTimecode);
+        
+        NSLog(@"returnMe: %@", returnMe);
+        
+        return returnMe;
     }
     else
     {
@@ -3359,11 +3364,12 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
 
 - (void)updateTimeLabel
 {
-    //Float64 curtime = CMTimeGetSeconds([player currentTime]);//(timecodeFormat) ?
+    // Float64 curtime = CMTimeGetSeconds([player currentTime]);//(timecodeFormat) ?
        // kCVTime ([player currentTime]) + startTimecode :
        // kCVTime ([player currentTime]);
     
     theTime.text = [self timeFormat: [player currentTime]];
+    // theTime.text = [self timeFormat: curtime];
 }
 
 static int saveRate;
@@ -3398,6 +3404,8 @@ static int saveRate;
 
 - (void)sliderValueChange
 {
+    
+    
     Float64 playerTime = movieTimeControl.value * CMTimeGetSeconds ([[player currentItem] duration]); 
     
  	[player seekToTime: kCMTimeMakeWithSeconds(playerTime)];
@@ -4744,7 +4752,8 @@ static int saveRate;
          NSLog (@"!!! Seeking to %lg (%@) for Note", (secs), theNote.timeStamp);
         
         // seekToZeroBeforePlay = NO;
-        [player seekToTime: CMTimeMakeWithSeconds(secs, 30)];
+        [player seekToTime: kCMTimeMakeWithSeconds(secs) toleranceBefore: kCMTimeZero toleranceAfter: kCMTimeZero];
+        
     }
 
     newNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
