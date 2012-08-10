@@ -8,7 +8,7 @@
 #import "Note.h"
 
 @implementation Note
-@synthesize thumb, text, timeStamp, drawing, colors, date, initials, voiceMemo, frameWidth, frameHeight, imageName, rotation, framerate;
+@synthesize thumb, text, timeStamp, drawing, colors, date, initials, voiceMemo, frameWidth, frameHeight, secs, imageName, rotation, framerate;
 
 // The method used to archive a note
 
@@ -23,6 +23,7 @@
     [encoder  encodeObject: initials forKey: @"NoteInitials"];
     [encoder  encodeFloat: frameWidth forKey: @"NoteFrameWidth"];
     [encoder  encodeFloat: frameHeight forKey: @"NoteFrameHeight"];
+    [encoder  encodeFloat: secs forKey: @"NoteSecs"];
     [encoder  encodeObject: imageName forKey: @"NoteImageName"];
     [encoder  encodeInt: rotation forKey: @"NoteRotation"];
     
@@ -42,7 +43,8 @@
     drawing = [[decoder decodeObjectForKey: @"NoteDrawing"] mutableCopy]; 
     colors = [[decoder decodeObjectForKey: @"NoteColors"] mutableCopy]; 
     frameWidth =  [decoder decodeFloatForKey: @"NoteFrameWidth"]; 
-    frameHeight =  [decoder decodeFloatForKey: @"NoteFrameHeight"]; 
+    frameHeight =  [decoder decodeFloatForKey: @"NoteFrameHeight"];
+    secs =  [decoder decodeFloatForKey: @"NoteSecs"];
     imageName = [[decoder  decodeObjectForKey: @"NoteImageName"] retain];
     rotation = [decoder  decodeIntForKey: @"NoteRotation"];
  

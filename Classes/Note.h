@@ -18,6 +18,7 @@
     NSData          *voiceMemo;
     NSString        *text;
     NSString        *timeStamp;
+    float           secs;
     NSString        *date;
     NSString        *initials;
     NSMutableArray  *drawing;
@@ -37,7 +38,7 @@
 @property (nonatomic, copy)    NSMutableArray  *drawing;  // an array (of an array) of line segments
 @property (nonatomic, copy)    NSMutableArray  *colors;   // an array of colors for each line segment
 @property (nonatomic) Float64 framerate;
-@property float frameWidth, frameHeight;                  // a scale factor so iPhone/iPad notes work
+@property float frameWidth, frameHeight, secs;                  // a scale factor so iPhone/iPad notes work
 @property int   rotation;
 -(BOOL) isStill;
 @end

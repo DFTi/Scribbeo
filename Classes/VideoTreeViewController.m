@@ -1823,6 +1823,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         timecodeFormat = YES;
         //aNewNote.timeStamp = [self timeFormat: curTime];
         aNewNote.timeStamp = theTime.text;
+
+        //        CMTime = [[self player] currentTime];
+        aNewNote.secs = CMTimeGetSeconds([[self player] currentTime]);
         
         // NSStringFromCMTimecode( CMTimecodeFromCMTimeWithoutDrop([player currentTime], [self currentTrack].nominalFrameRate));
         timecodeFormat = saveFormat;
@@ -4744,7 +4747,8 @@ static int saveRate;
          NSLog (@"!!! Seeking to %lg (%@) for Note", (secs), theNote.timeStamp);
         
         // seekToZeroBeforePlay = NO;
-        [player seekToTime:kCMTimeMakeWithSeconds(secs) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+        [player seekToTime:CMTimeMakeWithSeconds(theNote.secs, ([[self player] currentTime]).timescale) toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+        
     }
 
     newNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
