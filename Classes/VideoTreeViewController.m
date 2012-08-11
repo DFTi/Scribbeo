@@ -3694,6 +3694,7 @@ static int saveRate;
 -(void) cleanup
 {
     NSLog (@"cleaning up");
+    
 
     noteTableSelected = NO;
     
@@ -3714,7 +3715,7 @@ static int saveRate;
         drawView.frame = drawViewFrame;
         [self erase];
         [self clearAnyNotes];
-        newNote.text = @"";
+        
         
         // hide buttons that don't apply
         
@@ -3743,8 +3744,7 @@ static int saveRate;
     if (!player)
         return;
     
-    //if (newNote)
-      //  newNote.text = @"";
+    if (newNote.text != @"") newNote.text = @"";
     
     [self stopObservingTimeChanges];
 
