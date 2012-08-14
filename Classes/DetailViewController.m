@@ -241,7 +241,7 @@
         NSOperationQueue* queue = [[[NSOperationQueue alloc] init] autorelease];
         
         __block DetailViewController* blockSelf = self;
-        __block VideoTreeViewController *vc = [kAppDel viewController];
+        // __block VideoTreeViewController *vc = [kAppDel viewController];
         
        // [self showActivity];
         
@@ -283,7 +283,7 @@
 //                        [vc presentModalViewController:blockSelf.serverLogin animated:YES];
 //                    });
                     
-                    // FIXME: JUST ACCEPT HERE
+                    // JUST ACCEPT
                     
                     [blockSelf.serverLogin performSelector:@selector(serverLoginAttempt:)];
 

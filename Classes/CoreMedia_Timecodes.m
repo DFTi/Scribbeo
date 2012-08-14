@@ -19,7 +19,7 @@ const CMTimecode CMTimcodeZero = {0,0,0,0,-1.f,0.f};
 
 CMTimecode CMTimecodeFromCMTime(CMTime time, float framerate)
 {
-    
+    NSLog(@"DROPFRAME");
     if (framerate <= 0.f)
     {
         return CMTimcodeZero;
@@ -114,15 +114,15 @@ CMTimecode CMTimecodeFromCMTimeWithoutDrop(CMTime time, float framerate)
     // Get input in seconds
     Float64 seconds = CMTimeGetSeconds(time);
     
-#ifdef DEBUG
-    NSLog(@"CMTimecodeFromCMTimeWithoutDrop time: %f framerate:%f ", seconds, framerate);
-#endif
+//#ifdef DEBUG
+//    NSLog(@"CMTimecodeFromCMTimeWithoutDrop time: %f framerate:%f ", seconds, framerate);
+//#endif
     
     
     Float64 realSeconds = seconds;
     
     //Round up
-    framerate = ceil(framerate);
+    // framerate = ceil(framerate);
     
     //Calculate hours  
     NSInteger hours = seconds / 3600;
@@ -143,43 +143,43 @@ CMTimecode CMTimecodeFromCMTimeWithoutDrop(CMTime time, float framerate)
     
 }
 
-CMTime CMTimeFromCMTimecode(CMTimecode timecode)
-{
-    
-#ifdef DEBUG
-    NSLog(@"CMTimeFromCMTimecode timecode:%@ ", NSStringFromCMTimecode(timecode));
-#endif
-    
-    if (timecode.framerate > 0.f)
-    {
-        NSInteger framerate = ceilf(timecode.framerate) + 1;
-        
-        Float64 seconds = (Float64)(timecode.frames) / framerate;
-        seconds += timecode.seconds;
-        seconds += timecode.minutes * CMTimecodeSecondsInMinute;
-        seconds += timecode.hours * CMTimecodeSecondsInHour;
-        
-        CMTime baseTime = CMTimeMakeWithSeconds(seconds, 1000000000);
-        
-        Float64 droppedFrameMagic = 1 - 1000./1001.;
-        
-        NSInteger frameCount = seconds * framerate * droppedFrameMagic;
-                
-        CMTime timeAdjust = CMTimeMakeWithSeconds( (Float64)frameCount / framerate , 1000000000);
-        
-        return CMTimeAdd(baseTime, timeAdjust);
-
-    }
-    
-    return kCMTimeZero;
-}
+//CMTime CMTimeFromCMTimecode(CMTimecode timecode)
+//{
+//    
+////#ifdef DEBUG
+////    NSLog(@"CMTimeFromCMTimecode timecode:%@ ", NSStringFromCMTimecode(timecode));
+////#endif
+//    
+//    if (timecode.framerate > 0.f)
+//    {
+//        NSInteger framerate = ceilf(timecode.framerate) + 1;
+//        
+//        Float64 seconds = (Float64)(timecode.frames) / framerate;
+//        seconds += timecode.seconds;
+//        seconds += timecode.minutes * CMTimecodeSecondsInMinute;
+//        seconds += timecode.hours * CMTimecodeSecondsInHour;
+//        
+//        CMTime baseTime = CMTimeMakeWithSeconds(seconds, 1000000000);
+//        
+//        Float64 droppedFrameMagic = 1 - 1000./1001.;
+//        
+//        NSInteger frameCount = seconds * framerate * droppedFrameMagic;
+//                
+//        CMTime timeAdjust = CMTimeMakeWithSeconds( (Float64)frameCount / framerate , 1000000000);
+//        
+//        return CMTimeAdd(baseTime, timeAdjust);
+//
+//    }
+//    
+//    return kCMTimeZero;
+//}
 
 Float64 CMTimecodeGetSeconds(CMTimecode timecode)
 {
     
-#ifdef DEBUG
-    NSLog(@"CMTimecodeGetSeconds timecode:%@ ", NSStringFromCMTimecode(timecode));
-#endif
+//#ifdef DEBUG
+//    NSLog(@"CMTimecodeGetSeconds timecode:%@ ", NSStringFromCMTimecode(timecode));
+//#endif
     
     return timecode.realSeconds;
 }
@@ -190,18 +190,18 @@ CMTimecode CMTimecodeAdd(CMTimecode addend1, CMTimecode addend2)
 {
     
     
-#ifdef DEBUG
-    NSLog(@"CMTimecodeAdd addend1:%@ +addend2:%@ ", NSStringFromCMTimecode(addend1), NSStringFromCMTimecode(addend2));
-#endif
+//#ifdef DEBUG
+//    NSLog(@"CMTimecodeAdd addend1:%@ +addend2:%@ ", NSStringFromCMTimecode(addend1), NSStringFromCMTimecode(addend2));
+//#endif
     
     if (floatEquals(addend1.framerate, addend2.framerate, CMTimecodeFramerateCompareTolerance)) {
         
         float framerate = addend1.framerate;//They should be the same TODO: average 2?
         
-        if (framerate <= 0.f)
-        {
-            return CMTimcodeZero;
-        }
+//        if (framerate <= 0.f)
+//        {
+//            return CMTimcodeZero;
+//        }
         
         NSInteger frames = addend1.frames + addend2.frames;
         
@@ -248,9 +248,9 @@ NSString * NSStringFromCMTimecode(CMTimecode timecode)
 {
     NSString* timecodeString = [NSString stringWithFormat:@"%02i:%02i:%02i:%02i", timecode.hours, timecode.minutes, timecode.seconds, timecode.frames];
     
-    #ifdef DEBUG
-    NSLog(@"NSStringFromCMTimecode %@", timecodeString);
-    #endif
+//    #ifdef DEBUG
+//    NSLog(@"NSStringFromCMTimecode %@", timecodeString);
+//    #endif
     
     return timecodeString;
 }
@@ -259,13 +259,13 @@ CMTimecode CMTimecodeFromNSString(NSString* timecode, float framerate)
 {
     
 //    if (framerate <= 0.f)
-//    {// LOL!
+//    {
 //        framerate = 23.97;
 //    }
     
-#ifdef DEBUG
-    NSLog(@"CMTimecodeFromNSString timecode:%@ framerate:%f", timecode, framerate);
-#endif
+//#ifdef DEBUG
+//    NSLog(@"CMTimecodeFromNSString timecode:%@ framerate:%f", timecode, framerate);
+//#endif
     
     CMTimecode newTimecode = {0,0,0,0,0.f};
     
