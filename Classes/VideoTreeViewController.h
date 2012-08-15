@@ -50,7 +50,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
     UITextView                  *newNote;                   // The area where the text of a note is displayed
     UITableView                 *notes;                     // The table of notes
-    UIImage                     *newThumb;                  // a new thumbnail
+    UIImage                     *theThumb;                  // a new thumbnail
     
     UIView                      *playerLayerView;           // The view for video playback
 	AVPlayer                    *player;                    // Ahh, the actual player object
@@ -268,7 +268,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @property (nonatomic, retain)  UIImage  *pauseImage, *playImage, *recImage, *isRecordingImage;
 @property (nonatomic, retain)  UITableView *notes;
-@property (nonatomic, retain)  UIImage *newThumb;
+@property (nonatomic, retain)  UIImage *theThumb;
 @property (nonatomic, retain)  NSMutableArray *noteData;
 @property (nonatomic, retain)  NSMutableArray *filteredNoteData;
 @property (nonatomic, retain) UIActionSheet *filterActionSheet;

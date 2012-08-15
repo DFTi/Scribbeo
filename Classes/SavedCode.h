@@ -135,7 +135,7 @@ UIImage* UIImageFromLayer(CGLayerRef layer)
     id obj = [playerLayer getObjectForKey: @"contents"];
     NSLog (@"obj = %@", obj);
     
-    self.newThumb = [self UIImageFromLayer: playerLayer];
+    self.theThumb = [self UIImageFromLayer: playerLayer];
 }
 
 ///////////
@@ -146,7 +146,7 @@ UIImage* UIImageFromLayer(CGLayerRef layer)
 {
     UIDeviceOrientation useOrientation = [[UIDevice currentDevice] orientation];
     CGImageRef screen = UIGetScreenImage();
-    self.newThumb = [UIImage imageWithCGImage:screen];
+    self.theThumb = [UIImage imageWithCGImage:screen];
     CGImageRelease(screen);
     
     UIGraphicsBeginImageContext(CGSizeMake(1024.0f, 768.0f));
@@ -154,12 +154,12 @@ UIImage* UIImageFromLayer(CGLayerRef layer)
     if ( useOrientation == UIDeviceOrientationLandscapeRight )
     {
         CGContextRotateCTM (context, M_PI/2.0f);
-        [newThumb drawAtPoint:CGPointMake(0.0f, -1024.0f)];
+        [theThumb drawAtPoint:CGPointMake(0.0f, -1024.0f)];
     } else {
         CGContextRotateCTM (context, -M_PI/2.0f);
-        [newThumb drawAtPoint:CGPointMake (768.0f, 0.0f)];
+        [theThumb drawAtPoint:CGPointMake (768.0f, 0.0f)];
     }
-    self.newThumb  = UIGraphicsGetImageFromCurrentImageContext();
+    self.theThumb  = UIGraphicsGetImageFromCurrentImageContext();
 }
 #endif
 ////////////////////////////////
@@ -307,7 +307,7 @@ UIImage* UIImageFromLayer(CGLayerRef layer)
     // Now take the screenshot
     UIGraphicsBeginImageContext(playerLayerView.layer.bounds.size);
     [playerLayer renderInContext:UIGraphicsGetCurrentContext()];
-    self.newThumb = UIGraphicsGetImageFromCurrentImageContext();
+    self.theThumb = UIGraphicsGetImageFromCurrentImageContext();
     //UIImageWriteToSavedPhotosAlbum(viewImage, nil, nil, nil);
     UIGraphicsEndImageContext();
 }
@@ -336,7 +336,7 @@ CGSize newSize = (CGSize) {imageR.size.width / 16; imageR.size.height / 16 };
 
 UIGraphicsBeginImageContext(newSize);
 [imageR drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-self.newThumb = UIGraphicsGetImageFromCurrentImageContext();
+self.theThumb = UIGraphicsGetImageFromCurrentImageContext();
 UIGraphicsEndImageContext();
 
 ///////////////////

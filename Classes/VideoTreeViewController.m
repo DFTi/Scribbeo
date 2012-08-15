@@ -64,7 +64,7 @@ static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewC
 @synthesize allStills;
 @synthesize shareActionButonItem;
 
-@synthesize showName, newNote, fullScreenMode, drawView, movieTimeControl, notes, newThumb, noteBar, drawingBar;
+@synthesize showName, newNote, fullScreenMode, drawView, movieTimeControl, notes, theThumb, noteBar, drawingBar;
 @synthesize player, seekToZeroBeforePlay, movieURL, playerLayerView, theTime, maxLabel, minLabel, noteData, currentlyPlaying, isSaving, markers;
 @synthesize pausePlayButton, pauseImage, playImage, recImage, isRecordingImage, clip, clipPath, show, tape, filmDate, playerLayer, 
 editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSelected;
@@ -1655,7 +1655,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         }];
 #endif
     
-    self.newThumb = [self scaleImage: image andRotate: 0.0];
+    self.theThumb = [self scaleImage: image andRotate: 0.0];
     
     // [imageGen release];
 }
@@ -1760,7 +1760,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
             imageR = [self CGImageRotatedByAngle: image angle: 90];
     }
       
-    self.newThumb = [UIImage imageWithCGImage: imageR scale: iPHONE ? 4 : 64 orientation: UIImageOrientationUp];
+    self.theThumb = [UIImage imageWithCGImage: imageR scale: iPHONE ? 4 : 64 orientation: UIImageOrientationUp];
     CGImageRelease (rotatedScreen);  
     
     NSLog (@"bits per component = %i, color space = %i",  CGImageGetBitsPerComponent(image), CGImageGetColorSpace(image));
@@ -1768,7 +1768,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     CGImageRelease (image);
     CGImageRelease (imageR);  
 
-    NSLog (@"saved image size = %f x %f", newThumb.size.width, newThumb.size.height);
+    NSLog (@"saved image size = %f x %f", theThumb.size.width, theThumb.size.height);
 }
 #endif
 
@@ -1809,7 +1809,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     if ( !stillShows )
         [self frameDraw];
     else {
-        self.newThumb = [self scaleImage: [stillImage CGImage] andRotate: rotAngles [rotate % 4]];     // markups drawn on top by the method
+        self.theThumb = [self scaleImage: [stillImage CGImage] andRotate: rotAngles [rotate % 4]];     // markups drawn on top by the method
     }
     
     // Capture any text typed into the note pad area
@@ -1870,7 +1870,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // Let's compress the frame we grabbed and store it as NSData
     
     isSaving = YES;
-    aNewNote.thumb = UIImageJPEGRepresentation(newThumb, 0.9f);
+    aNewNote.thumb = UIImageJPEGRepresentation(theThumb, 0.9f);
 //  assert (aNewNote.thumb);
     
     // Love this part.  Animate the frame and note going into the notes table
@@ -4880,7 +4880,7 @@ static int saveRate;
     [activeAsyncRequests release];
     [notes release];
     [currentlyPlaying release];
-    [newThumb release];
+    [theThumb release];
     [stampLabel release];
     [minLabel release];
     [maxLabel release];
