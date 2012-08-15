@@ -298,8 +298,8 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 
 @property (nonatomic, retain) NSMutableArray* filterInitials;
 
-- (void) swipedLeft:(UISwipeGestureRecognizer*)gesture;
-- (void) swipedRight:(UISwipeGestureRecognizer*)gesture;
+//- (void) swipedLeft:(UISwipeGestureRecognizer*)gesture;
+//- (void) swipedRight:(UISwipeGestureRecognizer*)gesture;
 
 // Markup
 
@@ -352,7 +352,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(void) stopObservingTimeChanges;
 -(void) leaveFullScreen: (NSNotification *) aNotification;
 -(void) changeState: (NSNotification *) aNotification;
--(void) pauseIt;
+-(IBAction) pauseIt;
 -(void) singleFrame;
 -(void) showActivity;
 -(void) stopActivity;
@@ -400,7 +400,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(IBAction) printNotes;
 
 -(NSString *) exportXML;                // FCP XML out
--(void) getXML: (NSString *) file;      // FCP XML in
+//-(void) getXML: (NSString *) file;      // FCP XML in
 
 -(NSString *) exportAvid;               // Avid export out
 -(void) getAvid: (NSString *) file;      // Avid tab file in

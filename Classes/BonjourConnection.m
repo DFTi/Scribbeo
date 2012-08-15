@@ -135,6 +135,7 @@ void writeStreamEventHandler(CFWriteStreamRef stream, CFStreamEventType eventTyp
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <arpa/inet.h>
 
 
 -(NSString *) IPAddress {
@@ -402,11 +403,12 @@ void readStreamEventHandler(CFReadStreamRef stream, CFStreamEventType eventType,
     // We should now have the header. Time to extract the body.
     if ( [incomingDataBuffer length] >= packetBodySize ) {
       // We now have enough data to extract a meaningful packet.
-      NSData *raw = [NSData dataWithBytes:[incomingDataBuffer bytes] length:packetBodySize];
-      NSDictionary *packet = [NSKeyedUnarchiver unarchiveObjectWithData:raw];
+      // NSData *raw = [NSData dataWithBytes:[incomingDataBuffer bytes] length:packetBodySize];
+      // NSDictionary *packet = [NSKeyedUnarchiver unarchiveObjectWithData:raw];
       
       // Tell our delegate about it
-      [self receivedNetworkPacket:packet viaConnection:self];
+      // WARNING: NOT DEFINED ANYWHERE?!
+//      [self receivedNetworkPacket:packet viaConnection:self];
 
       // Remove that chunk from buffer
       NSRange rangeToDelete = {0, packetBodySize};

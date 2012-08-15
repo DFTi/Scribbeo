@@ -506,7 +506,7 @@ static int tryOne = 0;
             if (error != nil) {
                 NSLog(@"%@", error.localizedDescription);
                 [UIAlertView doAlert:  @"Connection Error" 
-                         withMsg: [NSString stringWithFormat:@"Cannot find a Scribbeo Server at the specified URL. Please enter a valid IP and Port, otherwise enable Auto Discovery.", manualServer]];
+                         withMsg:@"Cannot find a Scribbeo Server at the specified URL. Please enter a valid IP and Port, otherwise enable Auto Discovery."];
                 NSLog(@"Failed to connect to manually entered server %@", manualServer);
             } else {
                 NSLog(@"Got back this much data: %d", [data length]);   

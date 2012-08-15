@@ -36,7 +36,8 @@
 @property (nonatomic, retain)  UIPopoverController      *popoverController;
 @property int     currentClip;
 
-@property (nonatomic) SBServerLoginVC* serverLogin;
+@property (nonatomic, retain) SBServerLoginVC* serverLogin;
+
 
 - (void) showDisconnected;
 - (void) hideDisconnected;

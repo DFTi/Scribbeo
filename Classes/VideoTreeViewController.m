@@ -893,13 +893,15 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     if (start == NO)   // stop the animation
         if (![uploadActivityIndicator isAnimating])
             return;
-        else if (--uploadCount == 0) {
+        else {
+            if (--uploadCount == 0) {
             [uploadActivityIndicator stopAnimating];
             uploadActivityIndicatorView.hidden = YES;
 
             [uploadActivityIndicator removeFromSuperview];
             self.uploadActivityIndicator = nil;
             return;
+            }
         }
     else if ([uploadActivityIndicator isAnimating])   // check if it's already started
         return;
@@ -3092,7 +3094,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     }
     NSLog(@"Got back this much data: %d writing it to %@", [data length], localPath);
     [data writeToFile:localPath atomically:YES];
-    return YES;
+    return @"YES";
 }
 
 //
@@ -4274,6 +4276,7 @@ static int saveRate;
 {
     DetailViewController *dc =  [kAppDel rootTvc];
     [dc nextClip];
+    return YES;
 }
 
 // Notiication that a clip is done playing (MPMoviePlayer class)

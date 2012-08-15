@@ -11,8 +11,8 @@
 #define APPSTORE
 
 
-
-#define DEBUG YES
+// might have disabled debug who knows. force switch here? fuck it
+// #define DEBUG YES
 #ifdef DEBUG
 @implementation NSURLRequest (IgnoreSSL)
 

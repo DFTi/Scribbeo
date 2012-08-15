@@ -33,6 +33,6 @@
 
 - (void) connectionAttemptFailed:(BonjourConnection*)connection;
 - (void) connectionTerminated:(BonjourConnection*)connection;
-- (void) receivedNetworkPacket:(NSDictionary*)message viaConnection:(BonjourConnection*)connection;
+//- (void) receivedNetworkPacket:(NSDictionary*)message viaConnection:(BonjourConnection*)connection;
 
 @end
