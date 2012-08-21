@@ -64,7 +64,7 @@ static void *VideoTreeViewControllerAirPlayObservationContext = @"VideoTreeViewC
 @synthesize allStills;
 @synthesize shareActionButonItem;
 
-@synthesize showName, newNote, fullScreenMode, drawView, movieTimeControl, notes, theThumb, noteBar, drawingBar;
+@synthesize showName, theNewNote, fullScreenMode, drawView, movieTimeControl, notes, theThumb, noteBar, drawingBar;
 @synthesize player, seekToZeroBeforePlay, movieURL, playerLayerView, theTime, maxLabel, minLabel, noteData, currentlyPlaying, isSaving, markers;
 @synthesize pausePlayButton, pauseImage, playImage, recImage, isRecordingImage, clip, clipPath, show, tape, filmDate, playerLayer, 
 editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSelected;
@@ -98,11 +98,11 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     CGRect theFrame;
     
     if (iPHONE) {
-        newNote.font = [UIFont fontWithName: @"Helvetica" size: 10];
+        theNewNote.font = [UIFont fontWithName: @"Helvetica" size: 10];
         self.editButton = nil;
     }
     
-    newNote.delegate = self;
+    theNewNote.delegate = self;
     
     NSLog (@"Allocating drawView frame");
     self.drawView = [[[DrawView alloc] initWithFrame: 
@@ -149,11 +149,11 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     // Makes the note border look a little nicer
     
-    //newNote.layer.borderWidth = 1;
-	//newNote.layer.borderColor = [[UIColor darkGrayColor] CGColor];
+    //theNewNote.layer.borderWidth = 1;
+	//theNewNote.layer.borderColor = [[UIColor darkGrayColor] CGColor];
     
     if (iPHONE)
-        newNote.layer.cornerRadius = 8;
+        theNewNote.layer.cornerRadius = 8;
 
     // Add the TableView for the Notes (don't know why I didn't
     // lay this out in the interface (!)
@@ -410,7 +410,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     [self setAirPlayImageView:nil];
     [self setPlayerToolbar:nil];
     [self setPlayOutButton:nil];
-    self.newNote = nil;
+    self.theNewNote = nil;
     self.theTime = nil;
     self.movieTimeControl = nil;
     self.drawView = nil;
@@ -483,7 +483,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         
         [self erase];
         [self clearAnyNotes];
-        newNote.text = @"";
+        theNewNote.text = @"";
         
         // Load the notes table
         
@@ -1184,7 +1184,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         [voiceMemo stopRecording];
         recording.hidden = YES;
         madeRecording = YES;
-        newNote.text = [newNote.text stringByAppendingString: @" <<<Audio Note>>>"];
+        theNewNote.text = [theNewNote.text stringByAppendingString: @" <<<Audio Note>>>"];
         [self save];
     }
     else {
@@ -1291,7 +1291,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                 [player seekToTime: kCMTimeZero];
             }
         
-            newNote.text = @"";       // Clear any note or markups
+            theNewNote.text = @"";       // Clear any note or markups
             [self erase];
             player.rate = 1.0;        // Start playback and set the play/pause button to pause icon
             pausePlayButton.image = pauseImage;
@@ -1394,7 +1394,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     // Erase any pending markups or notes
     
-    newNote.text = @"";
+    theNewNote.text = @"";
     [self erase];
     
     pausePlayButton.image = pauseImage;
@@ -1782,7 +1782,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // Dismiss the keyboard if it's showing
     
     if (keyboardShows)  {
-        [newNote resignFirstResponder];
+        [theNewNote resignFirstResponder];
         pendingSave = YES;
         return;
     }
@@ -1802,7 +1802,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // We're here, so we really want to save a note
     // Create a new note object
     
-    Note *aNewNote = [[Note alloc] init];
+    Note *atheNewNote = [[Note alloc] init];
     
     // Capture the frame and draw the markups on it
     
@@ -1814,7 +1814,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     // Capture any text typed into the note pad area
     
-    aNewNote.text = newNote.text;
+    atheNewNote.text = theNewNote.text;
     //CMTime curTime;
     
     if ( !stillShows ) {
@@ -1824,11 +1824,11 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         
         BOOL saveFormat = timecodeFormat;
         timecodeFormat = YES;
-        //aNewNote.timeStamp = [self timeFormat: curTime];
-        aNewNote.timeStamp = theTime.text;
+        //atheNewNote.timeStamp = [self timeFormat: curTime];
+        atheNewNote.timeStamp = theTime.text;
 
         //        CMTime = [[self player] currentTime];
-        aNewNote.secs = CMTimeGetSeconds([[self player] currentTime]);
+        atheNewNote.secs = CMTimeGetSeconds([[self player] currentTime]);
         
         // NSStringFromCMTimecode( CMTimecodeFromCMTimeWithoutDrop([player currentTime], [self currentTrack].nominalFrameRate));
         timecodeFormat = saveFormat;
@@ -1836,42 +1836,42 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         // We use this to scale the markups as needed so it
         // works on both the iPhone and iPad
         
-        aNewNote.frameWidth = playerLayerView.frame.size.width;
-        aNewNote.frameHeight = playerLayerView.frame.size.height;
-        aNewNote.imageName = nil;
-        aNewNote.rotation = 0;
+        atheNewNote.frameWidth = playerLayerView.frame.size.width;
+        atheNewNote.frameHeight = playerLayerView.frame.size.height;
+        atheNewNote.imageName = nil;
+        atheNewNote.rotation = 0;
     }
     else {
-        aNewNote.frameWidth = drawView.frame.size.width;
-        aNewNote.frameHeight = drawView.frame.size.height;
+        atheNewNote.frameWidth = drawView.frame.size.width;
+        atheNewNote.frameHeight = drawView.frame.size.height;
         
-        aNewNote.timeStamp = @"";
-        aNewNote.imageName = clip;
-        aNewNote.rotation = rotate % 4;     // Save the current orientation of the still
+        atheNewNote.timeStamp = @"";
+        atheNewNote.imageName = clip;
+        atheNewNote.rotation = rotate % 4;     // Save the current orientation of the still
     }
     
     // Save the markups
     
-    aNewNote.drawing = [drawView myDrawing];
-    aNewNote.colors = [drawView colors];
+    atheNewNote.drawing = [drawView myDrawing];
+    atheNewNote.colors = [drawView colors];
     
     // Save the date this note was made, and who made it
     
-    aNewNote.date = [self formatDate: NO];
-    aNewNote.initials = initials;
+    atheNewNote.date = [self formatDate: NO];
+    atheNewNote.initials = initials;
 
     // If we made an audio note, save it as NSData
     
     if (madeRecording)
-        aNewNote.voiceMemo = [NSData dataWithContentsOfURL:[voiceMemo memoURL]];
+        atheNewNote.voiceMemo = [NSData dataWithContentsOfURL:[voiceMemo memoURL]];
     else
-        aNewNote.voiceMemo = nil;
+        atheNewNote.voiceMemo = nil;
 
     // Let's compress the frame we grabbed and store it as NSData
     
     isSaving = YES;
-    aNewNote.thumb = UIImageJPEGRepresentation(theThumb, 0.9f);
-//  assert (aNewNote.thumb);
+    atheNewNote.thumb = UIImageJPEGRepresentation(theThumb, 0.9f);
+//  assert (atheNewNote.thumb);
     
     // Love this part.  Animate the frame and note going into the notes table
 
@@ -1900,10 +1900,10 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     [notes beginUpdates];
     
-    [noteData insertObject: aNewNote atIndex: row];
-    [self.filteredNoteData insertObject:aNewNote atIndex:row];
+    [noteData insertObject: atheNewNote atIndex: row];
+    [self.filteredNoteData insertObject:atheNewNote atIndex:row];
 
-    [aNewNote release];
+    [atheNewNote release];
 
     [notes insertRowsAtIndexPaths:(NSArray *)indexPaths 
                      withRowAnimation:(UITableViewRowAnimation)UITableViewRowAnimationLeft];
@@ -1926,7 +1926,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
     // Clear the note
     
-    newNote.text = @"";
+    theNewNote.text = @"";
     [self erase];
     madeRecording = NO;
     [self storeData];
@@ -1935,8 +1935,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 }
 
 // 
-- (IBAction)clearNewNote:(id)sender {
-    newNote.text = @"";
+- (IBAction)cleartheNewNote:(id)sender {
+    theNewNote.text = @"";
 }
 
 -(void) animateSave {
@@ -1982,12 +1982,12 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // except now we're animating the note into the notes table, also along a curve
     
     path = CGPathCreateMutable();
-    CGPathMoveToPoint(path, NULL, newNote.frame.origin.x + newNote.bounds.size.width / 2,
-                      newNote.frame.origin.y + newNote.bounds.size.height / 2);
+    CGPathMoveToPoint(path, NULL, theNewNote.frame.origin.x + theNewNote.bounds.size.width / 2,
+                      theNewNote.frame.origin.y + theNewNote.bounds.size.height / 2);
     if ( !iPHONE)
-        CGPathAddQuadCurveToPoint(path, NULL, 450, newNote.frame.origin.y, 0, 800);
+        CGPathAddQuadCurveToPoint(path, NULL, 450, theNewNote.frame.origin.y, 0, 800);
     else
-        CGPathAddQuadCurveToPoint(path, NULL, 450, newNote.frame.origin.y, 0, 400);
+        CGPathAddQuadCurveToPoint(path, NULL, 450, theNewNote.frame.origin.y, 0, 400);
     
     CAKeyframeAnimation *pathAnimation2 = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     pathAnimation2.path = path;
@@ -2007,7 +2007,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                                             kCAMediaTimingFunctionEaseInEaseOut];
     animationGroup2.duration = 1;
     
-    [newNote.layer addAnimation:animationGroup2 forKey:nil];
+    [theNewNote.layer addAnimation:animationGroup2 forKey:nil];
     
     CFRelease(path);
 }
@@ -2150,11 +2150,11 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                                 NSLog(@"Clip has start timecode %@, in float: %f", timeCode, [self convertTimeToSecs:timeCode]);
                                 Float64 noteTime = [self convertTimeToSecs:aNote.timeStamp];
                                 Float64 clipTime = [self convertTimeToSecs:timeCode];
-                                Float64 newNoteTime = 0.0;
+                                Float64 theNewNoteTime = 0.0;
                                 NSLog(@"noteTime: %lf, startTimeCode: %lf", noteTime, clipTime);
                                 if (noteTime < clipTime) { // Then they probably didn't have the right timecode when they made the note... Let's just adjust it...
-                                    newNoteTime = noteTime + clipTime;
-                                    aNote.timeStamp = [self timeFormat:kCMTimeMakeWithSeconds (newNoteTime)];
+                                    theNewNoteTime = noteTime + clipTime;
+                                    aNote.timeStamp = [self timeFormat:kCMTimeMakeWithSeconds (theNewNoteTime)];
                                 }
                                  
                                 */
@@ -3389,7 +3389,7 @@ static int saveRate;
 
     player.rate = 0;
     seekToZeroBeforePlay = NO;
-    newNote.text = @"";
+    theNewNote.text = @"";
     [self erase];
 }
 
@@ -3755,7 +3755,7 @@ static int saveRate;
     if (!player)
         return;
     
-    if (newNote.text != @"") newNote.text = @"";
+    if (theNewNote.text != @"") theNewNote.text = @"";
     
     [self stopObservingTimeChanges];
 
@@ -4380,7 +4380,7 @@ static int saveRate;
     notes.hidden = YES;
     notePaper.hidden = YES;
     
-    newNote.hidden = YES;
+    theNewNote.hidden = YES;
     theTime.hidden = YES;
     backgroundLabel.hidden = YES;
     stampLabel.hidden = YES;
@@ -4433,7 +4433,7 @@ static int saveRate;
     
     // reshow everything we hid before
     
-    newNote.hidden = NO;
+    theNewNote.hidden = NO;
     
     if (! stillShows)
         theTime.hidden = NO;
@@ -4763,7 +4763,7 @@ static int saveRate;
         
     }
 
-    newNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
+    theNewNote.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
     
     // If there's an audio note, play it now
     
@@ -4885,7 +4885,7 @@ static int saveRate;
     [stampLabel release];
     [minLabel release];
     [maxLabel release];
-    [newNote release];
+    [theNewNote release];
     [movieTimeControl release];
     [stampLabelFull release];
     [drawView release];
