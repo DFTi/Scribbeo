@@ -48,7 +48,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
                 NSMutableArray              *filteredNoteData;
     NSMutableArray *activeAsyncRequests; // Store requests here so we can cancel them.
 
-    UITextView                  *theNewNote;                   // The area where the text of a note is displayed
+    UITextView                  *newNote;                   // The area where the text of a note is displayed
     UITableView                 *notes;                     // The table of notes
     UIImage                     *theThumb;                  // a new thumbnail
     
@@ -244,7 +244,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 @property (nonatomic, retain)  UIImageView *stillView;
 @property (nonatomic, retain)  UIImage *stillImage;
 
-@property (nonatomic, retain) IBOutlet UITextView *theNewNote;
+@property (nonatomic, retain) IBOutlet UITextView *newNote;
 @property (nonatomic, retain) IBOutlet UIToolbar *playerToolbar;
 @property (retain, nonatomic) IBOutlet UIToolbar *playerToolbar1;
 @property (nonatomic, retain) IBOutlet UILabel    *theTime;
@@ -415,7 +415,7 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(NSURL *) getTheURL: (NSString *) thePath;   // Used by loadMovie: and loadStill:
 
 -(void) directlySetStartTimecode: (NSString *) timeCodeStr;
-- (IBAction)cleartheNewNote:(id)sender;
+- (IBAction)clearNewNote:(id)sender;
 
 @property (nonatomic, retain) IASKAppSettingsViewController *appSettingsViewController;
 
