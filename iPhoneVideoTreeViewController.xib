@@ -53,7 +53,6 @@
 						<string key="NSFrame">{{0, 275}, {480, 44}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -1051,7 +1050,7 @@
 								</object>
 							</object>
 						</object>
-						<string key="NSFrame">{{154, 52}, {264, 83}}</string>
+						<string key="NSFrame">{{174, 51}, {264, 83}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="520636375"/>
@@ -1209,14 +1208,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
-						<string key="label">newNote</string>
-						<reference key="source" ref="372490531"/>
-						<reference key="destination" ref="188207310"/>
-					</object>
-					<int key="connectionID">98</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">recordButton</string>
 						<reference key="source" ref="372490531"/>
 						<reference key="destination" ref="824854500"/>
@@ -1334,6 +1325,14 @@
 						<reference key="destination" ref="193048117"/>
 					</object>
 					<int key="connectionID">205</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">theNewNote</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="188207310"/>
+					</object>
+					<int key="connectionID">206</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
@@ -1580,8 +1579,8 @@
 							<reference ref="625102129"/>
 							<reference ref="659495254"/>
 							<reference ref="667256905"/>
-							<reference ref="789978037"/>
 							<reference ref="241529372"/>
+							<reference ref="789978037"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -2149,7 +2148,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">205</int>
+			<int key="maxID">206</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -2171,7 +2170,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>airPlay</string>
 							<string>backFrame</string>
-							<string>clearNewNote:</string>
+							<string>cleartheNewNote:</string>
 							<string>color:</string>
 							<string>editNotesTable:</string>
 							<string>emailNotes</string>
@@ -2181,6 +2180,7 @@
 							<string>forwardFrame</string>
 							<string>forwardToEnd</string>
 							<string>fullScreen</string>
+							<string>pauseIt</string>
 							<string>playPauseButtonPressed:</string>
 							<string>printNotes</string>
 							<string>recordNote</string>
@@ -2222,6 +2222,7 @@
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
+							<string>id</string>
 							<string>UITextField</string>
 							<string>id</string>
 						</object>
@@ -2232,7 +2233,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>airPlay</string>
 							<string>backFrame</string>
-							<string>clearNewNote:</string>
+							<string>cleartheNewNote:</string>
 							<string>color:</string>
 							<string>editNotesTable:</string>
 							<string>emailNotes</string>
@@ -2242,6 +2243,7 @@
 							<string>forwardFrame</string>
 							<string>forwardToEnd</string>
 							<string>fullScreen</string>
+							<string>pauseIt</string>
 							<string>playPauseButtonPressed:</string>
 							<string>printNotes</string>
 							<string>recordNote</string>
@@ -2268,7 +2270,7 @@
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">clearNewNote:</string>
+								<string key="name">cleartheNewNote:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2305,6 +2307,10 @@
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">fullScreen</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">pauseIt</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -2386,7 +2392,6 @@
 							<string>minLabel</string>
 							<string>movieController</string>
 							<string>movieTimeControl</string>
-							<string>newNote</string>
 							<string>noteBar</string>
 							<string>notePaper</string>
 							<string>pausePlayButton</string>
@@ -2405,6 +2410,7 @@
 							<string>skipForwardButton</string>
 							<string>stampLabel</string>
 							<string>tapeLabel</string>
+							<string>theNewNote</string>
 							<string>theTime</string>
 							<string>uploadActivityIndicatorView</string>
 							<string>volLabel</string>
@@ -2428,7 +2434,6 @@
 							<string>UILabel</string>
 							<string>MPMoviePlayerController</string>
 							<string>UISlider</string>
-							<string>UITextView</string>
 							<string>UIToolbar</string>
 							<string>UIImageView</string>
 							<string>UIBarButtonItem</string>
@@ -2447,6 +2452,7 @@
 							<string>UIBarButtonItem</string>
 							<string>UILabel</string>
 							<string>UILabel</string>
+							<string>UITextView</string>
 							<string>UILabel</string>
 							<string>UIView</string>
 							<string>UILabel</string>
@@ -2473,7 +2479,6 @@
 							<string>minLabel</string>
 							<string>movieController</string>
 							<string>movieTimeControl</string>
-							<string>newNote</string>
 							<string>noteBar</string>
 							<string>notePaper</string>
 							<string>pausePlayButton</string>
@@ -2492,6 +2497,7 @@
 							<string>skipForwardButton</string>
 							<string>stampLabel</string>
 							<string>tapeLabel</string>
+							<string>theNewNote</string>
 							<string>theTime</string>
 							<string>uploadActivityIndicatorView</string>
 							<string>volLabel</string>
@@ -2567,10 +2573,6 @@
 								<string key="candidateClassName">UISlider</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">newNote</string>
-								<string key="candidateClassName">UITextView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
 								<string key="name">noteBar</string>
 								<string key="candidateClassName">UIToolbar</string>
 							</object>
@@ -2641,6 +2643,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">tapeLabel</string>
 								<string key="candidateClassName">UILabel</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">theNewNote</string>
+								<string key="candidateClassName">UITextView</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">theTime</string>
