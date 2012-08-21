@@ -54,14 +54,14 @@ extern int gIOSMajorVersion;
 // #define Turner  ////////////////////////////////
 // #define kOSXServer
 
-
-#ifdef DEBUG
-#define kMakeLogFile        // Only make log files for our own use (not the app store version)
-#endif
-
-#ifdef kMakeLogFile
-#define NSLog  MyNSLog
-#define NSLog2 
+//
+//#ifdef DEBUG
+//#define kMakeLogFile        // Only make log files for our own use (not the app store version)
+//#endif
+//
+//#ifdef kMakeLogFile
+//#define NSLog  MyNSLog
+//#define NSLog2 
 
 // These routines were supposed to make log file generation more efficient...
 
@@ -69,9 +69,9 @@ extern void MyNSLog (NSString *fmt, ...);
 extern void removeLogFile (void);
 extern void newLogFile (void);
 extern void uploadLogFile (void);
-#else
-#define NSLog(x,...) // Disables NSLog
-#define NSLog2(x,...)
-#endif
+//#else
+//#define NSLog(x,...) // Disables NSLog
+//#define NSLog2(x,...)
+//#endif
 
 void mySleep (unsigned long millisec);

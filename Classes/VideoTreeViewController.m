@@ -3243,6 +3243,7 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
     int saveI;
     
     // Word wrap code... enuf said
+    NSLog(@"numChars %@", numChars);
     
     while (i < numChars) {        
         while (noteText[i] == '\n' || noteText[i] == '\r') {
