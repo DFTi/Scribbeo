@@ -1851,7 +1851,8 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     // Let's compress the frame we grabbed and store it as NSData
     
     isSaving = YES;
-    atheNewNote.thumb = UIImageJPEGRepresentation(theThumb, 0.9f);
+//    atheNewNote.thumb = UIImageJPEGRepresentation(theThumb, 1.0);
+    atheNewNote.thumb = UIImagePNGRepresentation(theThumb);
 //  assert (atheNewNote.thumb);
     
     // Love this part.  Animate the frame and note going into the notes table
