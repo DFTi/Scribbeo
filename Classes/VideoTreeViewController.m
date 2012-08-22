@@ -1535,7 +1535,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         {(float) wid, (float) ht}
     };
 
-    NSLog (@"bits per component = %i, color space = %i",  CGImageGetBitsPerComponent(image), CGImageGetColorSpace(image));
+//    NSLog (@"bits per component = %i, color space = %i",  CGImageGetBitsPerComponent(image), CGImageGetColorSpace(image));
     
     CGFloat angleInRadians = angle * (M_PI / 180);
 
@@ -2866,7 +2866,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         [emailBody appendString: @"<table border=2 cellpadding=10 cellspacing=10>"];
         
         noteNumber = 1;
-        NSLog (@"emailing %lu notes", [noteData count]);
+//        NSLog (@"emailing %lu notes", [noteData count]);
 
         for (Note *theNote in filteredNoteData) {
             [emailBody appendString: [self noteToHTML: theNote]];
@@ -3243,7 +3243,7 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
     int saveI;
     
     // Word wrap code... enuf said
-    NSLog(@"numChars %@", numChars);
+//    NSLog(@"numChars %@", numChars);
     
     while (i < numChars) {        
         while (noteText[i] == '\n' || noteText[i] == '\r') {
@@ -3648,7 +3648,7 @@ static int saveRate;
         // If we read the data, we need to decode the starting timeocde and we're done!
         
         if (buffer) {  
-            NSLog (@"asset reader buffer = %lx, buffer size = %li",  CMSampleBufferGetDataBuffer (buffer), (long) CMSampleBufferGetSampleSize (buffer, 0));
+//            NSLog (@"asset reader buffer = %lx, buffer size = %li",  CMSampleBufferGetDataBuffer (buffer), (long) CMSampleBufferGetSampleSize (buffer, 0));
             CMBlockBufferCopyDataBytes (CMSampleBufferGetDataBuffer (buffer), 0, 4, &out);
             
             if (fps < .001)
@@ -4571,8 +4571,8 @@ static int saveRate;
         NSLog (@"common metadata formats = %@", player.currentItem.asset.availableMetadataFormats);
         NSLog (@"common metadata = %@", player.currentItem.asset.commonMetadata);
         
-        for (NSString *meta in player.currentItem.asset.availableMetadataFormats) 
-           NSLog (@"*** %@", meta, [player.currentItem.asset metadataForFormat: meta]);    
+//        for (NSString *meta in player.currentItem.asset.availableMetadataFormats)
+//           NSLog (@"*** %@", meta, [player.currentItem.asset metadataForFormat: meta]);    
     }
     else if (context == VideoTreeViewControllerAirPlayObservationContext) {
 

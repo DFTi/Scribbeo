@@ -321,7 +321,7 @@ void readStreamEventHandler(CFReadStreamRef stream, CFStreamEventType eventType,
 
 // Handle events from the read stream
 - (void)readStreamHandleEvent:(CFStreamEventType)event {
-  NSLog (@"read stream event = %i", event);
+  // NSLog (@"read stream event = %i", event);
     
   // Stream successfully opened
   if ( event == kCFStreamEventOpenCompleted ) {
@@ -365,7 +365,7 @@ void readStreamEventHandler(CFReadStreamRef stream, CFStreamEventType eventType,
         }
     
     [incomingDataBuffer appendBytes:buf length:len];
-    NSLog (@"appending %i bytes to incomingDataBuffer", len);
+    // NSLog (@"appending %i bytes to incomingDataBuffer", len);
 
   }
 
@@ -437,7 +437,7 @@ void writeStreamEventHandler(CFWriteStreamRef stream, CFStreamEventType eventTyp
 // Handle events from the write stream
 - (void)writeStreamHandleEvent:(CFStreamEventType)event {
   
-  NSLog (@"writeStreamHandleEvent = %i", event);
+  // NSLog (@"writeStreamHandleEvent = %i", event);
   // Stream successfully opened
   if ( event == kCFStreamEventOpenCompleted ) {
     writeStreamOpen = YES;
@@ -498,7 +498,7 @@ void writeStreamEventHandler(CFWriteStreamRef stream, CFStreamEventType eventTyp
   
   NSRange range = {0, writtenBytes};
   [outgoingDataBuffer replaceBytesInRange:range withBytes:NULL length:0];
-  NSLog (@"Wrote %i bytes to stream", writtenBytes);
+  // NSLog (@"Wrote %i bytes to stream", writtenBytes);
 }
 
 

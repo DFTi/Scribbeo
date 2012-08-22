@@ -792,7 +792,7 @@
     NSLog(@"setTheMoviePath sees theMovie at %@", theMovie);
     if (kBonjourMode) {
         NSString *thePath = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], theMovie];
-        NSLog(thePath);
+//        NSLog(thePath);
         self.moviePath = thePath;
     } else {
         NSArray *dirList = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);

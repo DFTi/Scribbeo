@@ -411,7 +411,7 @@ static int tryOne = 0;
     NSLog (@"Observe value change for HTTPserver: %@", HTTPserver);
     
     if ([[change objectForKey: NSKeyValueChangeKindKey] integerValue] !=  NSKeyValueChangeSetting) {
-        NSLog (@"Key value did not change: %i", [change objectForKey: NSKeyValueChangeKindKey]);
+//        NSLog (@"Key value did not change: %i", [change objectForKey: NSKeyValueChangeKindKey]);
         return;
     }
     
@@ -477,7 +477,7 @@ static int tryOne = 0;
     LiveTranscode = [defaults boolForKey: @"LiveTranscode"];
     if (!LiveTranscode) LiveTranscode = NO;
 
-    NSLog(@"Live Transcode: ", (LiveTranscode ? @"on" : @"off"));
+//    NSLog(@"Live Transcode: ", (LiveTranscode ? @"on" : @"off"));
     // Bonjour support
     
     BonjourMode = [defaults boolForKey: @"Bonjour"];
