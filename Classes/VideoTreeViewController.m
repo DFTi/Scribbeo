@@ -314,25 +314,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     uploadCount = 0;
     
     [stampLabel removeFromSuperview];  // Don't like the way IB places this
-   
-    
-   // Visualy debug views
-   /*  
-    for (UIView* aView in self.view.subviews)
-    {
-        aView.hidden = NO;
-        aView.layer.borderColor = [[UIColor redColor] CGColor];
-        aView.layer.borderWidth = 2;
-        
-        UILabel *name = [[UILabel alloc] initWithFrame:aView.bounds];
-        name.textColor = [UIColor redColor];
-        name.text = [NSString stringWithFormat:@"%@", aView];
-        
-        [aView addSubview:name];
-        
-    }
-  */ 
-    
     
 }
 
@@ -2145,21 +2126,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                                 return;
                             }
                             for (Note *aNote in noteArray) {
-                                /* the following snippet corrects timecode on notes that were made for clips that did not have the right timecode but now do.
-                                 
-                                NSLog(@"Clip has start timecode %@, in float: %f", timeCode, [self convertTimeToSecs:timeCode]);
-                                Float64 noteTime = [self convertTimeToSecs:aNote.timeStamp];
-                                Float64 clipTime = [self convertTimeToSecs:timeCode];
-                                Float64 theNewNoteTime = 0.0;
-                                NSLog(@"noteTime: %lf, startTimeCode: %lf", noteTime, clipTime);
-                                if (noteTime < clipTime) { // Then they probably didn't have the right timecode when they made the note... Let's just adjust it...
-                                    theNewNoteTime = noteTime + clipTime;
-                                    aNote.timeStamp = [self timeFormat:kCMTimeMakeWithSeconds (theNewNoteTime)];
-                                }
-                                 
-                                */
                                 [noteData addObject:aNote];
-                                //[self.filteredNoteData addObject:aNote];
                             }
                             [self noteStopActivity];
                             
@@ -2237,29 +2204,6 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
     [notes reloadData];
 }
-
-// CRUFT
-//// Parse FCP XML marker file
-//-(void) getXML: (NSString *) file
-//{
-//    NSLog (@"processing XML file %@", file);
-//    
-//    file = [file stringByReplacingOccurrencesOfString: @" " withString:@"%20"];
-//    
-//    if (!XMLURLreader)
-//		XMLURLreader = [[XMLURL alloc] init];
-//
-//    NSString *url;
-//    if (kBonjourMode) {
-//        url = [NSString stringWithFormat: @"/xml/%@", kHTTPserver, file];
-//    }
-//
-//    NSLog(@"Getting FCP XML marker file at: %@", url);
-//    // This is the guy that will parse the XML.  The XMLDone: method will get called when
-//    // the parsing has been completed
-//	
-//	[XMLURLreader parseXMLURL: url atEndDoSelector: @selector (XMLDone:) withObject: self];
-//}
 
 // Look at all the notes in the noteData array and just get mine to archive and upload
 // to the server or store locally
@@ -2789,31 +2733,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError*)error 
 {
-//	NSString *message = @"";
-//    
-//	// Notifies users about errors associated with the interface
-//    
-//	switch (result)
-//	{
-//		case MFMailComposeResultCancelled:
-//			// message = @"Email request canceled";
-//			break;
-//		case MFMailComposeResultSaved:
-//			message = @"Your email has been saved";
-//			break;
-//		case MFMailComposeResultSent:
-//			message = @"Your email was sent";
-//			break;
-//		case MFMailComposeResultFailed:
-//			message = @"Your email was not sent";
-//			break;
-//		default:
-//			message = @"Your email was not sent";
-//			break;
-//	}
-    
-    // display message to user here (note: we're not doing that!)
-    
+
 	[self dismissModalViewControllerAnimated:YES];
 }
 
@@ -4021,34 +3941,6 @@ static int saveRate;
         else
             NSLog (@"Failed to initiliaze the movie player!");
  
-//#if 0
-         // Lots of cool info about the video clip
-//         
-//        NSLog2 (@"playLayerView frame origin = (%g, %g), drawView frame origin = (%g, %g)",
-//               playerLayerView.frame.origin.x, playerLayerView.frame.origin.y,
-//               drawView.frame.origin.x, drawView.frame.origin.y);
-//        NSLog2 (@"playLayerView wid, ht = (%g, %g), drawView wid, ht = (%g, %g)",
-//               playerLayerView.frame.size.width, playerLayerView.frame.size.height,
-//               drawView.frame.size.width, drawView.frame.size.height);
-//        
-//        NSLog2 (@"playLayerView bounds origin = (%g, %g), drawView bounds origin = (%g, %g)",
-//               playerLayerView.bounds.origin.x, playerLayerView.bounds.origin.y,
-//               drawView.bounds.origin.x, drawView.bounds.origin.y);
-//        NSLog2 (@"playLayerView  bounds wid, ht = (%g, %g), drawView  bounds wid, ht = (%g, %g)",
-//               playerLayerView.bounds.size.width, playerLayerView.bounds.size.height,
-//               drawView.bounds.size.width, drawView.bounds.size.height);
-//        NSLog2 (@"common metadata formats = %@", player.currentItem.asset.availableMetadataFormats);
-//        NSLog2 (@"common metadata = %@", player.currentItem.asset.commonMetadata);
-         
-//         for (NSString *meta in player.currentItem.asset.availableMetadataFormats) 
-//             NSLog2 (@"*** %@", meta, [player.currentItem.asset metadataForFormat: meta]);
-//         
-//         NSLog2 (@"loaded time ranges = %@", player.currentItem.loadedTimeRanges);  
-//         NSLog2 (@"reverse playback end time = %@", [self timeFormat: player.currentItem.reversePlaybackEndTime]); 
-//         NSLog2 (@"forward playback end time = %@", [self timeFormat: player.currentItem.forwardPlaybackEndTime]);
-//         NSLog2 (@"timed metadata = %@", player.currentItem.timedMetadata); 
-//#endif
-
          NSLog (@"playbackLikelyToKeepUp = %i", player.currentItem.isPlaybackLikelyToKeepUp);
 
          NSLog(@"loadMovie calling directlySetStartTimecode for timecode: %@", [self timeCode]);
@@ -4655,82 +4547,19 @@ static int saveRate;
         cell.imageView.layer.masksToBounds = YES;
                
     }
-
-    // Fill in the cell with data from the note stored in noteData
-    
-    // The marked up frame thumbnail
- 
-#if 0
-    UIImage *thumbnail = [UIImage imageWithData: theNote.thumb];
-    float width = 200;
-    float ht = (width / thumbnail.size.width) * thumbnail.size.height;
-    
-    cell.imageView.image = [[UIImage imageWithData: theNote.thumb] imageScaledToSize: CGSizeMake(width, ht)];
-#endif
     
     UIImage *thumbnail = [UIImage imageWithData: theNote.thumb];
     cell.imageView.image = thumbnail;
     
-//  [self dumpRect: cell.imageView.frame title: @"cell.imageView.frame"];
-//  [self dumpRect: cell.imageView.bounds title: @"cell.imageView.bounds"];
-//   NSLog (@"cell imageView image size = (%g, %g)", cell.imageView.image.size.width, 
-//                    cell.imageView.image.size.height);
- 
-    // The typed note 
-   
-   /* cell.detailTextLabel.text = [theNote.text stringByReplacingOccurrencesOfString: @"<CHAPTER>" withString: @""];
-    
-    if (! theNote.imageName)  { // means it's a video 
-        // The time in either timecode or frame number format
-        
-        NSString *timeFormat = (timecodeFormat) ? theNote.timeStamp :
-                [self timeFormat: kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp] - startTimecode) ];
-        
-        // The time, the date of the note, and the initials of the user that made the note
-        
-        cell.textLabel.text = [NSString stringWithFormat: @"%@\n%@ %@", timeFormat, 
-                [theNote.date length] > 3 ? 
-                [theNote.date substringToIndex: [theNote.date length] - 3] : @"", theNote.initials];
-    }
-    else
-        cell.textLabel.text = [NSString stringWithFormat: @"%@ %@", [[theNote.imageName lastPathComponent] stringByDeletingPathExtension], theNote.initials];
-    
-    // My notes look different in the table than everyone else's
-    
-    if ([theNote.initials isEqualToString: initials] ) {
-        cell.detailTextLabel.textColor = [UIColor blackColor];  
-        cell.textLabel.textColor = [UIColor redColor];
-        cell.textLabel.backgroundColor = MYWHITE;
-        cell.detailTextLabel.backgroundColor = MYWHITE;
-    }
-    else {
-        cell.detailTextLabel.textColor = [UIColor blackColor]; 
-        cell.textLabel.textColor = [UIColor redColor];
-        cell.textLabel.backgroundColor = MYGRAY;
-        cell.detailTextLabel.backgroundColor = MYGRAY;
-    }*/
-      
-    
-//    UILabel *timeLabel = [[UILabel alloc] init];
-//    timeLabel.frame = CGRectMake(0, 110, tableView.frame.size.width, 20);
     if ([theNote isStill])
-        cell.timeLabel.text = @""; // Still show the dark bar for consistency, but don't print timecode for a still.
+        cell.timeLabel.text = @"";
     else
         cell.timeLabel.text = theNote.timeStamp;
-        //theTime.text;
-                    //theNote.timeStamp;
-        // [self timeFormat:kCMTimeMakeWithSeconds ([self convertTimeToSecs: theNote.timeStamp])];
+    
     cell.dateLabel.text = theNote.date;
     cell.initialsLabel.text = theNote.initials;
     cell.commentLabel.text = theNote.text;   
-//    timeLabel.textColor = [UIColor whiteColor];
-//     timeLabel.shadowColor = [UIColor blackColor];
-//    timeLabel.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.5];
-//    timeLabel.textAlignment = UITextAlignmentCenter;
-//    
-//    [cell addSubview:timeLabel];
-    
-    
+
     return cell;
 }
 
