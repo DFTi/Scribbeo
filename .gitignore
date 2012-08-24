@@ -1,5 +1,6 @@
 .DS_Store
 build/*
+Frank/frankefied_build/*
 VideoTree.xcodeproj/xcuserdata/*
 VideoTree.xcodeproj/project.xcworkspace/*
 Scribbeo.xcodeproj/xcuserdata/*
