@@ -15,7 +15,7 @@
 			</array>
 			<key>CFBundleTypeIconFiles</key>
 			<array>
-				<string>videotree_icon.png</string>
+				<string>scribbeo-icon.png</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>Video File</string>
@@ -38,7 +38,7 @@
 			</array>
 			<key>CFBundleTypeIconFiles</key>
 			<array>
-				<string>videotree_icon.png</string>
+				<string>scribbeo-icon.png</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>Image File</string>

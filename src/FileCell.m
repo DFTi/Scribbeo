@@ -5,6 +5,9 @@
 //  Created by keyvan on 11/18/11.
 //  Copyright (c) 2011 DFT. All rights reserved.
 //
+// This poorly named class controls the visual respresentation of the elements
+// within a note, such as the timecode label, the date label, the initials, etc
+// within the notes table view
 
 #import "FileCell.h"
 #import <QuartzCore/QuartzCore.h>
