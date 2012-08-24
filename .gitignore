@@ -1,4 +1,5 @@
 .DS_Store
+build/*
 VideoTree.xcodeproj/xcuserdata/*
 VideoTree.xcodeproj/project.xcworkspace/*
 Scribbeo.xcodeproj/xcuserdata/*
