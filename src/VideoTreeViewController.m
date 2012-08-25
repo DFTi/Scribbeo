@@ -3358,18 +3358,18 @@ static int saveRate;
     if (fps < 0.001) {
         NSArray *tracks = [asset tracks];
         
-        // NSLog2 (@"[tracks count] == %i, %@", [tracks count], tracks);
+        NSLog(@"[tracks count] == %i, %@", [tracks count], tracks);
 
         if ([tracks count] > 0) {
-            NSArray *tracks = [asset tracksWithMediaType: AVMediaTypeVideo];
+            NSArray *videoTracks = [asset tracksWithMediaType: AVMediaTypeVideo];
             
-            if ([tracks count] > 0) {
-                fps = [[tracks objectAtIndex: 0] nominalFrameRate];
-
+            if ([videoTracks count] > 0) { // False in simulator, true on device... Why?!
+                fps = [[videoTracks objectAtIndex: 0] nominalFrameRate];
+                
                 if (fps > 0.0) 
                     NSLog (@"nominal frame rate fps = %f", fps);
             }
-         }
+        }
         
         //
         // We've had to kludge the timecode for nonlocal files since
@@ -3837,9 +3837,21 @@ static int saveRate;
     NSLog(@"We will load the AVURLAsset with this movieURL: %@", movieURL);
     NSMutableDictionary *optionsDict = [NSMutableDictionary dictionaryWithObjectsAndKeys: 
             [NSNumber numberWithBool: YES], AVURLAssetPreferPreciseDurationAndTimingKey, nil];
+
+    /// ----------------------------------------------------------------
+    // We get an AVAsset back here, let's understand this object better
+    /// ----------------------------------------------------------------
     self.theAsset = [AVURLAsset URLAssetWithURL: movieURL options: optionsDict];
-    NSString *tracksKey = @"tracks";
     
+    /*
+     Judging the next call to asset, loadValuesAsynchronouslyForKeys:completionHandler:,
+     and the fact that in updateTimeControl, the tracks differ (it is empty in the simulator)
+     we can try it here in a minimal manner to see why/where we have data loss on the sim.
+    */
+    
+    // --------------------------- continues --------------------------
+    NSString *tracksKey = @"tracks";
+
     // We need some keys; we get them asynchronously
     
     [theAsset loadValuesAsynchronouslyForKeys:[NSArray arrayWithObject:tracksKey] completionHandler:
