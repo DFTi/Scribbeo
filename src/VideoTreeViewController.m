@@ -3676,8 +3676,6 @@ static int saveRate;
     if (!player)
         return;
     
-    if (theNewNote.text != @"") theNewNote.text = @"";
-    
     [self stopObservingTimeChanges];
 
     [player removeObserver: self forKeyPath:@"rate"];
@@ -3776,7 +3774,7 @@ static int saveRate;
 
 - (void)loadMovie: (id) theMovie
 {
-    
+    theNewNote.text = @"";
     
     editButton.title = @"Edit";
 

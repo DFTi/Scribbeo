@@ -124,6 +124,7 @@
 		7AA783B215E7BEB400ED18DB /* IASKSpecifierValuesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AA7839D15E7BEB400ED18DB /* IASKSpecifierValuesView.xib */; };
 		7AA783B915E7BFCE00ED18DB /* Scribbeo.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 7AA783B815E7BFCE00ED18DB /* Scribbeo.entitlements */; };
 		7AA783BB15E7BFEB00ED18DB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AA783BA15E7BFEB00ED18DB /* main.m */; };
+		7AEB2DDF15E921EF0044CF9F /* quartzregulardb.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7AEB2DDE15E921EF0044CF9F /* quartzregulardb.ttf */; };
 		BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = BCCDB3B61468C8FC008D41B2 /* JSONKit.m */; };
 /* End PBXBuildFile section */
 
@@ -284,6 +285,7 @@
 		7AA7839D15E7BEB400ED18DB /* IASKSpecifierValuesView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKSpecifierValuesView.xib; sourceTree = "<group>"; };
 		7AA783B815E7BFCE00ED18DB /* Scribbeo.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Scribbeo.entitlements; sourceTree = "<group>"; };
 		7AA783BA15E7BFEB00ED18DB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		7AEB2DDE15E921EF0044CF9F /* quartzregulardb.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = quartzregulardb.ttf; path = fonts/quartzregulardb.ttf; sourceTree = "<group>"; };
 		BCCDB3B51468C8FC008D41B2 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
 		BCCDB3B61468C8FC008D41B2 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -426,6 +428,7 @@
 		02A306CC13C6886100E7340D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7AEB2DDE15E921EF0044CF9F /* quartzregulardb.ttf */,
 				7A1606F515E7B7780039CCF2 /* helpScreeniPhone.png */,
 				7A1606F715E7B7780039CCF2 /* home.png */,
 				7A1606F815E7B7780039CCF2 /* cancelicon.png */,
@@ -717,6 +720,7 @@
 				7AA783B115E7BEB400ED18DB /* IASKPSToggleSwitchSpecifierViewCell.xib in Resources */,
 				7AA783B215E7BEB400ED18DB /* IASKSpecifierValuesView.xib in Resources */,
 				7AA783B915E7BFCE00ED18DB /* Scribbeo.entitlements in Resources */,
+				7AEB2DDF15E921EF0044CF9F /* quartzregulardb.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
