@@ -98,6 +98,7 @@
 		7A16076A15E7B7780039CCF2 /* scribbeo-icon~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 7A16072E15E7B7780039CCF2 /* scribbeo-icon~ipad.png */; };
 		7A16076B15E7B7780039CCF2 /* scribbeo.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7A16072F15E7B7780039CCF2 /* scribbeo.icns */; };
 		7A16076C15E7B7780039CCF2 /* spot.png in Resources */ = {isa = PBXBuildFile; fileRef = 7A16073015E7B7780039CCF2 /* spot.png */; };
+		7A188E5515E9440B002ED2F5 /* MediaAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A188E5415E9440B002ED2F5 /* MediaAsset.m */; };
 		7A6AA8A2148D6BD800F2B351 /* SVHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A6AA8A1148D6BD800F2B351 /* SVHTTPRequest.m */; };
 		7A89B2CC147740D300F172A3 /* FileCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A89B2CB147740D300F172A3 /* FileCell.m */; };
 		7AA7837315E7BE7800ED18DB /* SBServerLoginVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AA7837215E7BE7800ED18DB /* SBServerLoginVC.xib */; };
@@ -242,6 +243,8 @@
 		7A16072E15E7B7780039CCF2 /* scribbeo-icon~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "scribbeo-icon~ipad.png"; path = "graphics/scribbeo-icon~ipad.png"; sourceTree = "<group>"; };
 		7A16072F15E7B7780039CCF2 /* scribbeo.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = scribbeo.icns; path = graphics/scribbeo.icns; sourceTree = "<group>"; };
 		7A16073015E7B7780039CCF2 /* spot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spot.png; path = graphics/spot.png; sourceTree = "<group>"; };
+		7A188E5315E9440B002ED2F5 /* MediaAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MediaAsset.h; path = models/MediaAsset.h; sourceTree = "<group>"; };
+		7A188E5415E9440B002ED2F5 /* MediaAsset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MediaAsset.m; path = models/MediaAsset.m; sourceTree = "<group>"; };
 		7A6AA8A0148D6BD800F2B351 /* SVHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVHTTPRequest.h; sourceTree = "<group>"; };
 		7A6AA8A1148D6BD800F2B351 /* SVHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVHTTPRequest.m; sourceTree = "<group>"; };
 		7A89B2CA147740D300F172A3 /* FileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCell.h; sourceTree = "<group>"; };
@@ -353,46 +356,9 @@
 		02A305EF13C686D300E7340D /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				02A305F013C686D300E7340D /* base64.c */,
-				02A306CA13C6882300E7340D /* Bonjour */,
-				4B35E867152E236000B0BDBB /* CoreMedia_Timecodes.h */,
-				4B35E868152E236000B0BDBB /* CoreMedia_Timecodes.m */,
-				02A305F613C686D300E7340D /* DetailViewController.h */,
-				02A305F713C686D300E7340D /* DetailViewController.m */,
-				02A305F813C686D300E7340D /* DrawView.h */,
-				02A305F913C686D300E7340D /* DrawView.m */,
-				7A89B2CA147740D300F172A3 /* FileCell.h */,
-				7A89B2CB147740D300F172A3 /* FileCell.m */,
-				02A305FE13C686D300E7340D /* HelpScreenController.h */,
-				02A305FF13C686D300E7340D /* HelpScreenController.m */,
-				7AA7837515E7BEB400ED18DB /* InAppSettingsKit */,
-				BCE5C486145B617A003A0238 /* JSONKit */,
-				7AA783BA15E7BFEB00ED18DB /* main.m */,
-				02A3060213C686D300E7340D /* myDefs.h */,
-				02A3060313C686D300E7340D /* myDefs.m */,
-				02A3060413C686D300E7340D /* MyPlayerLayerView.h */,
-				02A3060513C686D300E7340D /* MyPlayerLayerView.m */,
-				02A3060613C686D300E7340D /* MyUIWindow.h */,
-				02A3060713C686D300E7340D /* MyUIWindow.m */,
-				02A3060813C686D300E7340D /* Note.h */,
-				02A3060913C686D300E7340D /* Note.m */,
-				4B3F51591549BB0500B7B09A /* NSURLConnection+BlockPatch.h */,
-				4B3F515A1549BB0500B7B09A /* NSURLConnection+BlockPatch.m */,
-				4B3F51531549BAFE00B7B09A /* SBServerLoginVC.h */,
-				4B3F51541549BAFE00B7B09A /* SBServerLoginVC.m */,
-				7A6AA8A4148D6BE000F2B351 /* SVHTTPRequest */,
-				0224AAE614181DAF005AFBAB /* UIImageView+Scaling.h */,
-				0224AAE714181DB0005AFBAB /* UIImageView+Scaling.m */,
-				02A3060E13C686D300E7340D /* VideoTreeAlert.h */,
-				02A3060F13C686D300E7340D /* VideoTreeAlert.m */,
-				02A3061013C686D300E7340D /* VideoTreeAppDelegate.h */,
-				02A3061113C686D300E7340D /* VideoTreeAppDelegate.m */,
-				02A3061213C686D300E7340D /* VideoTreeViewController.h */,
-				02A3061313C686D300E7340D /* VideoTreeViewController.m */,
-				02A3061513C686D300E7340D /* VoiceMemo.h */,
-				02A3061613C686D300E7340D /* VoiceMemo.m */,
-				02A3061713C686D300E7340D /* XMLURL.h */,
-				02A3061813C686D300E7340D /* XMLURL.m */,
+				7A188E5B15E9474C002ED2F5 /* Constants */,
+				7A188E5115E9439C002ED2F5 /* Engine */,
+				7A188E5615E94444002ED2F5 /* App */,
 			);
 			name = Sources;
 			path = src;
@@ -480,6 +446,93 @@
 				7A16073015E7B7780039CCF2 /* spot.png */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		7A188E5115E9439C002ED2F5 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				7A6AA8A4148D6BE000F2B351 /* SVHTTPRequest */,
+				02A305F013C686D300E7340D /* base64.c */,
+				02A306CA13C6882300E7340D /* Bonjour */,
+				4B35E867152E236000B0BDBB /* CoreMedia_Timecodes.h */,
+				4B35E868152E236000B0BDBB /* CoreMedia_Timecodes.m */,
+				02A305F613C686D300E7340D /* DetailViewController.h */,
+				02A305F713C686D300E7340D /* DetailViewController.m */,
+				02A305F813C686D300E7340D /* DrawView.h */,
+				02A305F913C686D300E7340D /* DrawView.m */,
+				7A89B2CA147740D300F172A3 /* FileCell.h */,
+				7A89B2CB147740D300F172A3 /* FileCell.m */,
+				02A305FE13C686D300E7340D /* HelpScreenController.h */,
+				02A305FF13C686D300E7340D /* HelpScreenController.m */,
+				7AA7837515E7BEB400ED18DB /* InAppSettingsKit */,
+				BCE5C486145B617A003A0238 /* JSONKit */,
+				7AA783BA15E7BFEB00ED18DB /* main.m */,
+				02A3060413C686D300E7340D /* MyPlayerLayerView.h */,
+				02A3060513C686D300E7340D /* MyPlayerLayerView.m */,
+				02A3060613C686D300E7340D /* MyUIWindow.h */,
+				02A3060713C686D300E7340D /* MyUIWindow.m */,
+				02A3060813C686D300E7340D /* Note.h */,
+				02A3060913C686D300E7340D /* Note.m */,
+				4B3F51591549BB0500B7B09A /* NSURLConnection+BlockPatch.h */,
+				4B3F515A1549BB0500B7B09A /* NSURLConnection+BlockPatch.m */,
+				0224AAE614181DAF005AFBAB /* UIImageView+Scaling.h */,
+				0224AAE714181DB0005AFBAB /* UIImageView+Scaling.m */,
+				02A3060E13C686D300E7340D /* VideoTreeAlert.h */,
+				02A3060F13C686D300E7340D /* VideoTreeAlert.m */,
+				02A3061513C686D300E7340D /* VoiceMemo.h */,
+				02A3061613C686D300E7340D /* VoiceMemo.m */,
+				02A3061713C686D300E7340D /* XMLURL.h */,
+				02A3061813C686D300E7340D /* XMLURL.m */,
+			);
+			name = Engine;
+			sourceTree = "<group>";
+		};
+		7A188E5615E94444002ED2F5 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				7A188E5315E9440B002ED2F5 /* MediaAsset.h */,
+				7A188E5415E9440B002ED2F5 /* MediaAsset.m */,
+				7A188E5715E94476002ED2F5 /* Login */,
+				7A188E5815E944BB002ED2F5 /* AppDelegate */,
+				7A188E5915E944C8002ED2F5 /* ScribbeoController */,
+			);
+			name = App;
+			sourceTree = "<group>";
+		};
+		7A188E5715E94476002ED2F5 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				4B3F51531549BAFE00B7B09A /* SBServerLoginVC.h */,
+				4B3F51541549BAFE00B7B09A /* SBServerLoginVC.m */,
+			);
+			name = Login;
+			sourceTree = "<group>";
+		};
+		7A188E5815E944BB002ED2F5 /* AppDelegate */ = {
+			isa = PBXGroup;
+			children = (
+				02A3061013C686D300E7340D /* VideoTreeAppDelegate.h */,
+				02A3061113C686D300E7340D /* VideoTreeAppDelegate.m */,
+			);
+			name = AppDelegate;
+			sourceTree = "<group>";
+		};
+		7A188E5915E944C8002ED2F5 /* ScribbeoController */ = {
+			isa = PBXGroup;
+			children = (
+				02A3061213C686D300E7340D /* VideoTreeViewController.h */,
+				02A3061313C686D300E7340D /* VideoTreeViewController.m */,
+			);
+			name = ScribbeoController;
+			sourceTree = "<group>";
+		};
+		7A188E5B15E9474C002ED2F5 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				02A3060213C686D300E7340D /* myDefs.h */,
+				02A3060313C686D300E7340D /* myDefs.m */,
+			);
+			name = Constants;
 			sourceTree = "<group>";
 		};
 		7A6AA8A4148D6BE000F2B351 /* SVHTTPRequest */ = {
@@ -769,6 +822,7 @@
 				7AA783AB15E7BEB400ED18DB /* IASKSwitch.m in Sources */,
 				7AA783AC15E7BEB400ED18DB /* IASKTextField.m in Sources */,
 				7AA783BB15E7BFEB00ED18DB /* main.m in Sources */,
+				7A188E5515E9440B002ED2F5 /* MediaAsset.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

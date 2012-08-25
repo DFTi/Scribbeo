@@ -315,6 +315,12 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     
     [stampLabel removeFromSuperview];  // Don't like the way IB places this
     
+    
+    // OK view did load, that has good connotes.
+//     view will appear probably happens before this one,
+//    [self loadMovie:@"https://app.scribbeo.com:44301/asset/TestFiles/chapter_markers.mov"];
+// SHUNT
+    // damn that didnt work either...
 }
 
 - (void) viewDidAppear: (BOOL) animated {
@@ -345,6 +351,11 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
                                                object:nil];
     
 	[self startObservingTimeChanges];
+    
+    
+    /// SHUNT
+//    [self loadMovie:@"https://app.scribbeo.com:44301/asset/TestFiles/chapter_markers.mov"];
+    // OK apparently that is NOT how you start a movie ... let's move it then
 }
 
 - (void)viewDidDisappear:(BOOL)animated

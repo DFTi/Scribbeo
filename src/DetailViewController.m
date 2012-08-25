@@ -390,6 +390,14 @@
 
     [self.tableView reloadData]; // reloads file listing
     [self finishLoad]; // reloads file listing... again...
+
+    // OK we are here now, where we get MediaAsset URL's apparently,
+    // this is a nice point entry point -- ahh yeah filesFromJSONFileListing...
+    [[kAppDel viewController] loadMovie:@"https://app.scribbeo.com:44301/asset/TestFiles/chapter_markers.mov"];
+    // SHUNT
+    // Yessss shunt worked [On device]! we have an entry point of a ready player in the internets.
+    // The problem is, again, that we won't get here in the iOS sim...
+    // Clearly fails on the simulator because we havent fixed the AVAsset problem.
 }
 
 // This method will fill the noteURLs array. Called when you select a clip.
