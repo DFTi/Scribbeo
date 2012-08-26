@@ -3867,19 +3867,31 @@ static int saveRate;
     
     [theAsset loadValuesAsynchronouslyForKeys:[NSArray arrayWithObject:tracksKey] completionHandler:
      ^{ 
-        //NSLog2 (@"completion handler");
-        NSError *error = nil; 
+        NSError *error = nil;
 
         AVKeyValueStatus status = [theAsset statusOfValueForKey:tracksKey error:&error];
        
-        if (status != AVKeyValueStatusLoaded) 
+        if (status != AVKeyValueStatusLoaded)
+            /* Found another symptom here.
+                Consider what `status` could possibly be:
+                enum {
+                    (0)    AVKeyValueStatusUnknown,
+                    (1)    AVKeyValueStatusLoading,
+                    (2)    AVKeyValueStatusLoaded,
+                    (3)    AVKeyValueStatusFailed,
+                    (4)    AVKeyValueStatusCancelled
+                };
+                On the device, status returns 2, AVKeyValueStatusLoaded
+                On the sim, status returns 3, AVKeyValueStatusFailed
+                Why?
+            */
+            
             self.playerItem = [AVPlayerItem playerItemWithURL: movieURL]; 
         else 
             self.playerItem = [AVPlayerItem playerItemWithAsset: theAsset];
          
          if (self.player) {
              [self.player pause];
-             //[self.player release];
          }
 
         self.player = [AVPlayer playerWithPlayerItem:playerItem];

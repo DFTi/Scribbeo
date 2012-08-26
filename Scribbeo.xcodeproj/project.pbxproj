@@ -356,9 +356,9 @@
 		02A305EF13C686D300E7340D /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				7A188E5615E94444002ED2F5 /* App */,
 				7A188E5B15E9474C002ED2F5 /* Constants */,
 				7A188E5115E9439C002ED2F5 /* Engine */,
-				7A188E5615E94444002ED2F5 /* App */,
 			);
 			name = Sources;
 			path = src;
