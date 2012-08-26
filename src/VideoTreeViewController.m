@@ -3852,6 +3852,7 @@ static int saveRate;
     /// ----------------------------------------------------------------
     // We get an AVAsset back here, let's understand this object better
     /// ----------------------------------------------------------------
+    self.movieURL = [NSURL URLWithString:@"http://192.168.1.6:3000/videos/chapter_markers.mov"];
     self.theAsset = [AVURLAsset URLAssetWithURL: movieURL options: optionsDict];
     
     /*
@@ -3862,7 +3863,7 @@ static int saveRate;
     
     // --------------------------- continues --------------------------
     NSString *tracksKey = @"tracks";
-
+    
     // We need some keys; we get them asynchronously
     
     [theAsset loadValuesAsynchronouslyForKeys:[NSArray arrayWithObject:tracksKey] completionHandler:

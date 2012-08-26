@@ -230,12 +230,19 @@ typedef void (^CanceledBlock)(NSString*);
         {
             
             #ifdef DEBUG
+            // seems like we're reading too much here, judging by the junk output here, surprised we're not crashing
+            // refactoring as such:
             
-            NSLog(@"%s", (char*)[data bytes]);
+            NSString *body = [[NSString alloc] initWithBytes:[data bytes] length:[data length] encoding: NSUTF8StringEncoding];
             
+            NSLog(@"%@", body);
+            
+            // And here's Zach's shortcut
+            // NSLog(@"%s", (char*)[data bytes]);
+
             #endif
             
-            __block SBServerLoginVC *blockSelf = self;
+            __block SBServerLoginVC *blockSelf = self; // what is all this nonsense
             
             dispatch_async(dispatch_get_main_queue(), ^(){
 
