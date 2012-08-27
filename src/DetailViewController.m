@@ -239,7 +239,6 @@
                         NSLog(@"Cancelled");
                     }];
                     
-                    
                     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
                     
                     blockSelf.serverLogin.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
@@ -308,8 +307,7 @@
     }
     NSLog(@"from with JSON File Listing... AssetURLs has %d items", [assetURLs count] );
 
-    [self.tableView reloadData]; // reloads file listing
-    [self finishLoad]; // reloads file listing... again...
+    [self finishLoad];
 
     // OK we are here now, where we get MediaAsset URL's apparently,    
     //[[kAppDel viewController] loadMovie:@"http://brevity.local:3000/videos/chapter_markers.mov"];

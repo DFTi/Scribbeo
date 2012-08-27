@@ -50,8 +50,6 @@
     
     // If it is animating, it is likely we are coming back from a disconnect.
     if ( [[[kAppDel rootTvc] activityIndicator] isAnimating]) {
-        HTTPserver = nil; // Clear our http server, the ip and port may change.
-        [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
         if (! [bonjour connect])  // ~connect updates the HTTPserver address
             NSLog (@"Couldn't reconnect to Scribbeo server");
     }
@@ -98,7 +96,7 @@
         return;
     
     [self removeObserver: self forKeyPath: @"HTTPserver"];
-        
+
     [kAppDel makeList];
 }
 
@@ -141,7 +139,6 @@
             }
         } else {
             [self setHTTPserver:nil];
-            // maybe put an observer now? :/
             NSLog(@"No manual override, will now discover bonjour servers.");
             NSLog(@"HTTP server: %@", HTTPserver);
             [self doBonjour];
