@@ -143,29 +143,6 @@
         [assetURLs removeAllObjects];
         [timeCodes removeAllObjects];
     }
-    
-    if (!kBonjourMode) { // local mode
-        self.title = @""; // No title needed in local mode
-        UIBarButtonItem *cRollButton = 
-        [[[UIBarButtonItem alloc] initWithImage: 
-                    [UIImage imageNamed: @"cameraRoll.png"]
-                        style:  UIBarButtonItemStyleBordered target: self 
-                        action: @selector(pickClip)] autorelease]; 
-        self.navigationItem.leftBarButtonItem = cRollButton;
-    } else { // remote mode
-        if (currentPath) {
-            NSString *theFolder = [currentPath lastPathComponent];
-            if ([theFolder isEqualToString:@"list"])
-                self.title = @"Files";
-            else
-                self.title = [theFolder stringByReplacingOccurrencesOfString:@"%20" withString:@" "];
-        }
-        else
-            self.title = @"Files";
-
-        self.navigationItem.leftBarButtonItem = nil;
-        self.navigationItem.rightBarButtonItem = nil;
-    }
 
     UIBarButtonItem *refresh = [[[UIBarButtonItem alloc] initWithImage:
                                   [UIImage imageNamed: @"Refresh.png"]
@@ -173,7 +150,7 @@
     self.navigationItem.rightBarButtonItem = refresh;
     
       
-    
+    // iPhone back bar
     if (([self.title isEqualToString:@"Files"] || [self.title isEqualToString:@""]) && iPHONE) {
         UIBarButtonItem *backBar = [[UIBarButtonItem alloc] initWithTitle:@"Close" style:UIBarButtonItemStylePlain target:self action:@selector(closeOut:)];
         
@@ -188,18 +165,8 @@
     
     [self.tableView reloadData];        // Refresh the table
     
-    // Get the current settings
-    
-    // [kAppDel makeSettings]; No need... we do this at launch always.
-    
     // If running in local mode, populate the clip table
     // with local video files
-    
-    if (!kBonjourMode) {
-        NSLog(@"makeList knows we're not in bonjour mode... calling iTunesLoad to serve local files");
-        [self iTunesLoad];
-        return;
-    }
     
     // If this is the first time populating the table...
     
@@ -211,13 +178,45 @@
     
     [self showActivity];
     
-   
-    if (kBonjourMode && kHTTPserver) {
+    if (kBonjourMode && (!kHTTPserver)) { // remote mode false start
+        NSLog(@"In bonjour mode, but the http server has not been set yet.");
+        [[[kAppDel mediaSource] serverBrowser] stop];
+        [[[kAppDel mediaSource] serverBrowser] start];
+        return;
+    } else if (!kBonjourMode) { // local mode
+        self.title = @""; // No title needed in local mode
+        UIBarButtonItem *cRollButton = 
+        [[[UIBarButtonItem alloc] initWithImage: 
+                    [UIImage imageNamed: @"cameraRoll.png"]
+                        style:  UIBarButtonItemStyleBordered target: self 
+                        action: @selector(pickClip)] autorelease]; 
+        self.navigationItem.leftBarButtonItem = cRollButton;
+        NSLog(@"makeList knows we're not in bonjour mode... calling iTunesLoad to serve local files");
+        [self iTunesLoad];
+        return;
+    } else if (kBonjourMode && kHTTPserver) { // remote mode ready
+
+        /* Now, the question is "What kind of server are we talking to? Python or CAPS?"
+            Regardless of which one it is, we know we are supposed to get assets back,
+            so all this shit needs to go into MediaSource and the shit be retrieved with:
+                mediaAsset.assets
+            It may start getting more complicated after this.
+        */ 
+
+        if (currentPath) {
+            NSString *theFolder = [currentPath lastPathComponent];
+            if ([theFolder isEqualToString:@"list"])
+                self.title = @"Files";
+            else
+                self.title = [theFolder stringByReplacingOccurrencesOfString:@"%20" withString:@" "];
+        } else self.title = @"Files";
+        self.navigationItem.leftBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = nil;
         // Send a list request to our HTTPServer
         NSString *urlstr = [NSString stringWithFormat:@"%@%@", [[kAppDel mediaSource] HTTPserver], currentPath];
         NSLog(@"Making list for BonjourMode. Querying: %@", urlstr);
         NSURL *url = [NSURL URLWithString:urlstr];
-        //NSError* error = nil;
+
         __block NSString *list = nil;//[NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:&error];
         
         NSURLRequest* request = [NSURLRequest requestWithURL:url];
@@ -231,25 +230,13 @@
         [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse* response, NSData* data, NSError* error){
             if (error)
             {
-                
                 if (error.code == -1012)
                 {
                     blockSelf.serverLogin = [SBServerLoginVC serverLoginVCAccepted:^{
                         [self makeList];//Retry
-                        
-                        // UI needs to be on the main thread.
-//                        dispatch_async(dispatch_get_main_queue(), ^{
-//                            [vc dismissModalViewControllerAnimated:YES];
-//                        });
-                        //blockSelf.serverLogin = nil;
                     } 
                     canceled:^(NSString* reason){
-                        
-                        // UI needs to be on the main thread.
-//                        dispatch_async(dispatch_get_main_queue(), ^{
-//                            [vc dismissModalViewControllerAnimated:YES];
-//                        });
-                        //blockSelf.serverLogin = nil;
+                        NSLog(@"Cancelled")
                     }];
                     
                     
@@ -258,71 +245,21 @@
                     blockSelf.serverLogin.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
                     blockSelf.serverLogin.serverPortInput.text = [defaults stringForKey:@"ServerPort"];
                     blockSelf.serverLogin.usernameInput.text = [defaults stringForKey:@"Username"];
-                    blockSelf.serverLogin.passwordInput.text = [defaults stringForKey:@"Password"];
-
-                    // jon: don't show it to me anymore
-                    // UI needs to be on the main thread.
-//                    dispatch_async(dispatch_get_main_queue(), ^{
-//                        [vc presentModalViewController:blockSelf.serverLogin animated:YES];
-//                    });
-                    
-                    // JUST ACCEPT
-                    
+                    blockSelf.serverLogin.passwordInput.text = [defaults stringForKey:@"Password"];                    
                     [blockSelf.serverLogin performSelector:@selector(serverLoginAttempt:)];
-
                 }
-            }
-            
-            else {
-                
-                // Resync main thread with new data
+            } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    
                     list = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                     NSLog(@"Got data... Filling the file list");
                     [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
                     [self stopActivity];
                     NSDictionary *fileDict = [list objectFromJSONString];
-                    // Now we need to populate the files array using our nice JSON list
                     [self filesFromJSONFileListing:fileDict];
-                    
                 });
             }
         }];
-        
-        
-        /*if (!list || (error && error.code == -1012)) 
-        {
-            NSLog(@"Could not get data from the URL: %@", error.localizedDescription);
-            
-            serverLogin = [SBServerLoginVC serverLoginVCAccepted:^{
-                [self makeList];//Retry
-                
-                [blockSelf dismissModalViewControllerAnimated:YES];
-                //is this legal?
-                //self.serverLogin = nil;
-            } 
-            canceled:^(NSString* reason){
-                [blockSelf dismissModalViewControllerAnimated:YES];
-                //is this legal?
-                //self.serverLogin = nil;
-            }];
-            
-            [self presentModalViewController:serverLogin animated:YES];
-            
-            return;
-        }*/
-       // NSLog(@"Got data... Filling the file list");
-       // [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
-       // NSDictionary *fileDict = [list objectFromJSONString];
-        // Now we need to populate the files array using our nice JSON list
-       // [self filesFromJSONFileListing:fileDict];       
-    } else if (kBonjourMode && (!kHTTPserver)) {
-        NSLog(@"In bonjour mode, but the http server has not been set yet.");
-        [[[kAppDel mediaSource] serverBrowser] stop];
-        [[[kAppDel mediaSource] serverBrowser] start];
     }
-    
 }
 
 - (void)closeOut:(id)sender{
