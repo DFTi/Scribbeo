@@ -99,6 +99,7 @@
 		7A16076B15E7B7780039CCF2 /* scribbeo.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7A16072F15E7B7780039CCF2 /* scribbeo.icns */; };
 		7A16076C15E7B7780039CCF2 /* spot.png in Resources */ = {isa = PBXBuildFile; fileRef = 7A16073015E7B7780039CCF2 /* spot.png */; };
 		7A188E5515E9440B002ED2F5 /* MediaAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A188E5415E9440B002ED2F5 /* MediaAsset.m */; };
+		7A38FFC215EB8DBC00A652EF /* MediaSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A38FFC115EB8DBC00A652EF /* MediaSource.m */; };
 		7A6AA8A2148D6BD800F2B351 /* SVHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A6AA8A1148D6BD800F2B351 /* SVHTTPRequest.m */; };
 		7A89B2CC147740D300F172A3 /* FileCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A89B2CB147740D300F172A3 /* FileCell.m */; };
 		7AA7837315E7BE7800ED18DB /* SBServerLoginVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AA7837215E7BE7800ED18DB /* SBServerLoginVC.xib */; };
@@ -245,6 +246,8 @@
 		7A16073015E7B7780039CCF2 /* spot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spot.png; path = graphics/spot.png; sourceTree = "<group>"; };
 		7A188E5315E9440B002ED2F5 /* MediaAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MediaAsset.h; path = models/MediaAsset.h; sourceTree = "<group>"; };
 		7A188E5415E9440B002ED2F5 /* MediaAsset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MediaAsset.m; path = models/MediaAsset.m; sourceTree = "<group>"; };
+		7A38FFC015EB8DBC00A652EF /* MediaSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaSource.h; sourceTree = "<group>"; };
+		7A38FFC115EB8DBC00A652EF /* MediaSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaSource.m; sourceTree = "<group>"; };
 		7A6AA8A0148D6BD800F2B351 /* SVHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVHTTPRequest.h; sourceTree = "<group>"; };
 		7A6AA8A1148D6BD800F2B351 /* SVHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVHTTPRequest.m; sourceTree = "<group>"; };
 		7A89B2CA147740D300F172A3 /* FileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCell.h; sourceTree = "<group>"; };
@@ -358,7 +361,7 @@
 			children = (
 				7A188E5615E94444002ED2F5 /* App */,
 				7A188E5B15E9474C002ED2F5 /* Constants */,
-				7A188E5115E9439C002ED2F5 /* Engine */,
+				7A188E5115E9439C002ED2F5 /* Core */,
 			);
 			name = Sources;
 			path = src;
@@ -448,7 +451,7 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		7A188E5115E9439C002ED2F5 /* Engine */ = {
+		7A188E5115E9439C002ED2F5 /* Core */ = {
 			isa = PBXGroup;
 			children = (
 				7A6AA8A4148D6BE000F2B351 /* SVHTTPRequest */,
@@ -484,12 +487,14 @@
 				02A3061713C686D300E7340D /* XMLURL.h */,
 				02A3061813C686D300E7340D /* XMLURL.m */,
 			);
-			name = Engine;
+			name = Core;
 			sourceTree = "<group>";
 		};
 		7A188E5615E94444002ED2F5 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				7A38FFC015EB8DBC00A652EF /* MediaSource.h */,
+				7A38FFC115EB8DBC00A652EF /* MediaSource.m */,
 				7A188E5315E9440B002ED2F5 /* MediaAsset.h */,
 				7A188E5415E9440B002ED2F5 /* MediaAsset.m */,
 				7A188E5715E94476002ED2F5 /* Login */,
@@ -823,6 +828,7 @@
 				7AA783AC15E7BEB400ED18DB /* IASKTextField.m in Sources */,
 				7AA783BB15E7BFEB00ED18DB /* main.m in Sources */,
 				7A188E5515E9440B002ED2F5 /* MediaAsset.m in Sources */,
+				7A38FFC215EB8DBC00A652EF /* MediaSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

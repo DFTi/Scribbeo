@@ -21,24 +21,19 @@ int gIOSMajorVersion;
 
 @synthesize window, demoView;
 @synthesize tvc, nc, clipList, rootTvc;
-@synthesize iPhone, viewController, BonjourMode, UseManualServerDetails;
-@synthesize serverBrowser, server, bonjour, theURL, theExtension, HTTPserver, serverBase, outputFilename, LiveTranscode;
+@synthesize iPhone, viewController;
+@synthesize theURL, theExtension, outputFilename;
 
-static int tryOne = 0;
+@synthesize mediaSource;
 
 
 #pragma mark -
 #pragma mark Application lifecycle
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {   
-    //NSLog (@"****** Begin execution of Scribbeo v%@.%@ (free mem = %.2f MB)", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"],
-    //       [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleVersion"], ([self freemem]/ (1024. * 1024.)));
-    
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     gIOSMajorVersion = [[[UIDevice currentDevice] systemVersion] characterAtIndex: 0];
-    // NSLog (@"Running %@ version (IOS version %c) ", iPhone ? @"iPhone" : @"iPad", gIOSMajorVersion);
-
     iPhone = [[UIScreen mainScreen] applicationFrame].size.height < 1000;
-    
+
     if (iPhone) {
         self.viewController =  [[VideoTreeViewController alloc] 
                 initWithNibName: @"iPhoneVideoTreeViewController" bundle:[NSBundle mainBundle]];
@@ -97,22 +92,19 @@ static int tryOne = 0;
     
     NSLog (@"app did become active");
     
-    BOOL wasBonjourMode = BonjourMode;
-    BOOL wasUsingManualServerDetails = UseManualServerDetails;
-    BOOL wasUsingLiveTranscode = LiveTranscode;
+    BOOL wasBonjourMode = [mediaSource BonjourMode];
+    BOOL wasUsingManualServerDetails = [mediaSource UseManualServerDetails];
+    BOOL wasUsingLiveTranscode = [mediaSource LiveTranscode];
+    
     [self makeSettings]; // Get any new setting changes.
     [viewController makeSettings]; // Get the lesser changes.    
     [viewController uploadActivityIndicator: NO];
+
+    BOOL modeChanged = ((wasUsingLiveTranscode != [mediaSource LiveTranscode]) ||
+                        (wasBonjourMode != [mediaSource BonjourMode]) ||
+                        (wasUsingManualServerDetails != [mediaSource UseManualServerDetails]));
     
-    // NSLog (@"player = %@, moviePath = %@", viewController.player, tvc.moviePath);
-    
-    // Restart playback as appropriate
-    // But first, check if the user changed any important settings.
-    if (
-            (wasUsingLiveTranscode != LiveTranscode) || 
-            (wasBonjourMode != BonjourMode) || 
-            (wasUsingManualServerDetails != UseManualServerDetails)
-        ) { 
+    if (modeChanged) {
         NSLog(@"Mode was changed, cleaning up");
         [viewController cleanup];
     } else {
@@ -126,7 +118,7 @@ static int tryOne = 0;
         }
     }
 
-    NSLog(@"Live Transcode %@", ([self LiveTranscode] ? @"True" : @"False"));
+    NSLog(@"Live Transcode %@", ([mediaSource LiveTranscode] ? @"True" : @"False"));
     [viewController showNav];
     
     [self releasemem];
@@ -158,7 +150,7 @@ static int tryOne = 0;
     // where to store the notes or where to play the clips from
     
     [defaults setBool: NO forKey: @"Bonjour"];
-    BonjourMode = NO;
+    mediaSource.BonjourMode = NO;
 
     [defaults synchronize];
     
@@ -368,159 +360,13 @@ static int tryOne = 0;
 }
 
 #pragma mark -
-#pragma mark Bonjour
-
-// Part of Bonjour server support; connect to a discovered Scribbeo server
-- (void)updateServerList {
-    NSLog(@"updateServerList called");
-    
-    if (serverBrowser.servers.count == 0) {
-        NSLog (@"Scribbeo Server disconnected!");
-        [rootTvc showActivity];
-        [rootTvc showDisconnected]; // show the disconnected indicator
-        return;
-    }
-    // else...
-    self.server = [serverBrowser.servers objectAtIndex: 0];
-    NSLog (@"Connecting to Scribbeo server");
-    
-    if (bonjour)
-        self.bonjour = nil;
-    
-    bonjour = [[BonjourConnection alloc] initWithNetService: server];
-
-    
-    // If it is animating, it is likely we are coming back from a disconnect.
-    if ( [[rootTvc activityIndicator] isAnimating]) {
-        HTTPserver = nil; // Clear our http server, the ip and port may change.
-        [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
-        if (! [bonjour connect])  // ~connect updates the HTTPserver address
-            NSLog (@"Couldn't reconnect to Scribbeo server");
-    }
-}
-
-#pragma mark -
 #pragma mark settings
-
-// When we receive the IP address from the Bonjour server, it will be stored
-// in the HTTPServer variable.  We're observing that variable so we are alerted
-// when it changes
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    NSLog (@"Observe value change for HTTPserver: %@", HTTPserver);
-    
-    if ([[change objectForKey: NSKeyValueChangeKindKey] integerValue] !=  NSKeyValueChangeSetting) {
-//        NSLog (@"Key value did not change: %i", [change objectForKey: NSKeyValueChangeKindKey]);
-        return;
-    }
-    
-    if (! HTTPserver)
-        return;
-    
-    [self removeObserver: self forKeyPath: @"HTTPserver"];
-           
-    if (! iPhone) {
-        NSLog(@"Now we need to make the list of files");
-        [rootTvc makeList];
-    }
-    else
-        [viewController showNav];
-}
-
-// Start looking for Bonjour services
-
--(void) doBonjour
-{
-    static int once;
-    
-    if (once)
-        return;
-    else
-        once = 1;
-    
-    NSLog (@"Get Bonjour server info");
-    
-    if (! BonjourMode )
-        return;
-  
-    tryOne = 0;
-        
-    // restart server browser if already running
-    
-    if (serverBrowser) 
-        [serverBrowser stop];
-    else {
-        self.serverBrowser = [[[ServerBrowser alloc] init] autorelease];
-        serverBrowser.delegate = self;
-    }
-
-    [serverBrowser start];
-    
-    [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
-    
-    NSLog (@"**** UDID is %@", [[UIDevice currentDevice] uniqueIdentifier]);
-}
-
-// This method looks at the user defaults and sets up various parameters
 
 -(void) makeSettings
 {
-    static int count = 1;
-    NSLog (@"makeSettings: %i", count++);
-    
-    // Load the user settings
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
- //   [[NSUserDefaults standardUserDefaults] synchronize];
-
-    // Live Transcode
-    LiveTranscode = [defaults boolForKey: @"LiveTranscode"];
-    if (!LiveTranscode) LiveTranscode = NO;
-
-//    NSLog(@"Live Transcode: ", (LiveTranscode ? @"on" : @"off"));
-    // Bonjour support
-    
-    BonjourMode = [defaults boolForKey: @"Bonjour"];
-    UseManualServerDetails = ![defaults boolForKey:@"AutoDiscover"];
-    
-    if (!BonjourMode) BonjourMode = NO;
-    if (!UseManualServerDetails) UseManualServerDetails = NO;
-
-    // show finger presses (good for demos)
-    
-    demoView = [defaults boolForKey: @"showPresses"]; 
-
-    if (BonjourMode) {
-        NSLog(@"Running in Networked Mode");
-        if (UseManualServerDetails) {
-            [self setHTTPserver:nil];
-            NSString *manualIP = [defaults stringForKey:@"ServerIP"];
-            NSString *manualPort = [defaults stringForKey:@"ServerPort"];            
-            NSString *manualServer = [NSString stringWithFormat:@"https://%@:%@", manualIP, manualPort];
-            NSLog(@"Manual override requested, will not do bonjour discovery.");
-            NSLog(@"Checking for valid Scribbeo server: %@", manualServer);
-            NSError *error = nil;
-            NSURLResponse *response;
-            NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:manualServer] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:3];
-            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-            if (error != nil) {
-                NSLog(@"%@", error.localizedDescription);
-                [UIAlertView doAlert:  @"Connection Error" 
-                         withMsg:@"Cannot find a Scribbeo Server at the specified URL. Please enter a valid IP and Port, otherwise enable Auto Discovery."];
-                NSLog(@"Failed to connect to manually entered server %@", manualServer);
-            } else {
-                NSLog(@"Got back this much data: %d", [data length]);   
-                [self setHTTPserver:manualServer];
-            }
-        } else {
-            [self setHTTPserver:nil];
-            // maybe put an observer now? :/
-            NSLog(@"No manual override, will now discover bonjour servers.");
-            NSLog(@"HTTP server: %@", HTTPserver);
-            [self doBonjour];
-        }
-    } else
-        NSLog (@"Running in iTunes Document sharing mode");
+    NSUserDefaults *settings = [NSUserDefaults standardUserDefaults];
+    [mediaSource useSettings:settings];
+    demoView = [settings boolForKey: @"showPresses"];
 }
 
 // Create our DetailViewController, which manages clip selection
@@ -644,6 +490,13 @@ static int tryOne = 0;
     
     //write the changes to disk
     [defaults synchronize];
+}
+
+- (void)makeList {
+    if (!iPHONE)
+        [rootTvc makeList];
+    else
+        [viewController showNav];
 }
 
 @end

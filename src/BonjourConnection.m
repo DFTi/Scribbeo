@@ -163,7 +163,7 @@ void writeStreamEventHandler(CFWriteStreamRef stream, CFStreamEventType eventTyp
       // Path to our pythonic bonjour+web combo server:
       NSString *httpServer = [NSString stringWithFormat:@"https://%@:%d", serverIP, port];
       // Set it to the HTTPserver in the app delegate
-      [(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] setHTTPserver: httpServer];
+      [[(VideoTreeAppDelegate *)[[UIApplication sharedApplication] delegate] mediaSource] setHTTPserver: httpServer];
       NSLog(@"HTTP Server has been set to %@", httpServer);
       
       // Bind read/write streams to a new socket

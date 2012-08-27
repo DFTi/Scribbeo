@@ -129,37 +129,6 @@
 
 -(void) makeList
 {
-    NSLog(@"DetailView::makeList called");
-    if (!kBonjourMode) { // local mode
-        UIBarButtonItem *cRollButton = 
-        [[[UIBarButtonItem alloc] initWithImage: 
-                    [UIImage imageNamed: @"cameraRoll.png"]
-                        style:  UIBarButtonItemStyleBordered target: self 
-                        action: @selector(pickClip)] autorelease]; 
-        self.navigationItem.leftBarButtonItem = cRollButton;
-        //self.navigationItem.rightBarButtonItem = nil; // no refresh button
-        // We want a refresh button in Local Mode now so that when we add something in using
-        // iTunes, we can refresh and see the new files without restarting the app.
-        
-        
-    }
-    else { // remote mode
-        self.navigationItem.leftBarButtonItem = nil;
-        self.navigationItem.rightBarButtonItem = nil;
-
-//        if (! iPHONE) {
-//            UIBarButtonItem *refresh =  [[[UIBarButtonItem alloc] initWithImage: 
-//          [UIImage imageNamed: @"Refresh.png"]
-//                  style: UIBarButtonItemStylePlain target: self action: @selector(makeList)] autorelease];  
-//            self.navigationItem.rightBarButtonItem = refresh;
-//        }
-    }
-
-    UIBarButtonItem *refresh =  [[[UIBarButtonItem alloc] initWithImage: 
-                                  [UIImage imageNamed: @"Refresh.png"]
-                                  style: UIBarButtonItemStylePlain target: self action: @selector(makeList)] autorelease];  
-    self.navigationItem.rightBarButtonItem = refresh;
-    
     // Create our clip list arrays, or clear if already created
     
     if (!files) {
@@ -175,7 +144,15 @@
         [timeCodes removeAllObjects];
     }
     
-    if (kBonjourMode) { 
+    if (!kBonjourMode) { // local mode
+        self.title = @""; // No title needed in local mode
+        UIBarButtonItem *cRollButton = 
+        [[[UIBarButtonItem alloc] initWithImage: 
+                    [UIImage imageNamed: @"cameraRoll.png"]
+                        style:  UIBarButtonItemStyleBordered target: self 
+                        action: @selector(pickClip)] autorelease]; 
+        self.navigationItem.leftBarButtonItem = cRollButton;
+    } else { // remote mode
         if (currentPath) {
             NSString *theFolder = [currentPath lastPathComponent];
             if ([theFolder isEqualToString:@"list"])
@@ -183,21 +160,27 @@
             else
                 self.title = [theFolder stringByReplacingOccurrencesOfString:@"%20" withString:@" "];
         }
-        else 
+        else
             self.title = @"Files";
-    } else
-        self.title = @""; // No title needed in local mode
+
+        self.navigationItem.leftBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = nil;
+    }
+
+    UIBarButtonItem *refresh = [[[UIBarButtonItem alloc] initWithImage:
+                                  [UIImage imageNamed: @"Refresh.png"]
+                                  style: UIBarButtonItemStylePlain target: self action: @selector(makeList)] autorelease];  
+    self.navigationItem.rightBarButtonItem = refresh;
+    
       
     
     if (([self.title isEqualToString:@"Files"] || [self.title isEqualToString:@""]) && iPHONE) {
         UIBarButtonItem *backBar = [[UIBarButtonItem alloc] initWithTitle:@"Close" style:UIBarButtonItemStylePlain target:self action:@selector(closeOut:)];
         
-        if ([self.title isEqualToString:@""]) {
+        if ([self.title isEqualToString:@""])
             self.navigationItem.rightBarButtonItem = backBar;
-        }else
-        {
+        else
             self.navigationItem.leftBarButtonItem = backBar;
-        }
         
         [backBar release]; 
     }
@@ -231,7 +214,7 @@
    
     if (kBonjourMode && kHTTPserver) {
         // Send a list request to our HTTPServer
-        NSString *urlstr = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], currentPath];
+        NSString *urlstr = [NSString stringWithFormat:@"%@%@", [[kAppDel mediaSource] HTTPserver], currentPath];
         NSLog(@"Making list for BonjourMode. Querying: %@", urlstr);
         NSURL *url = [NSURL URLWithString:urlstr];
         //NSError* error = nil;
@@ -336,8 +319,8 @@
        // [self filesFromJSONFileListing:fileDict];       
     } else if (kBonjourMode && (!kHTTPserver)) {
         NSLog(@"In bonjour mode, but the http server has not been set yet.");
-        [[kAppDel serverBrowser] stop];
-        [[kAppDel serverBrowser] start];
+        [[[kAppDel mediaSource] serverBrowser] stop];
+        [[[kAppDel mediaSource] serverBrowser] start];
     }
     
 }
@@ -373,7 +356,7 @@
         NSString *fileName = [dict objectForKey:@"name"];
         NSString *fileExt = [dict objectForKey:@"ext"];
         NSString *assetURL = nil;
-        if ([kAppDel LiveTranscode])
+        if ([[kAppDel mediaSource] LiveTranscode])
             assetURL = [dict objectForKey:@"live_transcode"];
         else
             assetURL = [dict objectForKey:@"asset_url"];
@@ -391,13 +374,10 @@
     [self.tableView reloadData]; // reloads file listing
     [self finishLoad]; // reloads file listing... again...
 
-    // OK we are here now, where we get MediaAsset URL's apparently,
-    // this is a nice point entry point -- ahh yeah filesFromJSONFileListing...
-    [[kAppDel viewController] loadMovie:@"https://app.scribbeo.com:44301/asset/TestFiles/chapter_markers.mov"];
+    // OK we are here now, where we get MediaAsset URL's apparently,    
+    //[[kAppDel viewController] loadMovie:@"http://brevity.local:3000/videos/chapter_markers.mov"];
+    // disable the shunt for now...
     // SHUNT
-    // Yessss shunt worked [On device]! we have an entry point of a ready player in the internets.
-    // The problem is, again, that we won't get here in the iOS sim...
-    // Clearly fails on the simulator because we havent fixed the AVAsset problem.
 }
 
 // This method will fill the noteURLs array. Called when you select a clip.
@@ -405,11 +385,11 @@
 // Oh and also timecode...
 - (void) setNotesAndTimecodeForAsset: (NSString *) assetURL atIndex:(NSInteger) index
 {
-    NSLog(@"Updating notes & timecode for asset %@ at index: %d from %@", assetURL, index, [kAppDel HTTPserver]);
+    NSLog(@"Updating notes & timecode for asset %@ at index: %d from %@", assetURL, index, [[kAppDel mediaSource] HTTPserver]);
 
     // Prep the urls
-    NSString *notesFetchURLstr = [[NSString stringWithFormat:@"%@/notes%@", [kAppDel HTTPserver], assetURL] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-    NSString *tcFetchURLstr = [[NSString stringWithFormat:@"%@/timecode%@", [kAppDel HTTPserver], assetURL] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+    NSString *notesFetchURLstr = [[NSString stringWithFormat:@"%@/notes%@", [[kAppDel mediaSource] HTTPserver], assetURL] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+    NSString *tcFetchURLstr = [[NSString stringWithFormat:@"%@/timecode%@", [[kAppDel mediaSource] HTTPserver], assetURL] stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
 
     // Fetch the notes
     NSURL *notesFetchURL = [NSURL URLWithString:notesFetchURLstr];
@@ -799,7 +779,7 @@
     NSLog(@"setTheMoviePath");
     NSLog(@"setTheMoviePath sees theMovie at %@", theMovie);
     if (kBonjourMode) {
-        NSString *thePath = [NSString stringWithFormat:@"%@%@", [kAppDel HTTPserver], theMovie];
+        NSString *thePath = [NSString stringWithFormat:@"%@%@", [[kAppDel mediaSource] HTTPserver], theMovie];
 //        NSLog(thePath);
         self.moviePath = thePath;
     } else {

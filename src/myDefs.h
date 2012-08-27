@@ -1,6 +1,6 @@
 /*
  *  myDefs.h
- *  VideoTree
+ *  Scribbeo
  *
  *
  *  Copyright © 2010-2011 by Digital Film Tree. All rights reserved.
@@ -9,20 +9,6 @@
 #import "VideoTreeAlert.h"
 
 #define APPSTORE
-
-
-// might have disabled debug who knows. force switch here? fuck it
-// #define DEBUG YES
-//#ifdef DEBUG
-//@implementation NSURLRequest (IgnoreSSL)
-//
-//+ (BOOL)allowsAnyHTTPSCertificateForHost:(NSString *)host
-//{
-//    return YES;
-//}
-//
-//@end
-//#endif
 
 extern int gIOSMajorVersion;
 
@@ -45,11 +31,11 @@ extern int gIOSMajorVersion;
 
 #define kRunningOS5OrGreater  (gIOSMajorVersion >= '5') 
 
-#define kHTTPserver  ([kAppDel HTTPserver])
+#define kHTTPserver  ([[kAppDel mediaSource] HTTPserver])
 #define kVideoTreeWebsite @"http://www.scribbeo.com"
 
 
-#define kBonjourMode ([kAppDel BonjourMode])
+#define kBonjourMode ([[kAppDel mediaSource] BonjourMode])
 
 // #define Turner  ////////////////////////////////
 // #define kOSXServer

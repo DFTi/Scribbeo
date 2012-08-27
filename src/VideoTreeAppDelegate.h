@@ -16,44 +16,40 @@
 #import <mach/mach_host.h>
 #import <AVFoundation/AVFoundation.h>
 
-#import "ServerBrowser.h"
-#import "ServerBrowserDelegate.h"
-#import "BonjourConnection.h"
 #import "MyUIWindow.h"
+#import "MediaSource.h"
 
 @class DetailViewController;
 @class VideoTreeViewController;
 @class AVPlayer;
 
-@interface VideoTreeAppDelegate : NSObject <UIApplicationDelegate, MFMailComposeViewControllerDelegate, UIImagePickerControllerDelegate, ServerBrowserDelegate, UINavigationControllerDelegate, UIAlertViewDelegate> {
+@interface VideoTreeAppDelegate : NSObject <UIApplicationDelegate, MFMailComposeViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIAlertViewDelegate> {
     MyUIWindow              *window;
     VideoTreeViewController *viewController;
     
     DetailViewController    *rootTvc, *tvc;
     UINavigationController  *nc;
     NSMutableArray          *clipList;
-    NSString                *HTTPserver, *serverBase;
+
     BOOL                    iPhone;         // Running on an iPhone
-    BOOL                    LiveTranscode;
-    BOOL                    BonjourMode;
-    BOOL                    UseManualServerDetails;
+    
     BOOL                    demoView;
     CMTime                  theTime;
     float                   theRate;
-    ServerBrowser           *serverBrowser;
-    NSNetService            *server;
-    BonjourConnection       *bonjour;
-    NSURL                   *theURL;        // From the camera roll or another app
-    NSString                *theExtension;
-    NSString                *outputFilename;
     
-    UIImage                 *imageReference;  // image selected from camera roll
+    NSURL                   *theURL;        // From the camera roll or another app FIXME rename this from "the URL" ... wtf?
+    NSString                *theExtension; // really necessary on the app delegate?
+    NSString                *outputFilename; // again, is this necessary?
+    UIImage                 *imageReference;  // and this, what is this?
+    // looks like the 4 above are related to local mode, perhaps another extension to AppServer, rather, MediaSource?
+    
+    MediaSource             *mediaSource;
 }
 
 @property (nonatomic, retain) IBOutlet MyUIWindow              *window;
 @property (nonatomic, retain) IBOutlet VideoTreeViewController *viewController;
 @property (nonatomic, retain) IBOutlet NSMutableArray          *clipList;
-@property BOOL demoView;
+@property BOOL demoView, iPhone;
 
 @property (nonatomic, assign)  DetailViewController   *tvc;
 @property (nonatomic, retain)  DetailViewController   *rootTvc;
@@ -61,19 +57,12 @@
 @property (nonatomic, retain)  NSURL                *theURL;
 @property (nonatomic, retain)  NSString             *theExtension, *outputFilename;
 
-@property BOOL  iPhone, BonjourMode, UseManualServerDetails, LiveTranscode;
-@property (nonatomic, retain)  NSString             *HTTPserver;
-@property (nonatomic, retain)  NSString             *serverBase;
-
-@property (nonatomic, retain)  ServerBrowser        *serverBrowser;
-@property (nonatomic, retain)  NSNetService         *server;
-@property (nonatomic, retain)  BonjourConnection    *bonjour;
+@property (nonatomic, retain) MediaSource           *mediaSource;
 
 -(void) finishLoad;
 
 -(natural_t) freemem; 
 -(void) releasemem;
--(void) doBonjour;
 -(void) makeSettings;
 -(void) copyVideoOrImageIntoApp: (id) from;
 -(void) saveFileNameEntered;
@@ -81,6 +70,8 @@
 
 -(void) makeDetailTableViewController;
 -(void)setupDefaults;
+
+-(void)makeList;
 
 @end
 
