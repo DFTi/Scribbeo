@@ -56,6 +56,8 @@ int gIOSMajorVersion;
     
     [window makeKeyAndVisible];
 
+    mediaSource = [[MediaSource alloc] init];
+    
     return YES;
 }
 

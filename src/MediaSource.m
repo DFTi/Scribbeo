@@ -8,17 +8,18 @@
 
 #import "MediaSource.h"
 #import "VideoTreeAppDelegate.h"
+#import "DetailViewController.h"
 
 @implementation MediaSource
 
 @synthesize BonjourMode, UseManualServerDetails, LiveTranscode;
 @synthesize HTTPserver, serverBase, serverBrowser, server, bonjour;
 
--(MediaSource*)init
-{
-    NSLog(@"Scribbeo, meet OOP. OOP, Scribbeo");
-    return self;
-}
+// -(MediaSource*)init
+// {
+//     NSLog(@"Scribbeo, meet OOP. OOP, Scribbeo");
+//     return self;
+// }
 
 - (NSDictionary*)assets
 {
@@ -33,8 +34,8 @@
     
     if (serverBrowser.servers.count == 0) {
         NSLog (@"Scribbeo Server disconnected!");
-//        [rootTvc showActivity];
-//        [rootTvc showDisconnected]; // show the disconnected indicator
+        [[kAppDel rootTvc] showActivity];
+        [[kAppDel rootTvc] showDisconnected]; // show the disconnected indicator
         return;
     }
     // else...
@@ -48,12 +49,12 @@
 
     
     // If it is animating, it is likely we are coming back from a disconnect.
-//    if ( [[rootTvc activityIndicator] isAnimating]) {
-//        HTTPserver = nil; // Clear our http server, the ip and port may change.
-//        [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
-//        if (! [bonjour connect])  // ~connect updates the HTTPserver address
-//            NSLog (@"Couldn't reconnect to Scribbeo server");
-//    }
+    if ( [[[kAppDel rootTvc] activityIndicator] isAnimating]) {
+        HTTPserver = nil; // Clear our http server, the ip and port may change.
+        [self addObserver: self forKeyPath: @"HTTPserver" options: NSKeyValueObservingOptionNew context: nil];
+        if (! [bonjour connect])  // ~connect updates the HTTPserver address
+            NSLog (@"Couldn't reconnect to Scribbeo server");
+    }
 }
 
 // Start looking for Bonjour services

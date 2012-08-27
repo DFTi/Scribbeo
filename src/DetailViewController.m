@@ -196,7 +196,7 @@
         return;
     } else if (kBonjourMode && kHTTPserver) { // remote mode ready
 
-        /* Now, the question is "What kind of server are we talking to? Python or CAPS?"
+        /*  Now, the question is "What kind of server are we talking to? Python or CAPS?"
             Regardless of which one it is, we know we are supposed to get assets back,
             so all this shit needs to go into MediaSource and the shit be retrieved with:
                 mediaAsset.assets
@@ -236,7 +236,7 @@
                         [self makeList];//Retry
                     } 
                     canceled:^(NSString* reason){
-                        NSLog(@"Cancelled")
+                        NSLog(@"Cancelled");
                     }];
                     
                     

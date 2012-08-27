@@ -31,5 +31,4 @@
 -(NSDictionary*) assets;
 -(void) doBonjour;
 -(void) useSettings: (NSUserDefaults *) settings;
-
 @end
