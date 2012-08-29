@@ -367,7 +367,7 @@ int gIOSMajorVersion;
 -(void) makeSettings
 {
     NSUserDefaults *settings = [NSUserDefaults standardUserDefaults];
-    [mediaSource useSettings:settings];
+    [mediaSource connectWithSettings:settings];
     demoView = [settings boolForKey: @"showPresses"];
 }
 

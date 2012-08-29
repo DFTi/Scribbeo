@@ -13,6 +13,7 @@
 #import "myDefs.h"
 #import "JSONKit.h"
 #import "SBServerLoginVC.h"
+#import "MediaSource.h"
 
 @interface DetailViewController : UITableViewController <UITableViewDelegate, UITableViewDataSource, UIPopoverControllerDelegate, UINavigationControllerDelegate,
     UIImagePickerControllerDelegate> {
@@ -27,6 +28,7 @@
     UIPopoverController *popoverController;         // The controller for showing the popover when selecting a local clip
     NSString            *moviePath;                 // Is this an album (all stills?)
     BOOL                allStills;
+    MediaSource         *mediaSource;
 }
 
 @property (nonatomic, retain) NSString                  *currentPath, *moviePath;
@@ -37,6 +39,7 @@
 @property int     currentClip;
 
 @property (nonatomic, retain) SBServerLoginVC* serverLogin;
+@property (nonatomic, retain) MediaSource* mediaSource;
 
 
 - (void) showDisconnected;

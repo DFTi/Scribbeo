@@ -27,13 +27,9 @@
     VideoTreeAppDelegate *appDel = kAppDel;
     
     appDel.tvc = self;
+    mediaSource = appDel.mediaSource;
     
-    // If we've been here before, update the clip list
-    
-    if (currentPath) {
-        [self makeList];
-    }
-    
+    // If we've been here before, update the clip list    
     // Various things related to the navigation bar and table view
     
     self.clearsSelectionOnViewWillAppear = NO;
@@ -49,10 +45,8 @@
 
 -(void) showDisconnected
 {
-    if (!kBonjourMode) return;
     NSLog(@"Showing the disconnected png");
-    CGSize  theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};  
-    // hard-coded #'s--uggh! :(
+    CGSize theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};  
     UIImageView *imgView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Disconnected.png"]];
     imgView.frame = CGRectMake((theSize.width / 2)-32, (theSize.height / 2)-72, 64, 64);
     imgView.tag = 75;
@@ -82,7 +76,7 @@
     
 	if (! progressView) {
         CGPoint theOrigin = {0, 0};
-        CGSize  theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};  // hard-coded #'s--uggh!
+        CGSize  theSize = (iPHONE) ? (CGSize) {182, 250} : (CGSize) {210, 344};
         CGRect  theFrame = {theOrigin, theSize};
         
         progressView = [[UIView alloc] initWithFrame: theFrame];
@@ -101,7 +95,7 @@
     // Start spinning and show it
     
 	[activityIndicator startAnimating];
-	[[[kAppDel viewController] view] addSubview: progressView];
+	[[[kAppDel viewController] view] addSubview: progressView]; // FIXME far reaching
 }
 
 //
@@ -210,10 +204,12 @@
             else
                 self.title = [theFolder stringByReplacingOccurrencesOfString:@"%20" withString:@" "];
         } else self.title = @"Files";
+        
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
+        
         // Send a list request to our HTTPServer
-        NSString *urlstr = [NSString stringWithFormat:@"%@%@", [[kAppDel mediaSource] HTTPserver], currentPath];
+        NSString *urlstr = [NSString stringWithFormat:@"%@%@", [mediaSource HTTPserver], currentPath];
         NSLog(@"Making list for BonjourMode. Querying: %@", urlstr);
         NSURL *url = [NSURL URLWithString:urlstr];
 

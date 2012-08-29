@@ -15,11 +15,6 @@
 @synthesize BonjourMode, UseManualServerDetails, LiveTranscode;
 @synthesize HTTPserver, serverBase, serverBrowser, server, bonjour;
 
-// -(MediaSource*)init
-// {
-//     NSLog(@"Scribbeo, meet OOP. OOP, Scribbeo");
-//     return self;
-// }
 
 - (NSDictionary*)assets
 {
@@ -100,51 +95,70 @@
     [kAppDel makeList];
 }
 
-- (void) useSettings: (NSUserDefaults *) settings {
-    NSLog(@"MediaSource is using new settings.");
-    // Live Transcode
-    LiveTranscode = [settings boolForKey: @"LiveTranscode"];
-    if (!LiveTranscode) LiveTranscode = NO;
-
-    // Network Support
-    BonjourMode = [settings boolForKey: @"Bonjour"];
-    
-    UseManualServerDetails = ![settings boolForKey:@"AutoDiscover"];
-
-    if (!UseManualServerDetails) UseManualServerDetails = NO;
-    
-    if (!BonjourMode) BonjourMode = NO;
-    
+- (void) connectWithSettings: (NSUserDefaults *) settings {
+    NSLog(@"MediaSource will use new settings.");
+    [self loadSettings:settings];
     if (BonjourMode) {
-        NSLog(@"Running in Networked Mode");
+        NSLog(@"Networking is ENABLED");
         if (UseManualServerDetails) {
             [self setHTTPserver:nil];
             NSString *manualIP = [settings stringForKey:@"ServerIP"];
-            NSString *manualPort = [settings stringForKey:@"ServerPort"];            
-            NSString *manualServer = [NSString stringWithFormat:@"https://%@:%@", manualIP, manualPort];
-            NSLog(@"Manual override requested, will not do bonjour discovery.");
-            NSLog(@"Checking for valid Scribbeo server: %@", manualServer);
-            NSError *error = nil;
-            NSURLResponse *response;
-            NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:manualServer] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:3];
-            NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-            if (error != nil) {
-                NSLog(@"%@", error.localizedDescription);
-                [UIAlertView doAlert:  @"Connection Error" 
-                         withMsg:@"Cannot find a Scribbeo Server at the specified URL. Please enter a valid IP and Port, otherwise enable Auto Discovery."];
-                NSLog(@"Failed to connect to manually entered server %@", manualServer);
-            } else {
-                NSLog(@"Got back this much data: %d", [data length]);   
-                [self setHTTPserver:manualServer];
-            }
+            NSString *manualPort = [settings stringForKey:@"ServerPort"];
+            NSString *scheme = [NSString stringWithString:(useSSL ? @"https" : @"http")];
+            HTTPserver = [NSString stringWithFormat:@"%@://%@:%@",
+                          scheme, manualIP, manualPort];
+            [self makeManualServerConnection];
         } else {
-            [self setHTTPserver:nil];
-            NSLog(@"No manual override, will now discover bonjour servers.");
-            NSLog(@"HTTP server: %@", HTTPserver);
-            [self doBonjour];
+            [self makeBonjourConnection];
         }
-    } else
-        NSLog (@"Running in iTunes Document sharing mode");
+    } else // "local mode"
+        NSLog(@"Networking is DISABLED, running in iTunes Document sharing mode");
+    
+    if (UseManualServerDetails) {
+    
+    } else {
+        
+    }
+}
+
+- (void) makeManualServerConnection {
+    // could be python or caps server
+    // we'll figure out if we're having an SSL problem
+    NSLog(@"Manual override requested, will not do bonjour discovery.");
+    NSLog(@"Checking for valid Scribbeo server: %@", HTTPserver);
+    NSError *error = nil;
+    NSURLResponse *response;
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:HTTPserver] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:3];
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    if (error != nil) {
+        NSLog(@"%@", error.localizedDescription);
+        [UIAlertView doAlert:  @"Connection Error"
+                     withMsg:@"Cannot find a Scribbeo Server at the specified URL. Please enter a valid IP and Port, otherwise enable Auto Discovery."];
+        NSLog(@"Failed to connect to manually entered server %@", HTTPserver);
+    } else {
+        NSLog(@"Got back this much data: %d", [data length]);
+    }
+}
+
+- (void) makeBonjourConnection {
+    [self setHTTPserver:nil];
+    NSLog(@"Will now discover bonjour servers.");
+    NSLog(@"HTTP server: %@", HTTPserver);
+    [self doBonjour];
+}
+
+//private
+
+-(void) loadSettings:(NSUserDefaults *)settings {
+    useSSL = NO;
+    useCAPS = NO;
+    LiveTranscode = [settings boolForKey: @"LiveTranscode"];
+    BonjourMode = [settings boolForKey: @"Bonjour"];
+    UseManualServerDetails = ![settings boolForKey:@"AutoDiscover"];
+    // default value is not working I guess? good insurance anyway...
+    if (!LiveTranscode) LiveTranscode = NO;
+    if (!UseManualServerDetails) UseManualServerDetails = NO;
+    if (!BonjourMode) BonjourMode = NO;
 }
 
 @end

@@ -16,13 +16,13 @@
 
 @interface MediaSource : NSObject <ServerBrowserDelegate> {
     NSString                *HTTPserver, *serverBase;
-    BOOL                    BonjourMode, LiveTranscode, UseManualServerDetails;
+    BOOL                    BonjourMode, LiveTranscode, UseManualServerDetails, useSSL, useCAPS;
     ServerBrowser           *serverBrowser;
     NSNetService            *server;
     BonjourConnection       *bonjour;
 }
 
-@property BOOL BonjourMode, UseManualServerDetails, LiveTranscode;
+@property BOOL BonjourMode, UseManualServerDetails, LiveTranscode, useSSL, useCAPS;
 @property (nonatomic, retain)  NSString             *HTTPserver, *serverBase;
 @property (nonatomic, retain)  ServerBrowser        *serverBrowser;
 @property (nonatomic, retain)  NSNetService         *server;
@@ -30,5 +30,9 @@
 
 -(NSDictionary*) assets;
 -(void) doBonjour;
--(void) useSettings: (NSUserDefaults *) settings;
+-(void) connectWithSettings: (NSUserDefaults *) settings;
+//private
+-(void) loadSettings: (NSUserDefaults *) settings;
+-(void) makeBonjourConnection;
+-(void) makeManualServerConnection;
 @end
