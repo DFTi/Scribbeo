@@ -77,6 +77,7 @@ static NSUInteger taskCount = 0;
     [operationConnection cancel];
     dispatch_release(saveDataDispatchGroup);
     dispatch_release(saveDataDispatchQueue);
+    [super dealloc];
 }
 
 - (void)increaseTaskCount {
@@ -485,8 +486,8 @@ static NSUInteger taskCount = 0;
 @implementation NSString (SVHTTPRequest)
 
 - (NSString*)encodedURLParameterString {
-    NSString *result = (__bridge_transfer NSString*)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
-                                                                                            (__bridge CFStringRef)self,
+    NSString *result = ( NSString*)CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                                                                            ( CFStringRef)self,
                                                                                             NULL,
                                                                                             CFSTR(":/=,!$&'()*+;[]@#?"),
                                                                                             kCFStringEncodingUTF8);

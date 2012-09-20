@@ -40,8 +40,6 @@
 		02A3067F13C686D300E7340D /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 02A3062113C686D300E7340D /* Settings.bundle */; };
 		02A3068013C686D300E7340D /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 02A3062213C686D300E7340D /* MainWindow.xib */; };
 		4B35E869152E236000B0BDBB /* CoreMedia_Timecodes.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B35E868152E236000B0BDBB /* CoreMedia_Timecodes.m */; };
-		4B3F51561549BAFF00B7B09A /* SBServerLoginVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F51541549BAFE00B7B09A /* SBServerLoginVC.m */; };
-		4B3F515B1549BB0500B7B09A /* NSURLConnection+BlockPatch.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B3F515A1549BB0500B7B09A /* NSURLConnection+BlockPatch.m */; };
 		7A16073115E7B7780039CCF2 /* helpScreeniPhone.png in Resources */ = {isa = PBXBuildFile; fileRef = 7A1606F515E7B7780039CCF2 /* helpScreeniPhone.png */; };
 		7A16073315E7B7780039CCF2 /* home.png in Resources */ = {isa = PBXBuildFile; fileRef = 7A1606F715E7B7780039CCF2 /* home.png */; };
 		7A16073415E7B7780039CCF2 /* cancelicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7A1606F815E7B7780039CCF2 /* cancelicon.png */; };
@@ -184,10 +182,6 @@
 		02A3062213C686D300E7340D /* MainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
 		4B35E867152E236000B0BDBB /* CoreMedia_Timecodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreMedia_Timecodes.h; sourceTree = "<group>"; };
 		4B35E868152E236000B0BDBB /* CoreMedia_Timecodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreMedia_Timecodes.m; sourceTree = "<group>"; };
-		4B3F51531549BAFE00B7B09A /* SBServerLoginVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBServerLoginVC.h; sourceTree = "<group>"; };
-		4B3F51541549BAFE00B7B09A /* SBServerLoginVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBServerLoginVC.m; sourceTree = "<group>"; };
-		4B3F51591549BB0500B7B09A /* NSURLConnection+BlockPatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLConnection+BlockPatch.h"; sourceTree = "<group>"; };
-		4B3F515A1549BB0500B7B09A /* NSURLConnection+BlockPatch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLConnection+BlockPatch.m"; sourceTree = "<group>"; };
 		7A1606F515E7B7780039CCF2 /* helpScreeniPhone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = helpScreeniPhone.png; path = graphics/helpScreeniPhone.png; sourceTree = "<group>"; };
 		7A1606F715E7B7780039CCF2 /* home.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = home.png; path = graphics/home.png; sourceTree = "<group>"; };
 		7A1606F815E7B7780039CCF2 /* cancelicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cancelicon.png; path = graphics/cancelicon.png; sourceTree = "<group>"; };
@@ -319,7 +313,6 @@
 		02A305BB13C6868B00E7340D = {
 			isa = PBXGroup;
 			children = (
-				7A9AD84B160AD17A004CA126 /* Default-568h@2x.png */,
 				02A3062113C686D300E7340D /* Settings.bundle */,
 				02A305EF13C686D300E7340D /* Sources */,
 				02A306C913C687C200E7340D /* XIB */,
@@ -382,10 +375,6 @@
 				02A3060713C686D300E7340D /* MyUIWindow.m */,
 				02A3060813C686D300E7340D /* Note.h */,
 				02A3060913C686D300E7340D /* Note.m */,
-				4B3F51591549BB0500B7B09A /* NSURLConnection+BlockPatch.h */,
-				4B3F515A1549BB0500B7B09A /* NSURLConnection+BlockPatch.m */,
-				4B3F51531549BAFE00B7B09A /* SBServerLoginVC.h */,
-				4B3F51541549BAFE00B7B09A /* SBServerLoginVC.m */,
 				7A6AA8A4148D6BE000F2B351 /* SVHTTPRequest */,
 				0224AAE614181DAF005AFBAB /* UIImageView+Scaling.h */,
 				0224AAE714181DB0005AFBAB /* UIImageView+Scaling.m */,
@@ -434,6 +423,7 @@
 		02A306CC13C6886100E7340D /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7A9AD84B160AD17A004CA126 /* Default-568h@2x.png */,
 				7AEB2DDE15E921EF0044CF9F /* quartzregulardb.ttf */,
 				7A1606F515E7B7780039CCF2 /* helpScreeniPhone.png */,
 				7A1606F715E7B7780039CCF2 /* home.png */,
@@ -759,8 +749,6 @@
 				BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */,
 				7A89B2CC147740D300F172A3 /* FileCell.m in Sources */,
 				4B35E869152E236000B0BDBB /* CoreMedia_Timecodes.m in Sources */,
-				4B3F51561549BAFF00B7B09A /* SBServerLoginVC.m in Sources */,
-				4B3F515B1549BB0500B7B09A /* NSURLConnection+BlockPatch.m in Sources */,
 				7AA7839E15E7BEB400ED18DB /* IASKAppSettingsViewController.m in Sources */,
 				7AA7839F15E7BEB400ED18DB /* IASKAppSettingsWebViewController.m in Sources */,
 				7AA783A015E7BEB400ED18DB /* IASKSpecifierValuesViewController.m in Sources */,
@@ -848,7 +836,7 @@
 				GCC_PREFIX_HEADER = Scribbeo_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Scribbeo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Scribbeo;
 				PROVISIONING_PROFILE = "";
@@ -875,7 +863,7 @@
 				GCC_PREFIX_HEADER = Scribbeo_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Scribbeo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Scribbeo;
 				PROVISIONING_PROFILE = "";
@@ -923,7 +911,7 @@
 				GCC_PREFIX_HEADER = Scribbeo_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "Scribbeo-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = Scribbeo;
 				PROVISIONING_PROFILE = "";

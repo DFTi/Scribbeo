@@ -8,14 +8,12 @@
 
 #import "DetailViewController.h"
 #import "VideoTreeViewController.h"
-#import "NSURLConnection+BlockPatch.h"
 
 @implementation DetailViewController
 
 @synthesize currentClip, popoverController, moviePath;
 @synthesize currentPath, files, fileTypes, assetURLs, timeCodes;
 @synthesize progressView, activityIndicator;
-@synthesize serverLogin;
 
 #pragma mark -
 #pragma mark View Loading
@@ -235,105 +233,71 @@
         NSLog(@"Making list for BonjourMode. Querying: %@", urlstr);
         NSURL *url = [NSURL URLWithString:urlstr];
         //NSError* error = nil;
-        __block NSString *list = nil;//[NSString stringWithContentsOfURL:url encoding:NSASCIIStringEncoding error:&error];
-        
+       
         NSURLRequest* request = [NSURLRequest requestWithURL:url];
         NSOperationQueue* queue = [[[NSOperationQueue alloc] init] autorelease];
-        
-        __block DetailViewController* blockSelf = self;
-        // __block VideoTreeViewController *vc = [kAppDel viewController];
-        
+      
        // [self showActivity];
         
         [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse* response, NSData* data, NSError* error){
             if (error)
             {
-                
                 if (error.code == -1012)
                 {
-                    blockSelf.serverLogin = [SBServerLoginVC serverLoginVCAccepted:^{
-                        [self makeList];//Retry
-                        
-                        // UI needs to be on the main thread.
-//                        dispatch_async(dispatch_get_main_queue(), ^{
-//                            [vc dismissModalViewControllerAnimated:YES];
-//                        });
-                        //blockSelf.serverLogin = nil;
-                    } 
-                    canceled:^(NSString* reason){
-                        
-                        // UI needs to be on the main thread.
-//                        dispatch_async(dispatch_get_main_queue(), ^{
-//                            [vc dismissModalViewControllerAnimated:YES];
-//                        });
-                        //blockSelf.serverLogin = nil;
-                    }];
-                    
-                    
                     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                    
-                    blockSelf.serverLogin.serverIPInput.text = [defaults stringForKey:@"ServerIP"];
-                    blockSelf.serverLogin.serverPortInput.text = [defaults stringForKey:@"ServerPort"];
-                    blockSelf.serverLogin.usernameInput.text = [defaults stringForKey:@"Username"];
-                    blockSelf.serverLogin.passwordInput.text = [defaults stringForKey:@"Password"];
-
-                    // jon: don't show it to me anymore
-                    // UI needs to be on the main thread.
-//                    dispatch_async(dispatch_get_main_queue(), ^{
-//                        [vc presentModalViewController:blockSelf.serverLogin animated:YES];
-//                    });
-                    
-                    // JUST ACCEPT
-                    
-                    [blockSelf.serverLogin performSelector:@selector(serverLoginAttempt:)];
-
+                    [SVHTTPRequest POST:[NSString stringWithFormat:@"https://%@:%@/login",
+                                         [defaults stringForKey:@"ServerIP"], [defaults stringForKey:@"ServerPort"]]
+                             parameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                         [defaults stringForKey:@"Username"], @"username",
+                                         [defaults stringForKey:@"Password"], @"password",
+                                         nil]
+                             completion:^(id response, NSHTTPURLResponse *urlResponse, NSError *error2)
+                     {
+                         if (error2)
+                         {
+                             NSLog(@"ErrorCode:%i", error2.code);
+                             UIAlertView *loginAlert = [[[UIAlertView alloc] initWithTitle:@"Server Login Alert" message:error2.localizedDescription delegate:nil cancelButtonTitle:@"Dismiss" otherButtonTitles:nil] autorelease];
+                             loginAlert.alertViewStyle = UIAlertViewStyleDefault;
+                             [loginAlert show];
+                             return;
+                             
+                         }
+                         NSData *data2 = [NSData dataWithData:(NSData*)response];
+                         if (data2)
+                         {
+                             NSString *responseString = [NSString stringWithFormat:@"%s",(char*)[data2 bytes]];                            
+                             if ([responseString isEqualToString:@"Invalid credentials."]) {
+                                 UIAlertView *loginAlert = [[[UIAlertView alloc] initWithTitle:@"Server Login Alert"
+                                                                                       message:@"Invalid login credentials."
+                                                                                      delegate:nil cancelButtonTitle:@"Dismiss"
+                                                                             otherButtonTitles:nil] autorelease];
+                                 loginAlert.alertViewStyle = UIAlertViewStyleDefault;
+                                 [loginAlert show];
+                                 return;
+                             } else {
+                                 // Successful login!
+                                 [self makeList]; //Retry
+                             }
+                             return;
+                         }
+                         
+                     }];
                 }
-            }
-            
-            else {
+            } else {
                 
                 // Resync main thread with new data
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    
-                    list = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                     NSLog(@"Got data... Filling the file list");
                     [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
                     [self stopActivity];
-                    NSDictionary *fileDict = [list objectFromJSONString];
+                    NSDictionary *fileDict = [[[NSString alloc] initWithData:data
+                                                                    encoding:NSUTF8StringEncoding] objectFromJSONString];
                     // Now we need to populate the files array using our nice JSON list
                     [self filesFromJSONFileListing:fileDict];
                     
                 });
             }
-        }];
-        
-        
-        /*if (!list || (error && error.code == -1012)) 
-        {
-            NSLog(@"Could not get data from the URL: %@", error.localizedDescription);
-            
-            serverLogin = [SBServerLoginVC serverLoginVCAccepted:^{
-                [self makeList];//Retry
-                
-                [blockSelf dismissModalViewControllerAnimated:YES];
-                //is this legal?
-                //self.serverLogin = nil;
-            } 
-            canceled:^(NSString* reason){
-                [blockSelf dismissModalViewControllerAnimated:YES];
-                //is this legal?
-                //self.serverLogin = nil;
-            }];
-            
-            [self presentModalViewController:serverLogin animated:YES];
-            
-            return;
-        }*/
-       // NSLog(@"Got data... Filling the file list");
-       // [self hideDisconnected]; // Remove the 'disconnected' indicator if it's there.
-       // NSDictionary *fileDict = [list objectFromJSONString];
-        // Now we need to populate the files array using our nice JSON list
-       // [self filesFromJSONFileListing:fileDict];       
+        }];    
     } else if (kBonjourMode && (!kHTTPserver)) {
         NSLog(@"In bonjour mode, but the http server has not been set yet.");
         [[kAppDel serverBrowser] stop];
