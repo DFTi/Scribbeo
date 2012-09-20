@@ -187,7 +187,7 @@ typedef void (^CanceledBlock)(NSString*);
         
     [SVHTTPRequest POST:[requestURL absoluteString]
              parameters:[NSDictionary dictionaryWithObjectsAndKeys:
-                         @"keyvan", @"username",
+                         @"keyvean", @"username",
                          @"shomal", @"password",
                          nil]
              completion:^(id response, NSHTTPURLResponse *urlResponse, NSError *error)
@@ -231,14 +231,18 @@ typedef void (^CanceledBlock)(NSString*);
             
         }
         NSData *data = [NSData dataWithData:(NSData*)response];
-        if (data)//Login success
+        if (data)
         {
-            
-            #ifdef DEBUG
-            
-            NSLog(@"%s", (char*)[data bytes]);
-            
-            #endif
+            NSString *responseString = [NSString stringWithFormat:@"%s",(char*)[data bytes]];
+            if ([responseString isEqualToString:@"Invalid credentials."]) {
+                UIAlertView *loginAlert = [[[UIAlertView alloc] initWithTitle:@"Server Login Alert"
+                                                                      message:@"Invalid login credentials."
+                                                                     delegate:nil cancelButtonTitle:@"Dismiss"
+                                                            otherButtonTitles:nil] autorelease];
+                loginAlert.alertViewStyle = UIAlertViewStyleDefault;
+                [loginAlert show];
+                return;
+            }
             
             __block SBServerLoginVC *blockSelf = self;
             
