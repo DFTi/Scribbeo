@@ -98,8 +98,10 @@
 		7A16076A15E7B7780039CCF2 /* scribbeo-icon~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 7A16072E15E7B7780039CCF2 /* scribbeo-icon~ipad.png */; };
 		7A16076B15E7B7780039CCF2 /* scribbeo.icns in Resources */ = {isa = PBXBuildFile; fileRef = 7A16072F15E7B7780039CCF2 /* scribbeo.icns */; };
 		7A16076C15E7B7780039CCF2 /* spot.png in Resources */ = {isa = PBXBuildFile; fileRef = 7A16073015E7B7780039CCF2 /* spot.png */; };
-		7A6AA8A2148D6BD800F2B351 /* SVHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A6AA8A1148D6BD800F2B351 /* SVHTTPRequest.m */; };
 		7A89B2CC147740D300F172A3 /* FileCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A89B2CB147740D300F172A3 /* FileCell.m */; };
+		7A9AD847160AD07C004CA126 /* SVHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A9AD846160AD07C004CA126 /* SVHTTPClient.m */; };
+		7A9AD84A160AD089004CA126 /* SVHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A9AD849160AD089004CA126 /* SVHTTPRequest.m */; };
+		7A9AD84C160AD17A004CA126 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7A9AD84B160AD17A004CA126 /* Default-568h@2x.png */; };
 		7AA7837315E7BE7800ED18DB /* SBServerLoginVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AA7837215E7BE7800ED18DB /* SBServerLoginVC.xib */; };
 		7AA7839E15E7BEB400ED18DB /* IASKAppSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AA7837815E7BEB400ED18DB /* IASKAppSettingsViewController.m */; };
 		7AA7839F15E7BEB400ED18DB /* IASKAppSettingsWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AA7837A15E7BEB400ED18DB /* IASKAppSettingsWebViewController.m */; };
@@ -242,10 +244,13 @@
 		7A16072E15E7B7780039CCF2 /* scribbeo-icon~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "scribbeo-icon~ipad.png"; path = "graphics/scribbeo-icon~ipad.png"; sourceTree = "<group>"; };
 		7A16072F15E7B7780039CCF2 /* scribbeo.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = scribbeo.icns; path = graphics/scribbeo.icns; sourceTree = "<group>"; };
 		7A16073015E7B7780039CCF2 /* spot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spot.png; path = graphics/spot.png; sourceTree = "<group>"; };
-		7A6AA8A0148D6BD800F2B351 /* SVHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVHTTPRequest.h; sourceTree = "<group>"; };
-		7A6AA8A1148D6BD800F2B351 /* SVHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVHTTPRequest.m; sourceTree = "<group>"; };
 		7A89B2CA147740D300F172A3 /* FileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCell.h; sourceTree = "<group>"; };
 		7A89B2CB147740D300F172A3 /* FileCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileCell.m; sourceTree = "<group>"; };
+		7A9AD845160AD07C004CA126 /* SVHTTPClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVHTTPClient.h; sourceTree = "<group>"; };
+		7A9AD846160AD07C004CA126 /* SVHTTPClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVHTTPClient.m; sourceTree = "<group>"; };
+		7A9AD848160AD089004CA126 /* SVHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SVHTTPRequest.h; sourceTree = "<group>"; };
+		7A9AD849160AD089004CA126 /* SVHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SVHTTPRequest.m; sourceTree = "<group>"; };
+		7A9AD84B160AD17A004CA126 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		7AA7837215E7BE7800ED18DB /* SBServerLoginVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SBServerLoginVC.xib; sourceTree = "<group>"; };
 		7AA7837715E7BEB400ED18DB /* IASKAppSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IASKAppSettingsViewController.h; sourceTree = "<group>"; };
 		7AA7837815E7BEB400ED18DB /* IASKAppSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IASKAppSettingsViewController.m; sourceTree = "<group>"; };
@@ -314,6 +319,7 @@
 		02A305BB13C6868B00E7340D = {
 			isa = PBXGroup;
 			children = (
+				7A9AD84B160AD17A004CA126 /* Default-568h@2x.png */,
 				02A3062113C686D300E7340D /* Settings.bundle */,
 				02A305EF13C686D300E7340D /* Sources */,
 				02A306C913C687C200E7340D /* XIB */,
@@ -485,8 +491,10 @@
 		7A6AA8A4148D6BE000F2B351 /* SVHTTPRequest */ = {
 			isa = PBXGroup;
 			children = (
-				7A6AA8A0148D6BD800F2B351 /* SVHTTPRequest.h */,
-				7A6AA8A1148D6BD800F2B351 /* SVHTTPRequest.m */,
+				7A9AD845160AD07C004CA126 /* SVHTTPClient.h */,
+				7A9AD846160AD07C004CA126 /* SVHTTPClient.m */,
+				7A9AD848160AD089004CA126 /* SVHTTPRequest.h */,
+				7A9AD849160AD089004CA126 /* SVHTTPRequest.m */,
 			);
 			name = SVHTTPRequest;
 			sourceTree = "<group>";
@@ -721,6 +729,7 @@
 				7AA783B215E7BEB400ED18DB /* IASKSpecifierValuesView.xib in Resources */,
 				7AA783B915E7BFCE00ED18DB /* Scribbeo.entitlements in Resources */,
 				7AEB2DDF15E921EF0044CF9F /* quartzregulardb.ttf in Resources */,
+				7A9AD84C160AD17A004CA126 /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -749,7 +758,6 @@
 				0224AAE814181DB0005AFBAB /* UIImageView+Scaling.m in Sources */,
 				BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */,
 				7A89B2CC147740D300F172A3 /* FileCell.m in Sources */,
-				7A6AA8A2148D6BD800F2B351 /* SVHTTPRequest.m in Sources */,
 				4B35E869152E236000B0BDBB /* CoreMedia_Timecodes.m in Sources */,
 				4B3F51561549BAFF00B7B09A /* SBServerLoginVC.m in Sources */,
 				4B3F515B1549BB0500B7B09A /* NSURLConnection+BlockPatch.m in Sources */,
@@ -769,6 +777,8 @@
 				7AA783AB15E7BEB400ED18DB /* IASKSwitch.m in Sources */,
 				7AA783AC15E7BEB400ED18DB /* IASKTextField.m in Sources */,
 				7AA783BB15E7BFEB00ED18DB /* main.m in Sources */,
+				7A9AD847160AD07C004CA126 /* SVHTTPClient.m in Sources */,
+				7A9AD84A160AD089004CA126 /* SVHTTPRequest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

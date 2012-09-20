@@ -43,10 +43,10 @@ static int tryOne = 0;
         self.viewController =  [[VideoTreeViewController alloc] 
                 initWithNibName: @"iPhoneVideoTreeViewController" bundle:[NSBundle mainBundle]];
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:NO];
-        [window addSubview: viewController.view];
+        window.rootViewController = viewController;
     }
     else {
-        [window addSubview: viewController.view];
+        window.rootViewController = viewController;
     }
     
     [self makeDetailTableViewController];

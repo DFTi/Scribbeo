@@ -2112,7 +2112,7 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
         NSLog(@"ARCHIVE PATH: %@ REMOTEPATH: %@", archivePath, remoteURL);    
         [activeAsyncRequests addObject:[SVHTTPRequest GET:remoteURL
                 parameters:nil
-                completion:^(NSObject *response) {
+                completion:^(id response, NSHTTPURLResponse *urlResponse, NSError *error) {
                     if (response) {
                         NSData *data = [NSData dataWithData:(NSData*)response];
                         [data writeToFile:archivePath atomically:YES];

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="7.10">
 	<data>
-		<int key="IBDocument.SystemTarget">1296</int>
-		<string key="IBDocument.SystemVersion">12A269</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2549</string>
-		<string key="IBDocument.AppKitVersion">1187</string>
-		<string key="IBDocument.HIToolboxVersion">624.00</string>
+		<int key="IBDocument.SystemTarget">1536</int>
+		<string key="IBDocument.SystemVersion">12C54</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2840</string>
+		<string key="IBDocument.AppKitVersion">1187.34</string>
+		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-			<string key="NS.object.0">1498</string>
+			<string key="NS.object.0">1926</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -57,7 +57,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{73, 60}, {209, 23}}</string>
 								<reference key="NSSuperview" ref="921314107"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="671504456"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -67,7 +66,6 @@
 						</object>
 						<string key="NSFrame">{{669, 43}, {355, 119}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="33629876"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<object class="NSColor" key="IBUIBackgroundColor" id="540236945">
@@ -81,7 +79,6 @@
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{711, 43}, {270, 57}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="282792061"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -119,7 +116,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{7, -3}, {51, 50}}</string>
 								<reference key="NSSuperview" ref="192450752"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="67004520"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -155,7 +151,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{642, 8}, {124, 30}}</string>
 								<reference key="NSSuperview" ref="192450752"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="311498232"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -204,6 +199,7 @@
 								<object class="NSColor" key="IBTintColor">
 									<int key="NSColorSpace">1</int>
 									<bytes key="NSRGB">MCAwIDAAA</bytes>
+									<string key="IBUIColorCocoaTouchKeyPath">darkTextColor</string>
 								</object>
 							</object>
 							<object class="IBUIView" id="311498232">
@@ -211,7 +207,6 @@
 								<int key="NSvFlags">-2147483356</int>
 								<string key="NSFrame">{{776, 6}, {34, 33}}</string>
 								<reference key="NSSuperview" ref="192450752"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="147162038"/>
 								<object class="NSColor" key="IBUIBackgroundColor" id="781911557">
 									<int key="NSColorSpace">3</int>
@@ -222,7 +217,6 @@
 						</object>
 						<string key="NSFrame">{{207, -1}, {817, 44}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="825006258"/>
 						<object class="NSColor" key="IBUIBackgroundColor" id="994980202">
 							<int key="NSColorSpace">1</int>
@@ -336,7 +330,6 @@
 						<int key="NSvFlags">266</int>
 						<string key="NSFrame">{{669, 162}, {356, 44}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="692699041"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
@@ -408,7 +401,6 @@
 						<int key="NSvFlags">266</int>
 						<string key="NSFrame">{{669, 206}, {355, 44}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="909807589"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
@@ -487,7 +479,6 @@
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{957, 100}, {57, 24}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="131617378"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -522,7 +513,6 @@
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{677, 103}, {57, 21}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="436114046"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -547,7 +537,6 @@
 						<int key="NSvFlags">303</int>
 						<string key="NSFrame">{{-22, 347}, {229, 44}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="371440629"/>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -595,7 +584,6 @@
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{300, 72}, {260, 128}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="921314107"/>
 						<reference key="IBUIBackgroundColor" ref="781911557"/>
 						<bool key="IBUIOpaque">NO</bool>
@@ -629,7 +617,6 @@
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{207, 43}, {461, 207}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="515329688"/>
 						<reference key="IBUIBackgroundColor" ref="540236945"/>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -640,7 +627,8 @@
 						<string key="IBUIText"/>
 						<object class="NSColor" key="IBUITextColor">
 							<int key="NSColorSpace">1</int>
-							<bytes key="NSRGB">MC42IDAuNiAwLjYgMC42AA</bytes>
+							<bytes key="NSRGB">MSAxIDEgMC42AA</bytes>
+							<string key="IBUIColorCocoaTouchKeyPath">lightTextColor</string>
 						</object>
 						<object class="IBUITextInputTraits" key="IBUITextInputTraits">
 							<int key="IBUIAutocapitalizationType">2</int>
@@ -668,7 +656,6 @@
 								<int key="NSvFlags">274</int>
 								<string key="NSFrame">{{61, -99}, {809, 500}}</string>
 								<reference key="NSSuperview" ref="371440629"/>
-								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="284580594"/>
 								<string key="NSReuseIdentifierKey">_NS:544</string>
 								<reference key="IBUIBackgroundColor" ref="781911557"/>
@@ -685,8 +672,6 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{674, 417}, {80, 21}}</string>
 								<reference key="NSSuperview" ref="371440629"/>
-								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:327</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -715,7 +700,6 @@
 						</object>
 						<string key="NSFrame">{{207, 251}, {817, 500}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
-						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="975396087"/>
 						<string key="NSReuseIdentifierKey">_NS:195</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
@@ -730,7 +714,6 @@
 				</object>
 				<string key="NSFrame">{{0, 20}, {1024, 748}}</string>
 				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="192450752"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">3</int>
@@ -1836,538 +1819,12 @@
 			<nil key="sourceID"/>
 			<int key="maxID">357</int>
 		</object>
-		<object class="IBClassDescriber" key="IBDocument.Classes">
-			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-				<object class="IBPartialClassDescription">
-					<string key="className">MPMoviePlayerController</string>
-					<string key="superclassName">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/MPMoviePlayerController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">MyPlayerLayerView</string>
-					<string key="superclassName">UIView</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/MyPlayerLayerView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">VideoTreeViewController</string>
-					<string key="superclassName">UIViewController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>airPlay</string>
-							<string>backFrame</string>
-							<string>clearNewNote:</string>
-							<string>cleartheNewNote:</string>
-							<string>color:</string>
-							<string>editNotesTable:</string>
-							<string>emailNotes</string>
-							<string>erase</string>
-							<string>fastForward</string>
-							<string>filterNotes:</string>
-							<string>forwardFrame</string>
-							<string>forwardToEnd</string>
-							<string>fullScreen</string>
-							<string>pauseIt</string>
-							<string>playPauseButtonPressed:</string>
-							<string>printNotes</string>
-							<string>recordNote</string>
-							<string>rewind</string>
-							<string>rewindToStart</string>
-							<string>save</string>
-							<string>shareActionButton:</string>
-							<string>showHelp</string>
-							<string>showNav</string>
-							<string>skipBack</string>
-							<string>skipForward</string>
-							<string>unDo</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>UISegmentedControl</string>
-							<string>UIBarButtonItem</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-							<string>id</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="actionInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>airPlay</string>
-							<string>backFrame</string>
-							<string>clearNewNote:</string>
-							<string>cleartheNewNote:</string>
-							<string>color:</string>
-							<string>editNotesTable:</string>
-							<string>emailNotes</string>
-							<string>erase</string>
-							<string>fastForward</string>
-							<string>filterNotes:</string>
-							<string>forwardFrame</string>
-							<string>forwardToEnd</string>
-							<string>fullScreen</string>
-							<string>pauseIt</string>
-							<string>playPauseButtonPressed:</string>
-							<string>printNotes</string>
-							<string>recordNote</string>
-							<string>rewind</string>
-							<string>rewindToStart</string>
-							<string>save</string>
-							<string>shareActionButton:</string>
-							<string>showHelp</string>
-							<string>showNav</string>
-							<string>skipBack</string>
-							<string>skipForward</string>
-							<string>unDo</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBActionInfo">
-								<string key="name">airPlay</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">backFrame</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">clearNewNote:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">cleartheNewNote:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">color:</string>
-								<string key="candidateClassName">UISegmentedControl</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">editNotesTable:</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">emailNotes</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">erase</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">fastForward</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">filterNotes:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">forwardFrame</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">forwardToEnd</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">fullScreen</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">pauseIt</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">playPauseButtonPressed:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">printNotes</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">recordNote</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">rewind</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">rewindToStart</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">save</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">shareActionButton:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">showHelp</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">showNav</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">skipBack</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">skipForward</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">unDo</string>
-								<string key="candidateClassName">id</string>
-							</object>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>airPlayImageView</string>
-							<string>clipLabel</string>
-							<string>dateLabel</string>
-							<string>drawingBar</string>
-							<string>editButton</string>
-							<string>episodeLabel</string>
-							<string>fastForwardButton</string>
-							<string>filenameView</string>
-							<string>filterButton</string>
-							<string>forwardToEndButton</string>
-							<string>frameBackButton</string>
-							<string>frameForwardButton</string>
-							<string>fullScreenButton</string>
-							<string>maxLabel</string>
-							<string>minLabel</string>
-							<string>movieController</string>
-							<string>movieTimeControl</string>
-							<string>newNote</string>
-							<string>noteBar</string>
-							<string>notePaper</string>
-							<string>pausePlayButton</string>
-							<string>playOutButton</string>
-							<string>playerLayerView</string>
-							<string>playerToolbar</string>
-							<string>playerToolbar1</string>
-							<string>recordButton</string>
-							<string>recording</string>
-							<string>remote</string>
-							<string>rewindButton</string>
-							<string>rewindToStartButton</string>
-							<string>saveFilename</string>
-							<string>shareActionButonItem</string>
-							<string>skipBackButton</string>
-							<string>skipForwardButton</string>
-							<string>stampLabel</string>
-							<string>tapeLabel</string>
-							<string>theNewNote</string>
-							<string>theTime</string>
-							<string>uploadActivityIndicatorView</string>
-							<string>volLabel</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>UIImageView</string>
-							<string>UILabel</string>
-							<string>UILabel</string>
-							<string>UIToolbar</string>
-							<string>UIBarButtonItem</string>
-							<string>UILabel</string>
-							<string>UIBarButtonItem</string>
-							<string>UIView</string>
-							<string>UIBarButtonItem</string>
-							<string>UIBarButtonItem</string>
-							<string>UIBarButtonItem</string>
-							<string>UIBarButtonItem</string>
-							<string>UIBarButtonItem</string>
-							<string>UILabel</string>
-							<string>UILabel</string>
-							<string>MPMoviePlayerController</string>
-							<string>UISlider</string>
-							<string>UITextView</string>
-							<string>UIToolbar</string>
-							<string>UIImageView</string>
-							<string>UIBarButtonItem</string>
-							<string>UIBarButtonItem</string>
-							<string>UIView</string>
-							<string>UIToolbar</string>
-							<string>UIToolbar</string>
-							<string>UIButton</string>
-							<string>UILabel</string>
-							<string>UIView</string>
-							<string>UIBarButtonItem</string>
-							<string>UIBarButtonItem</string>
-							<string>UITextField</string>
-							<string>UIBarButtonItem</string>
-							<string>UIBarButtonItem</string>
-							<string>UIBarButtonItem</string>
-							<string>UILabel</string>
-							<string>UILabel</string>
-							<string>UITextView</string>
-							<string>UILabel</string>
-							<string>UIView</string>
-							<string>UILabel</string>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>airPlayImageView</string>
-							<string>clipLabel</string>
-							<string>dateLabel</string>
-							<string>drawingBar</string>
-							<string>editButton</string>
-							<string>episodeLabel</string>
-							<string>fastForwardButton</string>
-							<string>filenameView</string>
-							<string>filterButton</string>
-							<string>forwardToEndButton</string>
-							<string>frameBackButton</string>
-							<string>frameForwardButton</string>
-							<string>fullScreenButton</string>
-							<string>maxLabel</string>
-							<string>minLabel</string>
-							<string>movieController</string>
-							<string>movieTimeControl</string>
-							<string>newNote</string>
-							<string>noteBar</string>
-							<string>notePaper</string>
-							<string>pausePlayButton</string>
-							<string>playOutButton</string>
-							<string>playerLayerView</string>
-							<string>playerToolbar</string>
-							<string>playerToolbar1</string>
-							<string>recordButton</string>
-							<string>recording</string>
-							<string>remote</string>
-							<string>rewindButton</string>
-							<string>rewindToStartButton</string>
-							<string>saveFilename</string>
-							<string>shareActionButonItem</string>
-							<string>skipBackButton</string>
-							<string>skipForwardButton</string>
-							<string>stampLabel</string>
-							<string>tapeLabel</string>
-							<string>theNewNote</string>
-							<string>theTime</string>
-							<string>uploadActivityIndicatorView</string>
-							<string>volLabel</string>
-						</object>
-						<object class="NSArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<object class="IBToOneOutletInfo">
-								<string key="name">airPlayImageView</string>
-								<string key="candidateClassName">UIImageView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">clipLabel</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">dateLabel</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">drawingBar</string>
-								<string key="candidateClassName">UIToolbar</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">editButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">episodeLabel</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">fastForwardButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">filenameView</string>
-								<string key="candidateClassName">UIView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">filterButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">forwardToEndButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">frameBackButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">frameForwardButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">fullScreenButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">maxLabel</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">minLabel</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">movieController</string>
-								<string key="candidateClassName">MPMoviePlayerController</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">movieTimeControl</string>
-								<string key="candidateClassName">UISlider</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">newNote</string>
-								<string key="candidateClassName">UITextView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">noteBar</string>
-								<string key="candidateClassName">UIToolbar</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">notePaper</string>
-								<string key="candidateClassName">UIImageView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">pausePlayButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">playOutButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">playerLayerView</string>
-								<string key="candidateClassName">UIView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">playerToolbar</string>
-								<string key="candidateClassName">UIToolbar</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">playerToolbar1</string>
-								<string key="candidateClassName">UIToolbar</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">recordButton</string>
-								<string key="candidateClassName">UIButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">recording</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">remote</string>
-								<string key="candidateClassName">UIView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">rewindButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">rewindToStartButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">saveFilename</string>
-								<string key="candidateClassName">UITextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">shareActionButonItem</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">skipBackButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">skipForwardButton</string>
-								<string key="candidateClassName">UIBarButtonItem</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">stampLabel</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">tapeLabel</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">theNewNote</string>
-								<string key="candidateClassName">UITextView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">theTime</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">uploadActivityIndicatorView</string>
-								<string key="candidateClassName">UIView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">volLabel</string>
-								<string key="candidateClassName">UILabel</string>
-							</object>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/VideoTreeViewController.h</string>
-					</object>
-				</object>
-			</object>
-		</object>
+		<object class="IBClassDescriber" key="IBDocument.Classes"/>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBIPadFramework</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaTouchPlugin.iPhoneOS</string>
-			<real value="1296" key="NS.object.0"/>
+			<real value="1536" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaTouchPlugin.InterfaceBuilder3</string>
@@ -2414,6 +1871,6 @@
 				<string>{36, 21}</string>
 			</object>
 		</object>
-		<string key="IBCocoaTouchPluginVersion">1498</string>
+		<string key="IBCocoaTouchPluginVersion">1926</string>
 	</data>
 </archive>

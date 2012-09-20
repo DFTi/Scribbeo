@@ -10,6 +10,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "NSURLConnection+BlockPatch.h"
 #import <dispatch/dispatch.h>
+#import "SVHTTPRequest.h"
 
 typedef void (^AcceptedBlock)(void);
 typedef void (^CanceledBlock)(NSString*);
@@ -167,26 +168,30 @@ typedef void (^CanceledBlock)(NSString*);
     [self becomeFirstResponder];
     [self resignFirstResponder];
     
-    NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@:%@/login", self.serverIPInput.text, self.serverPortInput.text]];
+//    NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@:%@/login", self.serverIPInput.text, self.serverPortInput.text]];
+    
+    NSURL *requestURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://app.scribbeo.com:44301/login"]];
+    
     
     NSMutableURLRequest* urlRequest = [NSMutableURLRequest requestWithURL:requestURL];
     
     [urlRequest setHTTPMethod:self.HTTPMethod];
     
-    NSMutableString *POSTDataString = [NSMutableString stringWithFormat:@"username=%@", self.usernameInput.text];
-    [POSTDataString appendFormat:@"&password=%@", self.passwordInput.text];
+    NSMutableString *POSTDataString = [NSMutableString stringWithFormat:@"username=keyvan"];
+    [POSTDataString appendFormat:@"&password=shomal"];
     
     NSData *POSTData = [NSData dataWithBytes:[POSTDataString UTF8String] length:[POSTDataString length]];
     [urlRequest setHTTPBody:POSTData];
     
-    NSLog(@"\n%@\nUser:%@\nPass:%@", requestURL, self.usernameInput.text, self.passwordInput.text);
-    
-    NSOperationQueue *queue = [[[NSOperationQueue alloc] init] autorelease];
-    
-    [NSURLConnection sendAsynchronousRequest:urlRequest queue:queue completionHandler:
-     ^(NSURLResponse* response, NSData* data, NSError* error)
-    {
+    NSLog(@"\n%@\nUser:%@\nPass:%@", requestURL, @"keyvan", @"shomal");
         
+    [SVHTTPRequest POST:[requestURL absoluteString]
+             parameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                         @"keyvan", @"username",
+                         @"shomal", @"password",
+                         nil]
+             completion:^(id response, NSHTTPURLResponse *urlResponse, NSError *error)
+    {
         if (error)
         {
                         
@@ -211,7 +216,7 @@ typedef void (^CanceledBlock)(NSString*);
             
             UIAlertView *loginAlert = [[[UIAlertView alloc] initWithTitle:@"Server Login Alert" message:error.localizedDescription delegate:nil cancelButtonTitle:@"Dismiss" otherButtonTitles:nil] autorelease];
             loginAlert.alertViewStyle = UIAlertViewStyleDefault;
-            [loginAlert show]; 
+            [loginAlert show];
             
             __block SBServerLoginVC *blockSelf = self;
             
@@ -225,7 +230,7 @@ typedef void (^CanceledBlock)(NSString*);
             return;
             
         }
-        
+        NSData *data = [NSData dataWithData:(NSData*)response];
         if (data)//Login success
         {
             
