@@ -504,8 +504,8 @@ static int tryOne = 0;
             NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:manualServer] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:3];
             NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
             if (error != nil) {
-                NSLog(@"%@", error.localizedDescription);
-                [UIAlertView doAlert:  @"Connection Error" 
+                NSLog(@"Connection error ... %@", error.localizedDescription);
+                [UIAlertView doAlert: @"Connection Error"
                          withMsg:@"Cannot find a Scribbeo Server at the specified URL. Please enter a valid IP and Port, otherwise enable Auto Discovery."];
                 NSLog(@"Failed to connect to manually entered server %@", manualServer);
             } else {

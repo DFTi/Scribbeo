@@ -2604,6 +2604,9 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
     NSArray *toRecipients = [NSArray arrayWithObject:@"keyvan@digitalfilmtree.com"]; // needs to be changed to support@scribbeo.com or something official
     [picker setToRecipients:toRecipients];
     NSData *myData = [NSData dataWithContentsOfFile: logFilePath];
+    NSError *error;
+    NSString *logcontents = [NSString stringWithContentsOfFile:logFilePath encoding:NSASCIIStringEncoding error:&error];
+    NSLog(logcontents);
     [picker addAttachmentData: myData mimeType: @"text/plain" 
                      fileName: [logFilePath lastPathComponent]];
     [picker setMessageBody:@"Please give as much information as possible below so that we can locate and resolve any issue you are experiencing with the app. A debug log will also be sent with this email.\n\n" isHTML:NO];
