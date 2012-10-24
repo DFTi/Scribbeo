@@ -1753,6 +1753,23 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 }
 #endif
 
+-(BOOL) datastoreAvailable
+{
+    if (kBonjourMode) {
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSString *manualIP = [defaults stringForKey:@"ServerIP"];
+        NSString *manualPort = [defaults stringForKey:@"ServerPort"];
+        NSString *manualServer = [NSString stringWithFormat:@"https://%@:%@", manualIP, manualPort];
+        NSLog(@"Checking for datastore availibility: %@", manualServer);
+        NSError *error = nil;
+        NSURLResponse *response;
+        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:manualServer] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:3];
+        [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+        if (error != nil) return NO;
+        else return YES;
+    } else return YES;
+}
+
 //
 // The Save button
 // This method is also called internally to save a note (e.g., when the keyboard is dismissed)
@@ -1760,6 +1777,12 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 -(IBAction) save
 {
+    if ([self datastoreAvailable] == NO) {
+        [UIAlertView doAlert:  @"Cannot Save Note"
+                     withMsg:@"There is no connectivity to the remote datastore. Please check your network connectivity."];
+        return;
+    }
+    
     // Dismiss the keyboard if it's showing
     
     if (keyboardShows)  {

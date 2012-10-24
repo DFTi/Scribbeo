@@ -417,6 +417,8 @@ enum downloadType { kNotes, kTimecode, kAvidTXT };
 -(void) directlySetStartTimecode: (NSString *) timeCodeStr;
 - (IBAction)cleartheNewNote:(id)sender;
 
+-(BOOL) datastoreAvailable;
+
 @property (nonatomic, retain) IASKAppSettingsViewController *appSettingsViewController;
 
 
