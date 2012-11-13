@@ -15,6 +15,20 @@
 #import <Endian.h>
 #import "VoiceMemo.h"
 
+// This category (i.e. class extension) is a workaround to get the
+// Image PickerController to appear in landscape mode.
+@interface UIImagePickerController(Nonrotating)
+- (BOOL)shouldAutorotate;
+@end
+
+@implementation UIImagePickerController(Nonrotating)
+
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
+@end
+
 @interface UIImage (TPAdditions)
 - (UIImage*)imageScaledToSize:(CGSize)size;
 @end
@@ -3233,6 +3247,10 @@ void CGContextShowMultilineText (CGContextRef pdfContext, const char *noteText, 
     }
 }    
 
+
+-(BOOL)shouldAutorotate{
+    return YES;
+}
          
 #pragma mark -
 #pragma mark scrubber

@@ -10,6 +10,7 @@
 #import "VideoTreeViewController.h"
 #import "DetailViewController.h"
 #import "Clip.h"
+#import "UIDevice+Resolutions.h"
 
 int gIOSMajorVersion;
 
@@ -39,16 +40,22 @@ static int tryOne = 0;
 
     iPhone = [[UIScreen mainScreen] applicationFrame].size.height < 1000;
     
-    if (iPhone) {
-        self.viewController =  [[VideoTreeViewController alloc] 
-                initWithNibName: @"iPhoneVideoTreeViewController" bundle:[NSBundle mainBundle]];
+    UIDeviceResolution res = [UIDevice currentResolution];
+    
+    if (res == UIDevice_iPhoneStandardRes || res == UIDevice_iPhoneHiRes) {
+        self.viewController =  [[VideoTreeViewController alloc]
+                                initWithNibName: @"iPhoneVideoTreeViewController" bundle:[NSBundle mainBundle]];
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:NO];
-        window.rootViewController = viewController;
+
     }
-    else {
-        window.rootViewController = viewController;
+    else if (res == UIDevice_iPhoneTallerHiRes) {
+        self.viewController =  [[VideoTreeViewController alloc]
+                                initWithNibName: @"iPhone5VideoTreeViewController" bundle:[NSBundle mainBundle]];
+        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:NO];
+
     }
     
+    window.rootViewController = viewController;
     [self makeDetailTableViewController];
     [viewController.view addSubview: nc.view];
     

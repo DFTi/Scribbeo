@@ -124,6 +124,8 @@
 		7AA783B215E7BEB400ED18DB /* IASKSpecifierValuesView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AA7839D15E7BEB400ED18DB /* IASKSpecifierValuesView.xib */; };
 		7AA783B915E7BFCE00ED18DB /* Scribbeo.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = 7AA783B815E7BFCE00ED18DB /* Scribbeo.entitlements */; };
 		7AA783BB15E7BFEB00ED18DB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AA783BA15E7BFEB00ED18DB /* main.m */; };
+		7AC54FF01652E8A0000B8175 /* iPhone5VideoTreeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7AC54FEF1652E8A0000B8175 /* iPhone5VideoTreeViewController.xib */; };
+		7AC54FF41652EB35000B8175 /* UIDevice+Resolutions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7AC54FF31652EB35000B8175 /* UIDevice+Resolutions.m */; };
 		7AEB2DDF15E921EF0044CF9F /* quartzregulardb.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7AEB2DDE15E921EF0044CF9F /* quartzregulardb.ttf */; };
 		BCCDB3B71468C8FC008D41B2 /* JSONKit.m in Sources */ = {isa = PBXBuildFile; fileRef = BCCDB3B61468C8FC008D41B2 /* JSONKit.m */; };
 /* End PBXBuildFile section */
@@ -284,6 +286,9 @@
 		7AA7839D15E7BEB400ED18DB /* IASKSpecifierValuesView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IASKSpecifierValuesView.xib; sourceTree = "<group>"; };
 		7AA783B815E7BFCE00ED18DB /* Scribbeo.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Scribbeo.entitlements; sourceTree = "<group>"; };
 		7AA783BA15E7BFEB00ED18DB /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		7AC54FEF1652E8A0000B8175 /* iPhone5VideoTreeViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = iPhone5VideoTreeViewController.xib; sourceTree = "<group>"; };
+		7AC54FF21652EB35000B8175 /* UIDevice+Resolutions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIDevice+Resolutions.h"; path = "lib/UIDevice+Resolutions.h"; sourceTree = SOURCE_ROOT; };
+		7AC54FF31652EB35000B8175 /* UIDevice+Resolutions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIDevice+Resolutions.m"; path = "lib/UIDevice+Resolutions.m"; sourceTree = SOURCE_ROOT; };
 		7AEB2DDE15E921EF0044CF9F /* quartzregulardb.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = quartzregulardb.ttf; path = fonts/quartzregulardb.ttf; sourceTree = "<group>"; };
 		BCCDB3B51468C8FC008D41B2 /* JSONKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONKit.h; sourceTree = "<group>"; };
 		BCCDB3B61468C8FC008D41B2 /* JSONKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKit.m; sourceTree = "<group>"; };
@@ -386,6 +391,8 @@
 				02A3061313C686D300E7340D /* VideoTreeViewController.m */,
 				02A3061513C686D300E7340D /* VoiceMemo.h */,
 				02A3061613C686D300E7340D /* VoiceMemo.m */,
+				7AC54FF21652EB35000B8175 /* UIDevice+Resolutions.h */,
+				7AC54FF31652EB35000B8175 /* UIDevice+Resolutions.m */,
 				02A3061713C686D300E7340D /* XMLURL.h */,
 				02A3061813C686D300E7340D /* XMLURL.m */,
 			);
@@ -396,6 +403,7 @@
 		02A306C913C687C200E7340D /* XIB */ = {
 			isa = PBXGroup;
 			children = (
+				7AC54FEF1652E8A0000B8175 /* iPhone5VideoTreeViewController.xib */,
 				02A3060013C686D300E7340D /* HelpScreenController.xib */,
 				7AA7837215E7BE7800ED18DB /* SBServerLoginVC.xib */,
 				02A3062213C686D300E7340D /* MainWindow.xib */,
@@ -720,6 +728,7 @@
 				7AA783B915E7BFCE00ED18DB /* Scribbeo.entitlements in Resources */,
 				7AEB2DDF15E921EF0044CF9F /* quartzregulardb.ttf in Resources */,
 				7A9AD84C160AD17A004CA126 /* Default-568h@2x.png in Resources */,
+				7AC54FF01652E8A0000B8175 /* iPhone5VideoTreeViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -767,6 +776,7 @@
 				7AA783BB15E7BFEB00ED18DB /* main.m in Sources */,
 				7A9AD847160AD07C004CA126 /* SVHTTPClient.m in Sources */,
 				7A9AD84A160AD089004CA126 /* SVHTTPRequest.m in Sources */,
+				7AC54FF41652EB35000B8175 /* UIDevice+Resolutions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

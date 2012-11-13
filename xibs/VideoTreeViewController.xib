@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1536</int>
 		<string key="IBDocument.SystemVersion">12C54</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2840</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2843</string>
 		<string key="IBDocument.AppKitVersion">1187.34</string>
 		<string key="IBDocument.HIToolboxVersion">625.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-			<string key="NS.object.0">1926</string>
+			<string key="NS.object.0">1929</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -672,6 +672,7 @@
 								<int key="NSvFlags">292</int>
 								<string key="NSFrame">{{674, 417}, {80, 21}}</string>
 								<reference key="NSSuperview" ref="371440629"/>
+								<reference key="NSNextKeyView"/>
 								<string key="NSReuseIdentifierKey">_NS:327</string>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
@@ -1871,6 +1872,6 @@
 				<string>{36, 21}</string>
 			</object>
 		</object>
-		<string key="IBCocoaTouchPluginVersion">1926</string>
+		<string key="IBCocoaTouchPluginVersion">1929</string>
 	</data>
 </archive>
