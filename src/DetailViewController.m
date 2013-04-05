@@ -245,6 +245,7 @@
                 if (error.code == -1012)
                 {
                     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                    [defaults setObject:[defaults stringForKey:@"Username"] forKey:@"Initials"];
                     [SVHTTPRequest POST:[NSString stringWithFormat:@"https://%@:%@/login",
                                          [defaults stringForKey:@"ServerIP"], [defaults stringForKey:@"ServerPort"]]
                              parameters:[NSDictionary dictionaryWithObjectsAndKeys:
