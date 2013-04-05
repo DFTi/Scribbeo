@@ -1791,12 +1791,12 @@ editButton, initials, episode, playerItem, slideshowTimer, theTimer, noteTableSe
 
 -(IBAction) save
 {
-    if ([self datastoreAvailable] == NO) {
-        [UIAlertView doAlert:  @"Cannot Save Note"
-                     withMsg:@"There is no connectivity to the remote datastore. Please check your network connectivity."];
-        return;
-    }
-    
+//    if ([self datastoreAvailable] == NO) {
+//        [UIAlertView doAlert:  @"Cannot Save Note"
+//                     withMsg:@"There is no connectivity to the remote datastore. Please check your network connectivity."];
+//        return;
+//    }
+  
     // Dismiss the keyboard if it's showing
     
     if (keyboardShows)  {
